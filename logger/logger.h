@@ -15,7 +15,7 @@
 #define WHITE 6
 
 char *close_color = "\x1b[0m";
-char __buf[256], __buf2[256], __buf3[256], __buf4[256];
+char __buf[256], __buf2[256], __buf3[256];
 
 typedef enum {
   Red,
@@ -39,6 +39,7 @@ typedef enum {
 Color color_of_level(LogLevel level);
 char* string_of_color(Color color);
 char* string_of_level(LogLevel level);
+void perror_exit(char* msg);
 
 #define colorf(color, fmt, ...) \
   memset(&__buf, 0, sizeof(__buf)); \
@@ -46,31 +47,52 @@ char* string_of_level(LogLevel level);
     string_of_color(color), fmt, close_color); \
   fprintf(stdout, __buf, ##__VA_ARGS__);
 
-#define successf(fmt, ...) colorf(GREEN, fmt, ##__VA_ARGS__);
-#define infof(fmt, ...) colorf(YELLOW, fmt, ##__VA_ARGS__);
-#define errorf(fmt, ...) colorf(RED, fmt, ##__VA_ARGS__);
+#define greenf(fmt, ...) colorf(GREEN, fmt, ##__VA_ARGS__);
+#define yellowf(fmt, ...) colorf(YELLOW, fmt, ##__VA_ARGS__);
+#define redf(fmt, ...) colorf(RED, fmt, ##__VA_ARGS__);
+#define bluef(fmt, ...) colorf(BLUE, fmt, ##__VA_ARGS__);
+#define magentaf(fmt, ...) colorf(MAGENTA, fmt, ##__VA_ARGS__);
+#define cyanf(fmt, ...) colorf(CYAN, fmt, ##__VA_ARGS__);
+#define whitef(fmt, ...) colorf(WHITE, fmt, ##__VA_ARGS__);
 
 #define error_exitf(fmt, ...) \
   memset(&__buf2, 0, sizeof(__buf2)); \
   sprintf(__buf2, "Error in %s:%d in function %s: %s", \
     __FILE__, __LINE__, __func__, fmt); \
-  errorf(__buf2, ##__VA_ARGS__); \
+  redf(__buf2, ##__VA_ARGS__); \
   exit(EXIT_FAILURE);
 
-#define perror_exit(msg) \
-  memset(&__buf3, 0, sizeof(__buf3)); \
-  if (strncmp(strerror(errno), "Success", 7) == 0) { \
-    sprintf(__buf3, "%s", msg); \
-  } else { \
-    sprintf(__buf3, "%s => %s", msg, strerror(errno));	\
-  } \
-  error_exitf(__buf3, NULL);
-
 #define logf(level, fmt, ...) \
-  memset(&__buf4, 0, sizeof(__buf4)); \
-  sprintf(__buf4, "[%s] %s:%d in function %s: %s", \
+  memset(&__buf3, 0, sizeof(__buf3)); \
+  sprintf(__buf3, "[%s] %s:%d in function %s: %s", \
     string_of_level(level), __FILE__, __LINE__, __func__, fmt); \
-  colorf(color_of_level(level), __buf4, ##__VA_ARGS__);
+  colorf(color_of_level(level), __buf3, ##__VA_ARGS__);
+
+/* #define logf2(level, fmt, ...) \ */
+/*   __logf(__FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__); */
+
+/* void __logf(char* filename, int line, char* function, char* fmt, ...) {} */
+
+#define log_successf(fmt, ...) logf(Success, fmt, ##__VA_ARGS__);
+#define log_infof(fmt, ...) logf(Info, fmt, ##__VA_ARGS__);
+#define log_debugf(fmt, ...) logf(Debug, fmt, ##__VA_ARGS__);
+#define log_warningf(fmt, ...) logf(Warning, fmt, ##__VA_ARGS__);
+#define log_errorf(fmt, ...) logf(Error, fmt, ##__VA_ARGS__);
+#define log_fatalf(fmt, ...) logf(Fatal, fmt, ##__VA_ARGS__);
+
+void perror_exit(char* msg) {
+  char buf[256];
+
+  memset(&buf, 0, sizeof(buf));
+
+  if (strncmp(strerror(errno), "Success", 7) == 0) {
+    sprintf(buf, "%s", msg);
+  } else {
+    sprintf(buf, "%s => %s", msg, strerror(errno));
+  }
+
+  error_exitf(buf, NULL);
+}
 
 char* string_of_color(Color color) {
   char *res = "";
