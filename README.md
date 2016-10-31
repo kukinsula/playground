@@ -10,3 +10,4 @@ TODO:
 
 * Framework de test unitaire en C avec des MACCROS
 * Parser d'arguments CLI
+* Lib de log
