@@ -43,7 +43,7 @@ void perror_exit(char* msg);
 
 #define colorf(color, fmt, ...) \
   memset(&__buf, 0, sizeof(__buf)); \
-  sprintf(__buf, "%s%s%s\n", \
+  sprintf(__buf, "%s%s%s", \
     string_of_color(color), fmt, close_color); \
   fprintf(stdout, __buf, ##__VA_ARGS__);
 
