@@ -3,6 +3,8 @@
 
 #include "../logger/logger.h"
 
+#define FUNCTION_NAME_LEN 128
+
 /** Unit test framework.
  *
  * This is a little framework of unit tests: it allows to easily assert values.
@@ -18,78 +20,66 @@
  * it prints a red message containing information about that failure.
  */
 
-char __current_test_name[128] = "";
+char __current_test_name[FUNCTION_NAME_LEN] = "";
+int __first_unit_test;
 int __current_test, __passed_tests, __failed_tests;
 int __asserts, __passed_asserts, __failed_asserts;
 int __asserts_in_test, __passed_asserts_in_test, __failed_asserts_in_test;
 
 void INIT_TEST();
 void INIT_UNIT_TEST();
-void PRINT_TESTS_RESULT();
+void EXIT_TEST();
 void __assert(int value, int expected_value, char* message, char* filename, int line, const char* function);
 
 void INIT_TEST() {
+  __first_unit_test = 1;
+
   __current_test = 0;
   __passed_tests = 0;
   __failed_tests = 0;
-  __asserts = 0;
+
   __passed_asserts = 0;
   __failed_asserts = 0;
+
+  __asserts = 0;
 
   INIT_UNIT_TEST();
 }
 
 void INIT_UNIT_TEST() {
+  __asserts_in_test = 0;
   __passed_asserts_in_test = 0;
   __failed_asserts_in_test = 0;
-}
-
-void PRINT_TESTS_RESULT() {
-  int color;
-
-  if (__passed_tests == __current_test) {
-    color = Green;
-  } else if (__passed_tests < 3 * __current_test / 4) {
-    color = Yellow;
-  } else {
-    color = Red;
-  }
-
-  printf("\nICI 2 __asserts_in_test = %d, __asserts = %d\n", __asserts_in_test, __asserts);
-
-  whitef("\n\nUnit tests result:\t", NULL);
-  colorf(color, "[Passed / Failed / Total] = [%d / %d / %d]\n",
-    __passed_tests, __current_test - __passed_tests, __current_test);
-
-  whitef("Asserts result: ", NULL);
-  colorf(color, "\t[Passed / Failed / Total] = [%d / %d / %d]\n",
-    color, __passed_asserts, __failed_asserts, __asserts);
 }
 
 #define ASSERT(value, expected_value, msg) \
   __assert(value, expected_value, msg, __FILE__, __LINE__, __func__)
 
-#define ASSERT_TRUE(value) ASSERT(value, 1, "true")
-#define ASSERT_FALSE(value) ASSERT(value, 0, "false")
-#define ASSERT_EQUALS(value, expected_value) ASSERT(value, expected_value, "equals")
-#define ASSERT_NOT_EQUALS(value, expected_value) ASSERT(value, expected_value, "not equals")
+#define ASSERT_TRUE(value) ASSERT(value, 1, "ASSERT_TRUE")
+#define ASSERT_FALSE(value) ASSERT(value, 0, "ASSERT_FALSE")
+#define ASSERT_EQUALS(value, expected_value) ASSERT(value, expected_value, "ASSERT_EQUALS")
+#define ASSERT_NOT_EQUALS(value, expected_value) ASSERT(value, expected_value, "ASSERT_NOT_EQUALS")
 
 void __assert(int value, int expected_value, char* message, char* filename, int line, const char* function) {
-  __asserts_in_test++;
-  __asserts++;
+  if (__first_unit_test) {
+    __first_unit_test = 0;
 
-  printf("\nICI 1 __asserts_in_test = %d, __asserts = %d\n", __asserts_in_test, __asserts);
-
-  if (strcmp(__current_test_name, "") == 0) {
+    strncpy(__current_test_name, function, FUNCTION_NAME_LEN);
   }
 
-  if (strcmp(__current_test_name, function) != 0) {
-    strcpy(__current_test_name, function);
+  __asserts++;
+  
+  if (value == expected_value) {
+    __passed_asserts_in_test++;
+  } else {
+    __failed_asserts_in_test++;
 
-    __current_test++;
-    __passed_asserts += __passed_asserts_in_test;
-    __failed_asserts += __failed_asserts_in_test;
+    redf("[ FAILED ASSERT ] %s:%d in %s:\n\n\t", filename, line, function);
+    redf("%s expected %d instead of %d", message, expected_value, value);
+  }
 
+  /* if new unit test */
+  if (strncmp(__current_test_name, function, strlen(function)) != 0) {
     if (__failed_asserts_in_test > 0) {
       __failed_tests++;
       redf("#%d unit test %s failed %d asserts out of %d\n",
@@ -100,16 +90,36 @@ void __assert(int value, int expected_value, char* message, char* filename, int 
         __current_test, function, __passed_asserts_in_test);
     }
 
+    strncpy(__current_test_name, function, FUNCTION_NAME_LEN);
+
+    __current_test++;
+    __passed_asserts += __passed_asserts_in_test;
+    __failed_asserts += __failed_asserts_in_test;
+
     INIT_UNIT_TEST();
+  } else {
+    __asserts_in_test++;
+  }
+}
+
+void EXIT_TEST() {
+  int color;
+
+  if (__passed_tests == __current_test) {
+    color = Green;
+  } else if (__passed_tests < 3 * __current_test / 4) {
+    color = Yellow;
+  } else {
+    color = Red;
   }
 
-  if (value == expected_value) {
-    __passed_asserts_in_test++;
-  } else {
-    __failed_asserts_in_test++;
-    redf("#%d unit test %s failed asserting %s in file %s at line %d:\n\n\tError: expected %d instead of %d",
-      __current_test, function, message, filename, line, expected_value, value);
-  }
+  whitef("\n\nUnit tests result:\t", NULL);
+  colorf(color, "[Passed / Failed / Total] = [%d / %d / %d]\n",
+    __passed_tests, __current_test - __passed_tests, __current_test);
+
+  whitef("Asserts result: ", NULL);
+  colorf(color, "\t[Passed / Failed / Total] = [%d / %d / %d]\n",
+    __passed_asserts, __failed_asserts, __asserts);
 }
 
 #endif

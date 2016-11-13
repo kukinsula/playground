@@ -1,10 +1,16 @@
 #include "unit_test.h"
 
+void test_a();
+
 int main() {
   INIT_TEST();
 
-  ASSERT_TRUE(1);
-  ASSERT_FALSE(0);
+  test_a();
 
-  PRINT_TESTS_RESULT();
+  EXIT_TEST();
+}
+
+void test_a() {
+  ASSERT_TRUE(1);
+  ASSERT_TRUE(1);
 }
