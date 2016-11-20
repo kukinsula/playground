@@ -1,12 +1,14 @@
 package gogroup
 
 import (
+	_ "fmt"
 	"time"
 )
 
 type GoGroup struct {
-	nb                                             int64
-	add, done, ready, waiting, finished, interrupt chan struct{}
+	nb                                      int64
+	ready                                   chan struct{}
+	add, done, waiting, finished, interrupt chan struct{}
 }
 
 func NewGroup() *GoGroup {
@@ -27,12 +29,12 @@ func NewGroup() *GoGroup {
 
 func (g *GoGroup) Add() {
 	g.add <- struct{}{}
-	<-g.ready
+	g.lock()
 }
 
 func (g *GoGroup) Done() {
 	g.done <- struct{}{}
-	<-g.ready
+	g.lock()
 }
 
 func (g *GoGroup) Wait() {
@@ -40,19 +42,32 @@ func (g *GoGroup) Wait() {
 	<-g.finished
 }
 
-func (g *GoGroup) WaitWithTimeout(timeout time.Duration) {
+func (g *GoGroup) WaitWithTimeout(timeout time.Duration) bool {
+	timedout := false
+
 	g.waiting <- struct{}{}
 
 	select {
 	case <-time.After(timeout):
+		timedout = true
+		g.interrupt <- struct{}{}
+		break
+
 	case <-g.finished:
+		break
 	}
+
+	return timedout
 }
 
 func (g *GoGroup) Interrupt() {
 	g.interrupt <- struct{}{}
+	<-g.finished
 }
 
+// monitoring loops "infenitely" handling signals coming from g.add,
+// g.done and g.interrupt channels. The loops ends when the group is
+// waiting andthere is no goroutine running or on interrupt.
 func (g *GoGroup) monitoring() {
 	running := true
 
@@ -60,12 +75,13 @@ func (g *GoGroup) monitoring() {
 		select {
 		case <-g.add:
 			g.nb++
-			g.ready <- struct{}{}
+			g.unlock()
 			break
 
 		case <-g.done:
 			g.nb--
 
+			// If n = 0 we need to check if we're already waiting
 			if g.nb == 0 {
 				select {
 				case <-g.waiting:
@@ -77,7 +93,7 @@ func (g *GoGroup) monitoring() {
 				}
 			}
 
-			g.ready <- struct{}{}
+			g.unlock()
 			break
 
 		case <-g.interrupt:
@@ -88,3 +104,7 @@ func (g *GoGroup) monitoring() {
 
 	g.finished <- struct{}{}
 }
+
+// locks and unlocks nb
+func (g *GoGroup) lock()   { <-g.ready }
+func (g *GoGroup) unlock() { g.ready <- struct{}{} }
