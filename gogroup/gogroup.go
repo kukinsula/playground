@@ -5,12 +5,14 @@ import (
 	"time"
 )
 
+// GoGroup aims to handle multiple goroutines from their begining to their end.
 type GoGroup struct {
 	nb                                      int64
 	ready                                   chan struct{}
 	add, done, waiting, finished, interrupt chan struct{}
 }
 
+// NewGroup returns a new GoGroup.
 func NewGroup() *GoGroup {
 	group := &GoGroup{
 		nb:        0,
@@ -22,29 +24,37 @@ func NewGroup() *GoGroup {
 		waiting:   make(chan struct{}),
 	}
 
+	// monitoring is started in a goroutine and will receive signals
+	// through the group's channels
 	go group.monitoring()
 
 	return group
 }
 
+// Add should be called before the begining of a Gorutine.
 func (g *GoGroup) Add() {
-	g.add <- struct{}{}
-	g.lock()
+	g.add <- struct{}{} // signals monitoring a goroutine was added
+	<-g.ready           // wait for monitoring to free ready
 }
 
+// Done should be called when a goroutine, previously added, is done.
 func (g *GoGroup) Done() {
-	g.done <- struct{}{}
-	g.lock()
+	g.done <- struct{}{} // signals monitoring a goroutine ended
+	<-g.ready            // waits for monitoring to free ready
 }
 
+// Wait waits for all goroutines to be Done.
 func (g *GoGroup) Wait() {
 	g.waiting <- struct{}{}
 	<-g.finished
 }
 
+// WaitWithTimeout waits for all goroutines to be Done or timeout expiration.
+// It returns true if the timeout expired, false otherwise.
 func (g *GoGroup) WaitWithTimeout(timeout time.Duration) bool {
 	timedout := false
 
+	// Signals monitoring we start waiting
 	g.waiting <- struct{}{}
 
 	select {
@@ -60,6 +70,8 @@ func (g *GoGroup) WaitWithTimeout(timeout time.Duration) bool {
 	return timedout
 }
 
+// Interrupt unblocks Wait or WaitWithTimeout even if some goroutines added
+// are still alive
 func (g *GoGroup) Interrupt() {
 	g.interrupt <- struct{}{}
 	<-g.finished
@@ -75,16 +87,17 @@ func (g *GoGroup) monitoring() {
 		select {
 		case <-g.add:
 			g.nb++
-			g.unlock()
+
+			// unlocks channel held by Add
+			g.ready <- struct{}{}
 			break
 
 		case <-g.done:
 			g.nb--
 
-			// If n = 0 we need to check if we're already waiting
 			if g.nb == 0 {
 				select {
-				case <-g.waiting:
+				case <-g.waiting: // Are we already waiting ?
 					running = false
 					break
 
@@ -93,7 +106,8 @@ func (g *GoGroup) monitoring() {
 				}
 			}
 
-			g.unlock()
+			// Unlocks channel held by Done
+			g.ready <- struct{}{}
 			break
 
 		case <-g.interrupt:
@@ -102,9 +116,6 @@ func (g *GoGroup) monitoring() {
 		}
 	}
 
+	// Unlocks channel held by Wait
 	g.finished <- struct{}{}
 }
-
-// locks and unlocks nb
-func (g *GoGroup) lock()   { <-g.ready }
-func (g *GoGroup) unlock() { g.ready <- struct{}{} }

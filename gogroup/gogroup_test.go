@@ -36,7 +36,7 @@ func TestGoGroupWithTimeout(t *testing.T) {
 	// 	group.Add()
 	// 	go func() {
 	// 		defer group.Done()
-	// 		time.Sleep(1 * time.Second)
+	// 		time.Sleep(10 * time.Second)
 	// 	}()
 	// }
 
@@ -71,24 +71,25 @@ func TestGoGroupGroup(t *testing.T) {
 	father.Wait()
 }
 
+// Creates max 8192 simultaneous goroutines (go -race imposes that).
 func TestGoGroupGroupGroup(t *testing.T) {
 	grandfather := NewGroup()
 
-	for i := 0; i < 10; i++ { // GrandFather
+	for i := 0; i < 2; i++ { // GrandFather
 		grandfather.Add()
 		go func(grandfather *GoGroup) {
 			defer grandfather.Done()
 
 			father := NewGroup()
 
-			for j := 0; j < 100; j++ { // Father
+			for j := 0; j < 4; j++ { // Father
 				father.Add()
 				go func(father *GoGroup) {
 					defer father.Done()
 
 					son := NewGroup()
 
-					for k := 0; k < 100; k++ { // Son
+					for k := 0; k < 1024; k++ { // Son
 						son.Add()
 						go func() {
 							defer son.Done()
