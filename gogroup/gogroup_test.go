@@ -2,6 +2,7 @@ package gogroup
 
 import (
 	_ "fmt"
+	"sync"
 	"testing"
 	"time"
 )
@@ -10,7 +11,7 @@ func TestGoGroup(t *testing.T) {
 	group := NewGroup()
 
 	for i := 0; i < 1000; i++ {
-		group.Add()
+		group.Add(1)
 		go group.Done()
 	}
 
@@ -21,7 +22,7 @@ func TestGoGroupWithTimeout(t *testing.T) {
 	group := NewGroup()
 
 	for i := 0; i < 1000; i++ {
-		group.Add()
+		group.Add(1)
 		go group.Done()
 	}
 
@@ -33,7 +34,7 @@ func TestGoGroupWithTimeout(t *testing.T) {
 	// group = NewGroup()
 
 	// for i := 0; i < 1; i++ {
-	// 	group.Add()
+	// 	group.Add(1)
 	// 	go func() {
 	// 		defer group.Done()
 	// 		time.Sleep(10 * time.Second)
@@ -50,14 +51,14 @@ func TestGoGroupGroup(t *testing.T) {
 	father := NewGroup()
 
 	for i := 0; i < 10; i++ { // Father
-		father.Add()
+		father.Add(1)
 		go func(father *GoGroup) {
 			defer father.Done()
 
 			son := NewGroup()
 
 			for j := 0; j < 100; j++ { // Son
-				son.Add()
+				son.Add(1)
 				go func() {
 					defer son.Done()
 					go time.Sleep(1 * time.Millisecond)
@@ -76,21 +77,21 @@ func TestGoGroupGroupGroup(t *testing.T) {
 	grandfather := NewGroup()
 
 	for i := 0; i < 2; i++ { // GrandFather
-		grandfather.Add()
+		grandfather.Add(1)
 		go func(grandfather *GoGroup) {
 			defer grandfather.Done()
 
 			father := NewGroup()
 
 			for j := 0; j < 4; j++ { // Father
-				father.Add()
+				father.Add(1)
 				go func(father *GoGroup) {
 					defer father.Done()
 
 					son := NewGroup()
 
 					for k := 0; k < 1024; k++ { // Son
-						son.Add()
+						son.Add(1)
 						go func() {
 							defer son.Done()
 
@@ -109,11 +110,22 @@ func TestGoGroupGroupGroup(t *testing.T) {
 	grandfather.Wait()
 }
 
-func BenchmarckGoGroup(b *testing.B) {
+func BenchmarkSGoGroup(b *testing.B) {
 	group := NewGroup()
 
 	for n := 0; n < b.N; n++ {
-		group.Add()
+		group.Add(1)
+		go group.Done()
+	}
+
+	group.Wait()
+}
+
+func BenchmarkSWaitGroup(b *testing.B) {
+	var group sync.WaitGroup
+
+	for n := 0; n < b.N; n++ {
+		group.Add(1)
 		go group.Done()
 	}
 

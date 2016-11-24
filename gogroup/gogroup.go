@@ -7,16 +7,17 @@ import (
 
 // GoGroup aims to handle multiple goroutines from their begining to their end.
 type GoGroup struct {
-	nb                                      int64
-	ready                                   chan struct{}
-	add, done, waiting, finished, interrupt chan struct{}
+	nb                                 int
+	add                                chan int
+	ready                              chan struct{}
+	done, waiting, finished, interrupt chan struct{}
 }
 
 // NewGroup returns a new GoGroup.
 func NewGroup() *GoGroup {
 	group := &GoGroup{
 		nb:        0,
-		add:       make(chan struct{}),
+		add:       make(chan int),
 		done:      make(chan struct{}),
 		ready:     make(chan struct{}),
 		finished:  make(chan struct{}),
@@ -25,22 +26,22 @@ func NewGroup() *GoGroup {
 	}
 
 	// monitoring is started in a goroutine and will receive signals
-	// through the group's channels
+	// through the group's channels.
 	go group.monitoring()
 
 	return group
 }
 
-// Add should be called before the begining of a Gorutine.
-func (g *GoGroup) Add() {
-	g.add <- struct{}{} // signals monitoring a goroutine was added
-	<-g.ready           // wait for monitoring to free ready
+// Add should be called before the begining of a Goroutine.
+func (g *GoGroup) Add(delta int) {
+	g.add <- delta
+	<-g.ready
 }
 
 // Done should be called when a goroutine, previously added, is done.
 func (g *GoGroup) Done() {
-	g.done <- struct{}{} // signals monitoring a goroutine ended
-	<-g.ready            // waits for monitoring to free ready
+	g.done <- struct{}{}
+	<-g.ready
 }
 
 // Wait waits for all goroutines to be Done.
@@ -85,8 +86,8 @@ func (g *GoGroup) monitoring() {
 
 	for running {
 		select {
-		case <-g.add:
-			g.nb++
+		case delta := <-g.add:
+			g.nb += delta
 
 			// unlocks channel held by Add
 			g.ready <- struct{}{}
