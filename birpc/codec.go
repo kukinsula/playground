@@ -90,7 +90,7 @@ func (u *ugorgiCodec) WriteRequest(req *Request, params interface{}) error {
 		return err
 	}
 
-	return u.dec.Decode(params)
+	return u.enc.Encode(params)
 }
 
 func (u *ugorgiCodec) WriteResponse(resp *Response, result interface{}) error {
@@ -99,7 +99,7 @@ func (u *ugorgiCodec) WriteResponse(resp *Response, result interface{}) error {
 		return err
 	}
 
-	return u.dec.Decode(result)
+	return u.enc.Encode(result)
 }
 
 func (u *ugorgiCodec) Close() error {
@@ -149,7 +149,10 @@ func CreateBufferedCode(name string, rwc io.ReadWriteCloser, size int) (codec *B
 func createUgorjiHandle(name string) (handle ugorji.Handle, err error) {
 	switch name {
 	case JSON:
-		handle = new(ugorji.JsonHandle)
+		jsHandle := new(ugorji.JsonHandle)
+		jsHandle.StructToArray = true
+
+		handle = jsHandle
 	case MSGPACK:
 		handle = new(ugorji.MsgpackHandle)
 	case BINC:

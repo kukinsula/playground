@@ -10,8 +10,7 @@ const (
 )
 
 type Client struct {
-	*BiRPC
-
+	BiRPC
 	conn     net.Conn
 	services *ServiceSet
 }
@@ -38,10 +37,8 @@ func NewClientWithCodec(conn net.Conn, codec *BufferedCodec, services *ServiceSe
 		services: services,
 	}
 
-	birpc := NewBiRPC(codec, client)
-	birpc.Prefix = conn.LocalAddr().String()
-
-	client.BiRPC = birpc
+	initBiRPC(&client.BiRPC, codec, client)
+	client.Prefix = conn.LocalAddr().String()
 
 	return client
 }

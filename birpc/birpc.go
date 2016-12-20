@@ -56,8 +56,16 @@ func NewBiRPC(codec *BufferedCodec, m Messager) *BiRPC {
 		messager: m,
 		seq:      startSeq,
 		calls:    make(map[uint32]*Call),
-		stop:     make(chan struct{}, 1),
+		stop:     make(chan struct{}),
 	}
+}
+
+func initBiRPC(b *BiRPC, codec *BufferedCodec, m Messager) {
+	b.codec = codec
+	b.messager = m
+	b.seq = startSeq
+	b.calls = make(map[uint32]*Call)
+	b.stop = make(chan struct{}, 1)
 }
 
 func (b *BiRPC) Start() {
@@ -70,9 +78,6 @@ func (b *BiRPC) Start() {
 	}
 
 	for b.isRunning() {
-		// msg := b.messager.EmptyMessage()
-		// var msg interface{}
-
 		req := Request{}
 		resp := Response{}
 
@@ -81,19 +86,21 @@ func (b *BiRPC) Start() {
 			_, stopped := b.getShutdonwStopped()
 			if stopped {
 				err = ErrBiRPCStopped
-			} else if verbose {
-				logger.Printf("%s> decode message failed: %s", b.Prefix, err)
+			} else {
 				b.setShutdown(true)
+			}
+
+			if verbose {
+				logger.Printf("%s> read header failed: %s", b.Prefix, err)
 			}
 
 			break
 		}
 
-		b.group.Add(1)
 		go b.handle(&req, &resp)
 	}
 
-	b.cancelPendingCalls()
+	b.cancelPendingCalls(err)
 
 	if verbose {
 		logger.Printf("%s> birpc finished (err: %s)", b.Prefix, err)
@@ -105,71 +112,107 @@ func (b *BiRPC) Start() {
 func (b *BiRPC) handle(req *Request, resp *Response) {
 	var err error
 
-	if req.Method != "" { // Message received is a request
+	b.group.Add(1)
+
+	if req.Method != "" {
+		err = b.handleRequest(req)
+	} else {
+		err = b.handleResponse(resp)
+	}
+
+	if !b.isRunning() {
+		err = ErrBiRPCStopped
+	}
+
+	if err != nil {
+		logger.Printf("%s> handle %s, %s failed: %s\n", b.Prefix, req, resp, err)
+	}
+
+	b.group.Done()
+}
+
+func (b *BiRPC) handleRequest(req *Request) error {
+	if verbose {
+		logger.Printf("%s> <- %s\n", b.Prefix, req)
+	}
+
+	result, err := b.messager.OnRequest(req)
+
+	if verbose {
+		logger.Printf("%s> exec service '%s' returned result=%v and err=%v\n",
+			b.Prefix, req.Method, result, err)
+	}
+
+	if req.Seq != notificationSeq { // If not a notification
+		resp := &Response{
+			Seq:    req.Seq,
+			Result: result,
+			Error:  err,
+		}
+
+		err = b.codec.WriteResponse(resp, result)
+		if err != nil {
+			logger.Printf("%s> WriteResponse failed: %s", b.Prefix, err)
+			return err
+		}
+
+		logger.Printf("%s> ICICICICI", b.Prefix)
+
+		err = b.codec.Flush()
+		if err != nil {
+			logger.Printf("%s> Flush failed: %s", b.Prefix, err)
+			return err
+		}
+
 		if verbose {
-			logger.Printf("%s> <- %s\n", b.Prefix, req)
-		}
-
-		result, err := b.messager.OnRequest(req)
-
-		if req.Seq != notificationSeq { // If not a notification
-			resp.Seq = req.Seq
-			resp.Result = result
-			resp.Error = err
-
-			err = b.codec.WriteResponse(resp, result)
-			if err != nil {
-				logger.Printf("%s> WriteResponse failed: %s", b.Prefix, err)
-			} else if verbose {
-				logger.Printf("%s> -> %s\n", b.Prefix, resp)
-			}
-
-			err = b.codec.Flush()
-			if err != nil {
-				logger.Printf("%s> Flush failed: %s", b.Prefix, err)
-			}
-		}
-	} else { // Message received is a response
-		if verbose {
-			logger.Printf("%s> <- %s\n", b.Prefix, resp)
-		}
-
-		call := b.unregisterCall(resp.Seq)
-
-		switch {
-		case call == nil:
-			if verbose {
-				logger.Println("%s> Call #%d not found", b.Prefix, resp.Seq)
-			}
-
-			err = b.codec.ReadResponseBody(nil)
-			if err != nil {
-				logger.Println("%s> ReadResponseBody failed: %s", b.Prefix, err)
-			}
-
-		case resp.Error != nil:
-			call.Error = resp.Error
-
-			err = b.codec.ReadResponseBody(nil)
-			if err != nil {
-				logger.Println("%s> ReadResponseBody failed: %s", b.Prefix, err)
-			}
-
-			call.done()
-
-		default:
-			err = b.codec.ReadResponseBody(call.Result)
-			if err != nil {
-				logger.Println("%s> ReadResponseBody failed: %s", err)
-			}
-
-			call.done()
+			logger.Printf("%s> -> %s\n", b.Prefix, resp)
 		}
 	}
+
+	return nil
+}
+
+func (b *BiRPC) handleResponse(resp *Response) (err error) {
+	if verbose {
+		logger.Printf("%s> <- %s\n", b.Prefix, resp)
+	}
+
+	call := b.unregisterCall(resp.Seq)
+
+	if call == nil {
+		if verbose {
+			logger.Println("%s> Call #%d not found", b.Prefix, resp.Seq)
+		}
+
+		err = b.codec.ReadResponseBody(nil)
+		if err != nil {
+			return err
+		}
+	} else if resp.Error != nil {
+		call.Error = resp.Error
+
+		err = b.codec.ReadResponseBody(nil)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = b.codec.ReadResponseBody(call.Result)
+		if err != nil {
+			return err
+		}
+	}
+
+	call.done()
+
+	if verbose {
+		logger.Println("%s> <- %s", b.Prefix, resp)
+	}
+
+	return nil
 }
 
 func (b *BiRPC) Stop() {
-	b.setStopped(false)
+	b.setStopped(true)
 	b.codec.Close()
 	<-b.stop
 }
@@ -286,6 +329,7 @@ func (b *BiRPC) send(call *Call, notification bool) (err error) {
 	req := &Request{
 		Seq:    seq,
 		Method: call.Method,
+		Params: call.Params,
 	}
 
 	err = b.codec.WriteRequest(req, call.Params)
@@ -298,14 +342,31 @@ func (b *BiRPC) send(call *Call, notification bool) (err error) {
 		}
 	}
 
-	return b.codec.Flush()
+	err = b.codec.Flush()
+	if err != nil {
+		return err
+	}
+
+	if verbose {
+		logger.Printf("%s> -> %s\n", b.Prefix, req)
+	}
+
+	return nil
 }
 
-func (b *BiRPC) cancelPendingCalls() {
+func (b *BiRPC) cancelPendingCalls(err error) {
 	b.callsLock.Lock()
 
+	if err == nil {
+		err = ErrCanceledCall
+	}
+
+	if verbose {
+		logger.Printf("%s> canceling %d call(s)\n", b.Prefix, len(b.calls))
+	}
+
 	for _, call := range b.calls {
-		call.Error = ErrCanceledCall
+		call.Error = err
 		call.done()
 	}
 

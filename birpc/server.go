@@ -114,12 +114,12 @@ func (s *Server) startHandler(handler func(conn net.Conn)) {
 		go func(conn net.Conn) {
 			handler(conn)
 
+			conn.Close()
 			if verbose {
-				logger.Printf("Server %s> connection from %s ended!",
+				logger.Printf("Server %s> connection to %s closed ",
 					s.Prefix, conn.RemoteAddr())
 			}
 
-			conn.Close()
 			s.group.Done()
 		}(conn)
 	}
@@ -152,8 +152,8 @@ func (s *Server) Stop() {
 	}
 
 	s.Close()
+	s.CloseAllClients()
 	<-s.stop
-	s.listener = nil
 
 	if verbose {
 		logger.Printf("Server %s> stopped!", s.Prefix)
