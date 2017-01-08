@@ -6,11 +6,16 @@ import (
 )
 
 type Service interface {
+	// Exec executes a service, it takes a RPC Request and a second parameter that
+	// can be anything. It must return two things: the result of the servie and an
+	// error in case the service encountered an error.
 	Exec(req *Request, v interface{}) (interface{}, error)
 }
 
+// ServiceFunc is a Service build from a function with the same signature.
 type ServiceFunc func(req *Request, v interface{}) (interface{}, error)
 
+// ServiceSet is a set of Services.
 type ServiceSet struct {
 	services map[string]Service
 	lock     sync.RWMutex
@@ -71,7 +76,7 @@ func (s *ServiceSet) Get(name string) (service Service, err error) {
 func (s *ServiceSet) Exists(name string) bool {
 	_, err := s.Get(name)
 
-	return err != nil
+	return err == nil
 }
 
 func (s *ServiceSet) Exec(req *Request, v interface{}) (interface{}, error) {

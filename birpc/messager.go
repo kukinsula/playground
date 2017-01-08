@@ -5,15 +5,16 @@ import (
 )
 
 type Messager interface {
-	// MessageBuilder
-	// Parse(v interface{}) (req *Request, resp *Response, err error)
+	MessageBuilder
+	Parse(v interface{}) (req *Request, resp *Response, err error)
 	OnRequest(req *Request) (interface{}, error)
 }
 
 type MessageBuilder interface {
-	EmptyMessage() interface{}
+	MessageContainer() interface{}
 	BuildRequest(seq uint32, method string, params interface{}) interface{}
 	BuildResponse(seq uint32, result interface{}, err error) interface{}
+	// BuildNotification(method string, params interface{}) interface{}
 }
 
 type Request struct {

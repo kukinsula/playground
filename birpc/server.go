@@ -25,24 +25,18 @@ func SetLogger(l *log.Logger) {
 }
 
 type Server struct {
-	*ServiceSet
-
-	listener net.Listener
-
+	ServiceSet
+	listener    net.Listener
 	runningLock sync.RWMutex
 	running     bool
-
-	group sync.WaitGroup
-
+	group       sync.WaitGroup
 	clientsLock sync.RWMutex
 	clients     map[string]net.Conn
-
-	stop chan struct{}
-
-	Prefix string
+	stop        chan struct{}
+	Prefix      string
 }
 
-func NewServerNetworkHostPort(network, host, port string) (*Server, error) {
+func NewServerOnNetworkHostPort(network, host, port string) (*Server, error) {
 	address := host + ":" + port
 
 	listener, err := net.Listen(network, address)
@@ -55,7 +49,7 @@ func NewServerNetworkHostPort(network, host, port string) (*Server, error) {
 	}
 
 	return &Server{
-		ServiceSet: NewServiceSet(),
+		ServiceSet: *NewServiceSet(),
 		listener:   listener,
 		running:    false,
 		clients:    make(map[string]net.Conn),
@@ -65,7 +59,7 @@ func NewServerNetworkHostPort(network, host, port string) (*Server, error) {
 }
 
 func NewTCPServer(host, port string) (*Server, error) {
-	return NewServerNetworkHostPort("tcp", host, port)
+	return NewServerOnNetworkHostPort("tcp", host, port)
 }
 
 func (s *Server) Start() {
@@ -76,13 +70,9 @@ func (s *Server) StartHandler(handler func(conn net.Conn)) {
 	s.startHandler(handler)
 }
 
-func (s *Server) startHandler(handler func(conn net.Conn)) {
+func (s *Server) startHandler(handler func(conn net.Conn)) (err error) {
 	if s.isRunning() {
 		panic("Server should not be started more than once")
-	}
-
-	if s.listener == nil {
-		panic("Server was already stopped (see Reset)")
 	}
 
 	s.setRunning(true)
@@ -114,7 +104,6 @@ func (s *Server) startHandler(handler func(conn net.Conn)) {
 		go func(conn net.Conn) {
 			handler(conn)
 
-			conn.Close()
 			if verbose {
 				logger.Printf("Server %s> connection to %s closed ",
 					s.Prefix, conn.RemoteAddr())
@@ -124,17 +113,28 @@ func (s *Server) startHandler(handler func(conn net.Conn)) {
 		}(conn)
 	}
 
+	if err != nil && verbose {
+		logger.Printf("Server %s> ended with error: ", s.Prefix, err)
+	}
+
 	s.stop <- struct{}{}
+
+	return err
 }
 
 func (s *Server) ServeConn(conn net.Conn) {
 	s.ServeCodec(conn, NewGobBufferedCodec(conn, bufSize))
 }
 
-func (s *Server) ServeCodec(conn net.Conn, codec *BufferedCodec) {
+func (s *Server) ServeCodec(conn net.Conn, codec Codec) {
+	client := NewClientWithCodec(conn, codec, &s.ServiceSet)
+	s.ServeCodecWithMessager(conn, codec, client)
+}
+
+func (s *Server) ServeCodecWithMessager(conn net.Conn, codec Codec, m Messager) {
 	s.Register(conn)
 
-	client := NewClientWithCodec(conn, codec, s.ServiceSet)
+	client := NewClientWithCodecWithMessageBuilder(conn, codec, &s.ServiceSet, m)
 	client.Start()
 
 	s.Unregister(conn)
@@ -161,7 +161,7 @@ func (s *Server) Stop() {
 }
 
 // func (s *Server) Reset(network, host, port string) error {
-// 	server, err := NewServerNetworkHostPort(network, host, port)
+// 	server, err := NewServerOnNetworkHostPort(network, host, port)
 // 	if err != nil {
 // 		return err
 // 	}

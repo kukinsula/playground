@@ -2,6 +2,7 @@ package birpc
 
 import (
 	"flag"
+	_ "fmt"
 	"net"
 	"testing"
 	"time"
@@ -10,7 +11,7 @@ import (
 const (
 	network = "tcp"
 	host    = "127.0.0.1"
-	port    = "20000"
+	port    = "22000"
 	address = host + ":" + port
 )
 
@@ -30,13 +31,13 @@ func connect(network, host, port string) (net.Conn, error) {
 	return net.Dial(network, address)
 }
 
-func newClientWithCodec(name string) (*Client, error) {
+func newClientWithCodec(name SerializerType) (*Client, error) {
 	conn, err := connect(network, host, port)
 	if err != nil {
 		return nil, err
 	}
 
-	codec, err := CreateBufferedCode(name, conn, bufSize)
+	codec, err := CreateBufferedCodec(name, conn, bufSize)
 	if err != nil {
 		return nil, err
 	}
@@ -45,9 +46,9 @@ func newClientWithCodec(name string) (*Client, error) {
 }
 
 func TestServerStartStop(t *testing.T) {
-	codecs := []string{JSON /* MSGPACK, CBOR, BINC, GOB */}
+	codecs := []SerializerType{JSON /*, MSGPACK, CBOR, BINC, GOB*/}
 
-	expextedResult := 42
+	expextedResult := uint64(42)
 	method := "foo"
 
 	for _, name := range codecs {
@@ -67,7 +68,7 @@ func TestServerStartStop(t *testing.T) {
 		go server.StartHandler(func(conn net.Conn) {
 			server.Register(conn)
 
-			codec, err := CreateBufferedCode(name, conn, bufSize)
+			codec, err := CreateBufferedCodec(name, conn, bufSize)
 			if err != nil {
 				t.Errorf("CreateBufferedCode: %s", err)
 				return
@@ -75,6 +76,8 @@ func TestServerStartStop(t *testing.T) {
 
 			server.ServeCodec(conn, codec)
 			server.Unregister(conn)
+
+			conn.Close()
 		})
 		sleep(100)
 
@@ -82,22 +85,23 @@ func TestServerStartStop(t *testing.T) {
 		go client.Start()
 		sleep(100)
 
-		// logger.Printf("Client calling %s...", method)
+		var res uint64
+		err = client.Call(method, 1234, &res)
+		if err != nil {
+			t.Errorf("Call %s should not fail: %s", method, err)
+		}
 
-		// var res int
-		// err = client.Call(method, 1234, &res)
-		// if err != nil {
-		// 	t.Errorf("Call %s should not fail: %s", err)
-		// }
-
-		// logger.Printf("Client call %s finished!", method)
-
-		// if res != 42 {
-		// 	t.Errorf("Call %s should return %d, not %d", method, expextedResult, res)
-		// }
+		if res != expextedResult {
+			t.Errorf("Call %s should returned %d, but expected not %d",
+				method, res, expextedResult)
+		}
 
 		client.Stop()
 		server.CloseAllClients()
 		server.Stop()
+
+		if verbose {
+			logger.Println()
+		}
 	}
 }

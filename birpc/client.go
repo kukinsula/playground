@@ -11,11 +11,16 @@ const (
 
 type Client struct {
 	BiRPC
+	MessageBuilder
 	conn     net.Conn
 	services *ServiceSet
 }
 
-type message struct {
+// Default Client's MessageBuilder.
+// See NewClientWithCodecWithMessageBuilder.
+type messageBuilder struct{}
+
+type Message struct {
 	Seq uint32 `json:"id"`
 
 	Method string      `json:"method,omitempty"`
@@ -31,36 +36,45 @@ func NewClient(conn net.Conn, services *ServiceSet) *Client {
 	return NewClientWithCodec(conn, codec, services)
 }
 
-func NewClientWithCodec(conn net.Conn, codec *BufferedCodec, services *ServiceSet) *Client {
+func NewClientWithCodec(conn net.Conn, codec Codec, services *ServiceSet) *Client {
+	return newClient(conn, codec, services, &messageBuilder{})
+}
+
+func NewClientWithCodecWithMessageBuilder(conn net.Conn, codec Codec, services *ServiceSet, m MessageBuilder) *Client {
+	return newClient(conn, codec, services, m)
+}
+
+func newClient(conn net.Conn, codec Codec, services *ServiceSet, m MessageBuilder) *Client {
 	client := &Client{
-		conn:     conn,
-		services: services,
+		MessageBuilder: m,
+		conn:           conn,
+		services:       services,
 	}
 
-	initBiRPC(&client.BiRPC, codec, client)
+	InitBiRPC(&client.BiRPC, codec, client)
 	client.Prefix = conn.LocalAddr().String()
 
 	return client
-}
-
-func (c *Client) EmptyMessage() interface{} {
-	return &message{}
 }
 
 func (c *Client) OnRequest(req *Request) (interface{}, error) {
 	return c.services.Exec(req, c)
 }
 
-func (c *Client) BuildRequest(seq uint32, method string, params interface{}) interface{} {
-	return &message{
+func (m *messageBuilder) MessageContainer() interface{} {
+	return &Message{}
+}
+
+func (m *messageBuilder) BuildRequest(seq uint32, method string, params interface{}) interface{} {
+	return &Message{
 		Seq:    seq,
 		Method: method,
 		Params: params,
 	}
 }
 
-func (c *Client) BuildResponse(seq uint32, result interface{}, err error) interface{} {
-	return &message{
+func (m *messageBuilder) BuildResponse(seq uint32, result interface{}, err error) interface{} {
+	return &Message{
 		Seq:    seq,
 		Result: result,
 		Error:  err,
@@ -68,17 +82,17 @@ func (c *Client) BuildResponse(seq uint32, result interface{}, err error) interf
 }
 
 func (c *Client) Parse(v interface{}) (req *Request, resp *Response, err error) {
-	var msg message
+	var msg Message
 
 	switch m := v.(type) {
-	case *message:
+	case *Message:
 		msg = *m
-	case message:
+	case Message:
 		msg = m
 
 	default:
 		err = fmt.Errorf(
-			"Client.Parse expected message type *message, not %T", v, v)
+			"Client.Parse expected Message type *Message, not %T", v, v)
 		return
 	}
 
@@ -101,23 +115,7 @@ func (c *Client) Parse(v interface{}) (req *Request, resp *Response, err error) 
 	return
 }
 
-func (m *message) Parse() (req *Request, resp *Response, err error) {
-	if m.Method != "" {
-		req.Seq = m.Seq
-		req.Method = m.Method
-		req.Params = m.Params
-	} else if m.Result != nil || m.Error != nil {
-		resp.Seq = m.Seq
-		resp.Result = m.Result
-		resp.Error = m.Error
-	} else {
-		err = ErrInvalidMessage
-	}
-
-	return
-}
-
-func (m *message) String() string {
+func (m *Message) String() string {
 	if m.Method != "" {
 		return fmt.Sprintf("Request: %d, %s, %v",
 			m.Seq, m.Method, m.Params)

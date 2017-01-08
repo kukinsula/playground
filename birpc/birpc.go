@@ -2,6 +2,7 @@ package birpc
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"sync"
 )
@@ -23,53 +24,50 @@ type Config struct {
 }
 
 type BiRPC struct {
-	codec    *BufferedCodec
-	messager Messager
-
-	group sync.WaitGroup
-
+	codec             Codec
+	messager          Messager
+	group             sync.WaitGroup
 	lock              sync.RWMutex
 	shutdown, stopped bool
-
-	callsLock sync.RWMutex
-	seq       uint32
-	calls     map[uint32]*Call
-
-	Prefix string
-
-	stop chan struct{}
+	callsLock         sync.RWMutex
+	seq               uint32
+	calls             map[uint32]*Call
+	Prefix            string
+	stop              chan struct{}
 }
 
 type Call struct {
 	Method string
 	Params interface{}
-
 	Result interface{}
 	Error  error
-
-	Done chan *Call
+	Done   chan *Call
 }
 
-func NewBiRPC(codec *BufferedCodec, m Messager) *BiRPC {
-	return &BiRPC{
-		codec:    codec,
-		messager: m,
-		seq:      startSeq,
-		calls:    make(map[uint32]*Call),
-		stop:     make(chan struct{}),
-	}
+func NewBiRPC(codec Codec, messager Messager) *BiRPC {
+	biRPC := &BiRPC{}
+
+	InitBiRPC(biRPC, codec, messager)
+
+	return biRPC
 }
 
-func initBiRPC(b *BiRPC, codec *BufferedCodec, m Messager) {
+func InitBiRPC(b *BiRPC, codec Codec, m Messager) {
 	b.codec = codec
 	b.messager = m
 	b.seq = startSeq
 	b.calls = make(map[uint32]*Call)
 	b.stop = make(chan struct{}, 1)
+	b.shutdown = true
+	b.stopped = true
 }
 
 func (b *BiRPC) Start() {
 	var err error
+
+	if b.isRunning() {
+		panic("BiRPC should not be started more than once")
+	}
 
 	b.setRunning()
 
@@ -78,10 +76,9 @@ func (b *BiRPC) Start() {
 	}
 
 	for b.isRunning() {
-		req := Request{}
-		resp := Response{}
+		msg := b.messager.MessageContainer()
 
-		err = b.codec.ReadHeader(&req, &resp)
+		err = b.codec.Decode(&msg)
 		if err != nil {
 			_, stopped := b.getShutdonwStopped()
 			if stopped {
@@ -91,13 +88,13 @@ func (b *BiRPC) Start() {
 			}
 
 			if verbose {
-				logger.Printf("%s> read header failed: %s", b.Prefix, err)
+				logger.Printf("%s> Decode failed: %s", b.Prefix, err)
 			}
 
 			break
 		}
 
-		go b.handle(&req, &resp)
+		go b.handle(msg)
 	}
 
 	b.cancelPendingCalls(err)
@@ -109,14 +106,21 @@ func (b *BiRPC) Start() {
 	b.stop <- struct{}{}
 }
 
-func (b *BiRPC) handle(req *Request, resp *Response) {
-	var err error
-
+func (b *BiRPC) handle(msg interface{}) {
 	b.group.Add(1)
 
-	if req.Method != "" {
+	req, resp, err := b.messager.Parse(msg)
+	if req == nil && resp == nil && err == nil {
+		panic("Messager.Parse returned a nil req, resp and error")
+	}
+
+	if req != nil && resp != nil {
+		panic("Messager.Parse: req XOR resp should be non nil")
+	}
+
+	if req != nil {
 		err = b.handleRequest(req)
-	} else {
+	} else if resp != nil {
 		err = b.handleResponse(resp)
 	}
 
@@ -139,28 +143,15 @@ func (b *BiRPC) handleRequest(req *Request) error {
 	result, err := b.messager.OnRequest(req)
 
 	if verbose {
-		logger.Printf("%s> exec service '%s' returned result=%v and err=%v\n",
+		logger.Printf("%s> Exec service '%s' returned %v, %v\n",
 			b.Prefix, req.Method, result, err)
 	}
 
 	if req.Seq != notificationSeq { // If not a notification
-		resp := &Response{
-			Seq:    req.Seq,
-			Result: result,
-			Error:  err,
-		}
-
-		err = b.codec.WriteResponse(resp, result)
+		resp := b.messager.BuildResponse(req.Seq, result, err)
+		err = b.codec.Encode(resp)
 		if err != nil {
-			logger.Printf("%s> WriteResponse failed: %s", b.Prefix, err)
-			return err
-		}
-
-		logger.Printf("%s> ICICICICI", b.Prefix)
-
-		err = b.codec.Flush()
-		if err != nil {
-			logger.Printf("%s> Flush failed: %s", b.Prefix, err)
+			logger.Printf("%s> Encode response %s failed: %s\n", b.Prefix, resp, err)
 			return err
 		}
 
@@ -178,37 +169,29 @@ func (b *BiRPC) handleResponse(resp *Response) (err error) {
 	}
 
 	call := b.unregisterCall(resp.Seq)
-
 	if call == nil {
-		if verbose {
-			logger.Println("%s> Call #%d not found", b.Prefix, resp.Seq)
-		}
+		err = fmt.Errorf("Call %d not found", resp.Seq)
+	}
 
-		err = b.codec.ReadResponseBody(nil)
+	if err == nil {
+		err = Copy(call.Result, &resp.Result)
+		logger.Printf("COPY: err = %s, call.Result = %#v", err, call.Result)
 		if err != nil {
-			return err
+			err = fmt.Errorf("Copy failed: %s", err)
 		}
-	} else if resp.Error != nil {
-		call.Error = resp.Error
+	}
 
-		err = b.codec.ReadResponseBody(nil)
-		if err != nil {
-			return err
-		}
-	} else {
-		err = b.codec.ReadResponseBody(call.Result)
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		call.Error = err
 	}
 
 	call.done()
 
 	if verbose {
-		logger.Println("%s> <- %s", b.Prefix, resp)
+		logger.Printf("%s> <- %s", b.Prefix, resp)
 	}
 
-	return nil
+	return err
 }
 
 func (b *BiRPC) Stop() {
@@ -326,13 +309,8 @@ func (b *BiRPC) send(call *Call, notification bool) (err error) {
 		b.callsLock.Unlock()
 	}
 
-	req := &Request{
-		Seq:    seq,
-		Method: call.Method,
-		Params: call.Params,
-	}
-
-	err = b.codec.WriteRequest(req, call.Params)
+	req := b.messager.BuildRequest(seq, call.Method, call.Params)
+	err = b.codec.Encode(req)
 	if err != nil {
 		if !notification {
 			call = b.unregisterCall(seq)
@@ -342,13 +320,9 @@ func (b *BiRPC) send(call *Call, notification bool) (err error) {
 		}
 	}
 
-	err = b.codec.Flush()
-	if err != nil {
-		return err
-	}
-
 	if verbose {
-		logger.Printf("%s> -> %s\n", b.Prefix, req)
+		logger.Printf("%s> -> %s\n", b.Prefix,
+			&Request{seq, call.Method, call.Params})
 	}
 
 	return nil
