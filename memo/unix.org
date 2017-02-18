@@ -3,9 +3,70 @@
 # Remplacer old par new dans tous les fichiers
 sed -i 's/old/new/g' *
 
+* cat
+
+# Ecrire dans foo.txt sur plusieur lignes avec la notation heredoc
+# NB : EOF est choisit comme délimiteur
+cat << EOF > foo.txt
+A
+Z
+E
+R
+T
+Y
+EOF
 
 * less
 * grep
 * fgrep
+* pgrep
 * xargs
+
 * tar
+
+** Options
+-c : créé l'archive
+-z : compresse avec gzip (+rapide, -compression)
+-j : compresse avec bz2 (-rapide, +compression)
+-v : verbose
+-f : nom de l'archive
+-x : extrait
+-r : ajoute à l'archive
+-C : repertoire de destination
+
+** Création / Listage / Ajout / Suppression
+
+# Archive et compresses avec gzip le dossier foo récursivement dans foo.tar.gz
+tar -czvf foo.tar.gz foo/
+# ou avec bz2
+tar -cjvf foo.tar.gz foo/
+
+# Lister le contenu de l'archive
+tar -f foo.tar.gz --list
+# ou
+tar -tf foo.tar.gz
+
+# Ajouter foo.txt à une archive non compressée
+tar -rf foo.tar foo.txt
+
+# Supprimer foo.txt d'une archive
+tar -f foo.tar --delete foo.txt
+
+** Extraction
+
+# Extrait foo.tar.gz dans le dossier foo
+tar -xzvf foo.tar.gz -C foo
+
+# Extraire seulement le fichier foo.txt de foo.tar
+tar -xf foo.tar foo.txt
+
+# Extraire seulement tous les fichiers .txt de foo.tar
+tar -xf foo.tar --wildcards *.txt
+
+** Vérification
+
+# Vérifier un archive compressée avec gzip
+gunzip -t foo.tar.gz
+
+# Vérifier un archive compressée avec bz2
+bzip2 -t foo.tar.bz2
