@@ -1,0 +1,5 @@
+* sed
+
+# Remplacer old_string par new_string dans tous les fichiers
+sed -i 's/old_string/new_string/g' *
+
