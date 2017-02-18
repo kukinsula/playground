@@ -1,33 +1,53 @@
-* sed
+* Mettre find ici !
 
-# Remplacer old par new dans tous les fichiers
-sed -i 's/old/new/g' *
+* locate
 
-* cat
-
-# Ecrire dans foo.txt sur plusieur lignes avec la notation heredoc
-# NB : EOF est choisit comme délimiteur
-cat << EOF > foo.txt
-A
-Z
-E
-R
-T
-Y
-EOF
-
-* less
 * grep
-* fgrep
-* pgrep
-* xargs
+
+# Rechercher les occurences de "foo" dans tous les fichiers du dossier courant
+grep "foo" *
+
+# Rechercher foo de manière insensible à la casse
+grep "foo" * -i
+
+# Rechercher avec un pattern
+grep "foo.*" *
+
+# Rechercher en excluant les occurences trouvées
+grep -v "foo.*" *
+
+# Compter le nombre de résultat
+grep "foo.*" * -c
+
+# Nom des fichiers dans lequel des occurence ont été trouvés
+grep "foo.*" * -l
+
+# Numéro de ligne des occurences
+grep "foo.*" * -b
+
+* pgrep / pkill
+
+# PIDs d'emacs
+pgrep emacs
+
+# PIDs d'emacs et son path
+pgrep emacs -a
+
+# Compter le nombre d'emacs lancé
+pgrep emacs -c
+
+# PIDs root de sshd
+pgrep -u root sshd
+
+# Tuer PIDs d'emacs
+pkill emacs
 
 * tar
 
 ** Options
 -c : créé l'archive
 -z : compresse avec gzip (+rapide, -compression)
--j : compresse avec bz2 (-rapide, +compression)
+-j : compresse avec bz2  (-rapide, +compression)
 -v : verbose
 -f : nom de l'archive
 -x : extrait
@@ -36,7 +56,7 @@ EOF
 
 ** Création / Listage / Ajout / Suppression
 
-# Archive et compresses avec gzip le dossier foo récursivement dans foo.tar.gz
+# Archive et compresse avec gzip le dossier foo récursivement dans foo.tar.gz
 tar -czvf foo.tar.gz foo/
 # ou avec bz2
 tar -cjvf foo.tar.gz foo/
@@ -55,7 +75,7 @@ tar -f foo.tar --delete foo.txt
 ** Extraction
 
 # Extrait foo.tar.gz dans le dossier foo
-tar -xzvf foo.tar.gz -C foo
+tar -xvf foo.tar.gz -C foo
 
 # Extraire seulement le fichier foo.txt de foo.tar
 tar -xf foo.tar foo.txt
@@ -70,3 +90,32 @@ gunzip -t foo.tar.gz
 
 # Vérifier un archive compressée avec bz2
 bzip2 -t foo.tar.bz2
+
+* sed
+
+# Remplacer old par new dans tous les fichiers
+sed -i 's/old/new/g' *
+
+* cat
+
+# Ecrire dans foo.txt sur plusieur lignes avec la notation heredoc
+# NB : EOF est choisit comme délimiteur
+cat << EOF > foo.txt
+A
+Z
+E
+R
+T
+Y
+EOF
+
+* ps
+* less
+* xargs
+* dd
+* cat
+* awk
+* ed
+* head
+* tail
+* kill
