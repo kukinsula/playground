@@ -1,6 +1,5 @@
 * TODO
 ** less
-** xargs
 ** dd
 ** cat
 ** awk
@@ -10,6 +9,34 @@
 ** ltrace
 ** watch
 ** ln
+** cut
+** wc
+** exec
+** sort
+
+* xargs
+
+** Options
+d : définir le délimiteur
+n : nombre d'élément afficher traiter à la fois
+a : lire à partir d'un fichier
+p : prompt avant exécution
+I : nommer l'argument courant
+
+# Nombre de lignes, mots et caractères dans les fichiers courants
+ls | xargs wc -lwc
+
+# Prompt avant exécution de la commande passée à xargs
+ls | xargs -p wc -lwc
+
+# Limiter le nombre d'élément traiter à la fois à 1
+ls | xargs -n 1 wc -lwc
+
+# Tous les fichiers temporaires en incluant ceux comportant des espaces
+find /tmp -name "*.tmp" -print0 | xargs -0
+
+# Nommer l'argument courant 'foo'
+find /tmp -name "*.tmp" -print0 | xargs -0 -I foo mv foo /tmp/old/
 
 * strace
 
