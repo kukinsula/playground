@@ -1,8 +1,151 @@
-* Mettre find ici !
+* TODO
+** less
+** xargs
+** dd
+** cat
+** awk
+** ed
+** head
+** tail
+** ltrace
+** watch
+** ln
+
+* strace
+
+** Options
+c : statistiques de tous les appels systèmes
+o : rediriger vers un fichier
+t : timestamp de l'appel système
+T : temps passé dans l'appel
+e : tracer uniquement certains appels
+p : PID d'un processus déjà en exécution
+
+# Tracer les appels systèmes faits par emacs
+strace emacs
+
+# Statistiques d'appels systèmes d'emacs
+strace -c emacs
+
+# Ecrit la trace dans foo.txt
+strace -o foo.txt emacs
+
+# Timestamp de chaque appel système
+# NB : t, tt ou ttt pour plus ou moins de précision
+strace -t emacs
+
+# Le temps passé dans chaque appel système
+strace -T emacs
+
+# Tracer uniquement les appels open et read
+strace -e trace open,read emacs
+
+# Tracer un processus déjà en cours d'exécutioon
+strace -p 42
+
+* ps
+
+** Options
+
+e : absolument tous les processus
+f : format complet d'affichage
+u : processus d'un utilisateur
+H : afficher les threads comme les processus
+p : filter les processus à afficher
+o : reformate la sortie
+L : les threads du processus
+
+ppid   : les processus dont le PPID est
+forest : hiérarchie des processus
+sort   : trier par
+
+# Tous les processus
+ps -e
+
+# Tous les processus dans un format complet
+ps -ef
+
+# Snapshot de tous les processus
+ps -aux | less
+
+# Tous les processus des utilisateurs root ou foo
+ps -fu root,foo
+
+# Tous les processus emacs ou zsh
+ps -C emacs,zsh
+
+# filter les processus à afficher
+ps -p 42,43,44
+
+# Tous les processus lancés formaté PID, PPID, Elapsed Time (format [[DD-]hh:]mm:ss), ...
+ps -o pid,ppid,etime,etimes,lstart,%cpu,%mem,nice,rss,args
+
+# Les threads du processus 42
+ps -Lp 42
+
+# Tous les processus lancés par le PID 42
+ps --ppid 42
+
+# Hiérarchie de tous les processus
+ps -e --forest
+# ou
+ps -axjf
+# ou
+pstree
+
+# Trie dans l'ordre croissant des résultats par % mémoire
+ps -ef --sort pmem
+# ou par % cpu
+ps -ef --sort pcpu
+
+# Observer tous les emacs en direct
+watch -n 1 'ps -C emacs -o cmd,pid,%cpu,%mem,etime'
+
+# Observer tous les processus de root en direct
+watch -n 1 'ps -u root-o cmd,pid,%cpu,%mem,etime'
+
+* kill
+
+** Signals
+1  | HUP    : Hang Up
+2  | SIGINT : équivalent à CTRL-C
+9  | KILL   : tue le processus
+15 | TERM   : termine le processus
+
+# Lister tous les signaux supportés
+kill -l
+
+# Envoyer le signal SIGINT au PID 42
+kill -INT 42
+
+* TODO mettre find ici !
 
 * locate
 
+** Options
+c : compte le nombre de résultat
+e : vérifie que le fichier existe à cet instant (updatedb pour mettre à jour)
+i : insensible à la casse
+n : limiter le nombre de résultat
+
+# Rechercher tous les fichiers dont le path absolu contient foo
+locate foo
+
+# Rechercher les 15 premiers résultats de manière insensible à la casse
+locate -in 15 foo
+
+# Mettre à jour la base de donnée de locate
+sudo updatedb
+
 * grep
+
+** Options
+i : insensible à la casse
+v : exclure ce qui matche
+c : compter le nombre d'occurence
+l : nom du fichier de l'occurence
+b : numéro de ligne de l'occurence
+
 
 # Rechercher les occurences de "foo" dans tous les fichiers du dossier courant
 grep "foo" *
@@ -36,8 +179,8 @@ pgrep emacs -a
 # Compter le nombre d'emacs lancé
 pgrep emacs -c
 
-# PIDs root de sshd
-pgrep -u root sshd
+# PIDs d'emacs de l'utilisateur root
+pgrep -u root emacs 
 
 # Tuer PIDs d'emacs
 pkill emacs
@@ -45,18 +188,18 @@ pkill emacs
 * tar
 
 ** Options
--c : créé l'archive
--z : compresse avec gzip (+rapide, -compression)
--j : compresse avec bz2  (-rapide, +compression)
--v : verbose
--f : nom de l'archive
--x : extrait
--r : ajoute à l'archive
--C : repertoire de destination
+c : créer l'archive
+z : compresser avec gzip (+rapide, compression)
+j : compresser avec bz2  (rapide, +compression)
+v : verbose
+f : nom de l'archive
+x : extraire
+r : ajouter à l'archive
+C : repertoire de destination
 
 ** Création / Listage / Ajout / Suppression
 
-# Archive et compresse avec gzip le dossier foo récursivement dans foo.tar.gz
+# Archive et compresse avec gzip/bz2 le dossier foo récursivement dans foo.tar.gz
 tar -czvf foo.tar.gz foo/
 # ou avec bz2
 tar -cjvf foo.tar.gz foo/
@@ -98,24 +241,16 @@ sed -i 's/old/new/g' *
 
 * cat
 
+# Numéro de ligne
+cat -n foo.xt
+
+# Numéro de ligne non vides
+cat -b foo.xt
+
 # Ecrire dans foo.txt sur plusieur lignes avec la notation heredoc
 # NB : EOF est choisit comme délimiteur
 cat << EOF > foo.txt
-A
-Z
-E
-R
-T
-Y
+F
+O
+O
 EOF
-
-* ps
-* less
-* xargs
-* dd
-* cat
-* awk
-* ed
-* head
-* tail
-* kill
