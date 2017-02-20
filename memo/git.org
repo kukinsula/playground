@@ -133,3 +133,19 @@ git reset --hard HEAD~1
 
 # Annuler des fichiers ajoutés
 git reset HEAD file.txt
+
+* divers
+
+git status
+
+git add file
+
+git commit
+
+git pull --rebase
+
+git push [ remote branch ]
+
+git stash
+
+git stash pop

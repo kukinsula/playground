@@ -1,0 +1,52 @@
+* pacman
+
+** Installation d'un paquet
+pacman -S [paquet1 ...]
+
+# Dans un dépôt précis
+pacman -S extra/paquet1
+
+# A partir de l'archive du paquet (localement)*
+pacman -U archive_du_paquet.pkg.tar.xz
+
+# A partir d'un lien de l'archive
+pacman -U https://www.archlinux.org/packages/core/i686/pacman/download/
+
+** Mise à jour
+pacman -Su
+
+# Synchronisation puis mise à jour
+pacman -Syu
+
+** Suppression de paquet
+pacman -R paquet
+
+# Supprimer aussi les dépendances du paquet
+pacman -Rs paquet
+
+** Recherche
+
+# Recherche parmi les paquets installés
+pacman -Qs paquet
+
+# Recherche dans les dépôts
+pacman -Ss paquet
+
+# Informations complètes sur un paquet installé
+pacman -Qi paquet
+
+# Informations complètes sur un paquet dans les dépôts
+pacman -Si paquet
+
+# A quel paquet appartient un fichier
+pacman -Qo /chemin/vers/le/fichier
+
+# Liste des dépendances plus nécessaire au système
+pacman -Qdt
+
+# Liste les paquets orphelins
+pacman -Qtdq
+
+** Divers
+# Vérifie qu'il ne manque pas de fichier installés sur l'ensemble des paquets
+pacman -Qqk

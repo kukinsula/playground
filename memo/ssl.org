@@ -1,0 +1,219 @@
+# -*- coding: utf-8 -*-
+#+TITLE: Utilisation des certificats SSL
+#+AUTHOR: Maxime Soulé
+#+EMAIL: msoule@ijenko.com
+#+DATE:      2014-03-20
+#+LANGUAGE:  fr
+#+OPTIONS:   H:3 num:t toc:1 \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+
+* Types de fichier utilisés plus bas
+
+- X.conf :: fichier de configuration de l'autorité de certification ;
+
+- X.key :: fichier contenant une clé privée ;
+
+- X.csr :: Certificate Signing Request, fichier de demande de
+           certificat contenant la clé publique ;
+
+- X.crt :: certificat signé par l'autorité de certification ;
+
+- X.crl :: Certificate Revocation List, fichier contenant une liste de
+           certificats révoqués.
+
+
+* Génération d'une clé privée (→ X.key)
+
+#+BEGIN_SRC shell
+openssl genrsa -out X.key 2048
+#+END_SRC
+
+
+* Génération d'une CSR (X.key → X.csr)
+
+#+BEGIN_SRC shell
+openssl req -config Z.conf -new -key X.key -out X.csr
+#+END_SRC
+
+
+* Génération d'une clé privée + CSR (→ X.key + X.csr)
+
+#+BEGIN_SRC shell
+openssl req -config Z.conf -nodes -new -keyout X.key -out X.csr -newkey rsa:2048 -verbose -sha256
+#+END_SRC
+
+
+* Génération d'un certificat signé (X.csr → X.crt)
+
+#+BEGIN_SRC shell
+openssl ca -config Z.conf -in X.csr -out X.crt -days 365
+#+END_SRC
+
+*/!\ ATTENTION* pour ~bd.ijenko.net~ ou ~bh.ijenko.net~, penser à ajouter
+l'option ~-startdate~ comme suit :
+
+#+BEGIN_SRC shell
+-startdate 090101000000Z
+#+END_SRC
+
+
+* PEM à partir d'une clé privée et de son certificat (X.crt + X.key → X.pem)
+
+#+BEGIN_SRC shell
+openssl x509 -outform PEM -in X.crt -out X.pem
+openssl rsa -outform PEM -in X.key >> X.pem
+#+END_SRC
+
+
+* Révocation d'un certificat (X.crt)
+
+#+BEGIN_SRC shell
+openssl ca -config Z.conf -revoke X.crt
+#+END_SRC
+
+
+* Génération d'une liste de révocation (→ X.crl)
+
+#+BEGIN_SRC shell
+openssl ca -config Z.conf -gencrl -out X.crl
+#+END_SRC
+
+*/!\ ATTENTION* pour la box l'option ~-startdate~ n'étant visiblement
+pas prise en compte :
+
+#+BEGIN_SRC shell
+a=`date +%Y%m%d%H%M.%S`; \
+sudo date 200901010000; \
+openssl ca -config ca-box.conf -gencrl -out X.crl; \
+sudo date $a; \
+sudo ntpdate 192.168.2.1
+#+END_SRC
+
+
+* Changer le mot de passe d'une clé privée (X1.key → X2.key)
+
+#+BEGIN_SRC shell
+openssl rsa -in X1.key -out X2.key -idea
+#+END_SRC
+
+
+* Changer le mot de passe d'une clé PKCS#12 (X1.p12 → X2.p12)
+
+#+BEGIN_SRC shell
+openssl pkcs12 -in X1.p12 -out tmp.pem -nodes
+openssl pkcs12 -export -out X2.p12 -in tmp.pem -idea
+rm tmp.pem
+#+END_SRC
+
+
+* Vérifier qu'un certificat correspond à une clé privée (X.crt et X.key)
+
+Une seule ligne doit résulter de la commande suivante :
+#+BEGIN_SRC shell
+(openssl rsa -noout -modulus -in X.key; \
+ openssl x509 -noout -modulus -in X.crt) | uniq
+#+END_SRC
+
+
+* Vérifier qu'un certificat est bien issu d'une autorité de certification
+
+#+BEGIN_SRC shell
+openssl verify -verbose -CAfile ca.crt X.crt
+#+END_SRC
+
+
+* Dumps
+
+** Dumper le contenu d'une clé privée (X.key)
+
+#+BEGIN_SRC shell
+openssl pkey -noout -text -in X.key
+#+END_SRC
+
+
+** Dumper un CSR (X.csr)
+
+#+BEGIN_SRC shell
+openssl req -text -noout -in X.csr
+#+END_SRC
+
+
+** Dumper un certificat signé (X.crt)
+
+#+BEGIN_SRC shell
+openssl x509 -noout -text -in X.crt
+#+END_SRC
+
+
+** Dumper une liste de révocation (X.crl)
+
+#+BEGIN_SRC shell
+openssl crl -noout -text -in X.crl
+#+END_SRC
+
+
+** Dumper un fichier PKCS#12 (X.p12)
+
+#+BEGIN_SRC shell
+openssl pkcs12 -noout -info -in X.p12
+#+END_SRC
+
+
+* Autorité de certification
+
+** Création du certificat de l'autorité de certification
+
+Pour 30 ans sur 2048 bits...
+
+#+BEGIN_SRC shell
+mkdir ca2048 && cd ca2048
+openssl req -new -x509 -days 10957 -newkey rsa:2048 -keyout ca-cert.key -out ca-cert.crt
+chmod 400 ca-cert.key
+mkdir newcerts
+touch index.txt
+echo 494a4b4f > serial
+#+END_SRC
+
+* Renouveler le certificat de l'autorité de certification
+
+Dans [ req ] rajouter :
+
+#+BEGIN_SRC
+x509_extensions = root_ca_extensions
+#+END_SRC
+
+Puis ajouter la section :
+
+#+BEGIN_SRC
+[ root_ca_extensions ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+basicConstraints=CA:TRUE
+#+END_SRC
+
+#+BEGIN_SRC shell
+openssl req -config Z.conf -x509 -new -key ca-cert.key -out ca-cert.crt \
+	    -days 3650 -batch
+#+END_SRC
+
+*/!\ ATTENTION* pour le CA de la box l'option ~-startdate~ n'existe
+pas dans req :
+
+#+BEGIN_SRC shell
+a=`date +%Y%m%d%H%M.%S`; \
+sudo date 200902261500; \
+openssl req -config ca-ca.conf -x509 -new -key ca/ca-cert.key -out ca-cert.crt \
+            -days 12783 -batch; \
+sudo date $a; \
+sudo ntpdate 192.168.2.1
+#+END_SRC
+
+* Prendre en compte section v3_req du .conf
+
+#+BEGIN_SRC
+openssl -config Z.conf -extensions v3_req
+#+END_SRC
