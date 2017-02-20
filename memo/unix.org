@@ -145,7 +145,18 @@ kill -l
 # Envoyer le signal SIGINT au PID 42
 kill -INT 42
 
-* TODO mettre find ici !
+* find
+
+# Recherche par type de fichier
+# NB : f : regular file, d : directory, l : symbolic link, c : character devices, b : block devices
+find -type TYPE
+
+# Recherche par nom (avec pattern)
+find / -name "*.conf"
+
+# Recherche fichier de moins de 50 bytes
+# NB : c : bytes, k : Kilobytes, M : Megabytes, G : Gigabytes, b : 512-byte blocks
+find / -size 50c
 
 * locate
 
@@ -207,7 +218,7 @@ pgrep emacs -a
 pgrep emacs -c
 
 # PIDs d'emacs de l'utilisateur root
-pgrep -u root emacs 
+pgrep -u root emacs
 
 # Tuer PIDs d'emacs
 pkill emacs
