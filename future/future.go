@@ -4,39 +4,45 @@ import (
 	"io"
 )
 
-type ioChan struct {
+type ioResult struct {
 	n   int
 	err error
 }
 
-func FutureRead(r io.Reader, p []byte) func() (int, error) {
-	done := make(chan ioChan)
+// FutureRead starts a goroutine reading b from the provided Reader and returns
+// a function to call to retrieve the Read result when needed. FutureRead
+// doesn't block waiting for Read to finish, it  only starts the reading.
+func FutureRead(r io.Reader, b []byte) func() (int, error) {
+	done := make(chan ioResult)
 
 	go func() {
-		n, err := r.Read(p)
+		n, err := r.Read(b)
 
-		done <- ioChan{n, err}
+		done <- ioResult{n, err}
 	}()
 
 	return func() (int, error) {
-		io := <-done
+		res := <-done
 
-		return io.n, io.err
+		return res.n, res.err
 	}
 }
 
-func FutureWrite(w io.Writer, p []byte) func() (int, error) {
-	done := make(chan ioChan)
+// FutureWrite starts a goroutine writing b in the provided Writer and returns a
+// function to call to retrieve the Write result when needed. FutureWrite
+// doesn't block waiting for the Write to finish, it only starts the writing.
+func FutureWrite(w io.Writer, b []byte) func() (int, error) {
+	done := make(chan ioResult)
 
 	go func() {
-		n, err := w.Write(p)
+		n, err := w.Write(b)
 
-		done <- ioChan{n, err}
+		done <- ioResult{n, err}
 	}()
 
 	return func() (int, error) {
-		io := <-done
+		res := <-done
 
-		return io.n, io.err
+		return res.n, res.err
 	}
 }
