@@ -108,6 +108,10 @@ git branch foo
 # ou
 git checkout -b foo
 
+# Après la création de la branche foo, il faut définir son upstream
+# NB : permet de taper 'git push' tout court, plutôt que 'git push origin master'
+git push --set-upstream origin foo
+
 # Aller dans la branche foo
 git checkout foo
 
