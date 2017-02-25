@@ -4,8 +4,6 @@
 ** cat
 ** awk
 ** ed
-** head
-** tail
 ** ltrace
 ** watch
 ** ln
@@ -13,6 +11,37 @@
 ** wc
 ** exec
 ** sort
+** trap
+** wait
+
+* tail
+
+# Les 10 dernières lignes du fichier /var/foo.log
+tail /var/log/foo.log
+
+# Les 42 dernières lignes du fichier /var/foo.log
+tail -n 42 /var/log/foo.log
+
+# Suivre en direct les log de foo
+tail -f /var/log/foo.log
+
+# Suivre en direct les log de foo et du système
+# NB : le nom des fichiers sont affichés avant de nouveaux log
+tail -f /var/log/foo.log -f /var/log/syslog.log
+
+# Fréquence de mise à jour d'un fichier à 10 secondes
+tail -f -s 10 /var/log/foo.log
+
+# Arréter tail lorsque le PID 42 termine
+tail -f /var/log/foo.log --pid 42
+
+* head
+
+# Les 42 premières lignes de foo.txt
+head -n 42 foo.txt
+
+# Des lignes 10 à 20 de foo.txt
+head -n 20 | tail -b 10
 
 * du
 
@@ -45,6 +74,9 @@ find /tmp -name "*.tmp" -print0 | xargs -0
 
 # Nommer l'argument courant 'foo'
 find /tmp -name "*.tmp" -print0 | xargs -0 -I foo mv foo /tmp/old/
+
+# Le nombre de fois que 'error' apparaît dans chacun des fichiers de log
+ls /var/log/*.log | xargs sudo grep -c error
 
 * strace
 
