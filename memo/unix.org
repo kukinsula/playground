@@ -5,14 +5,22 @@
 ** awk
 ** ed
 ** ltrace
-** watch
 ** ln
-** cut
 ** wc
 ** exec
 ** sort
 ** trap
 ** wait
+** tee
+** ifconfig
+
+* watch
+
+# Observer une commande toutes les secondes
+watch -n 1 'wc -lwc /var/log/*.log'
+
+* cut
+
 
 * tail
 
@@ -316,6 +324,9 @@ bzip2 -t foo.tar.bz2
 
 # Remplacer old par new dans tous les fichiers
 sed -i 's/old/new/g' *
+
+# Afficher la 5ème ligne de foo.txt
+sed -n '5p' foo.txt
 
 * cat
 
