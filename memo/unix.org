@@ -13,6 +13,7 @@
 ** wait
 ** tee
 ** ifconfig
+** tcpdump
 
 * watch
 
@@ -21,6 +22,13 @@ watch -n 1 'wc -lwc /var/log/*.log'
 
 * cut
 
+* test
+
+# NB : test termine avec comme statut le résultat du test
+
+# Tester l'existence d'un dossier
+# NB : $? vaut 0 ou 1 selon que foo/ existe
+test -d foo/
 
 * tail
 
@@ -274,16 +282,14 @@ pkill emacs
 * tar
 
 ** Options
-c : créer l'archive
-z : compresser avec gzip (+rapide, compression)
-j : compresser avec bz2  (rapide, +compression)
-v : verbose
+c : créé l'archive
+z : compression avec gzip (+rapide, compression)
+j : compression avec bz2  (rapide, +compression)
+v : verbosité
 f : nom de l'archive
-x : extraire
-r : ajouter à l'archive
+x : extraction
+r : ajout à l'archive
 C : repertoire de destination
-
-** Création / Listage / Ajout / Suppression
 
 # Archive et compresse avec gzip/bz2 le dossier foo récursivement dans foo.tar.gz
 tar -czvf foo.tar.gz foo/
@@ -301,8 +307,6 @@ tar -rf foo.tar foo.txt
 # Supprimer foo.txt d'une archive
 tar -f foo.tar --delete foo.txt
 
-** Extraction
-
 # Extrait foo.tar.gz dans le dossier foo
 tar -xvf foo.tar.gz -C foo
 
@@ -311,8 +315,6 @@ tar -xf foo.tar foo.txt
 
 # Extraire seulement tous les fichiers .txt de foo.tar
 tar -xf foo.tar --wildcards *.txt
-
-** Vérification
 
 # Vérifier un archive compressée avec gzip
 gunzip -t foo.tar.gz
