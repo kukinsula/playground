@@ -15,13 +15,30 @@
 ** ifconfig
 ** tcpdump
 ** ulimit
+** chown
+** chgrp
+** ln
+** link
+
+* netstat
+
+** Options
+
+l : seulement les services en train d'écouter sur un port
+n : afficher le numéro de port, ne passe pas par le DSN pour résoudre le nom d'adresse
+t : ports TCP
+u : ports UDP
+p : nom du programme
+
+# La liste de tous les ports TCP ouverts
+netstat -lntp
+
+** cut
 
 * watch
 
 # Observer une commande toutes les secondes
 watch -n 1 'wc -lwc /var/log/*.log'
-
-* cut
 
 * test
 
