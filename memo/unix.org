@@ -19,6 +19,9 @@
 ** chgrp
 ** ln
 ** link
+** ack
+** curl
+** wget
 
 * netstat
 
