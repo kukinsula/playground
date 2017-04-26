@@ -7,6 +7,9 @@ git config --global user.email "john@example.com"
 # Spécifier l'éditeur emcas lancé dans le terminal
 git config --global core.editor "emacs -nw"
 
+# Afficher la config actuelle
+git config -l
+
 * remote
 
 # Remotes
