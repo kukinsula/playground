@@ -1,6 +1,5 @@
 * TODO
 ** less
-** dd
 ** cat
 ** awk
 ** ed
@@ -22,13 +21,48 @@
 ** ack
 ** curl
 ** wget
+** mount
+** umount
+
+* dd
+
+** Options
+
+if : fichier d'entrée
+of : fichier de sortie
+bs : taille de bloc
+
+# Copie /path/to/iso vers /dev/sdX par bloc de 1 Mo
+dd if=/path/to/iso of=/dev/sdX bs=1M
+
+# Ecrit que des 0 dans /dev/sdX
+dd if=/dev/zero of=/dev/sdX
+
+# Ecrit des octets "pseudo-aléatoires" dans /dev/sdX
+dd if=/dev/random of=/dev/sdX
+dd if=/dev/urandom of=/dev/sdX
+
+* shred
+
+** Options
+
+v : verbeux
+z : fait une passe en plus d'écriture de 0
+n : nombre d'itération
+random-source : récupère les octets d'une source aléatoire
+
+# Par défaut : 3 passes, random-source=/dev/random
+shred -v /dev/sdX
+
+# Verbeux, 10 passes /dev/urandom, 1 dernière passe de 0
+shred -v -n 10 --random-source=/dev/urandom -z
 
 * netstat
 
 ** Options
 
 l : seulement les services en train d'écouter sur un port
-n : afficher le numéro de port, ne passe pas par le DSN pour résoudre le nom d'adresse
+n : afficher le numéro de port sans le DSN pour résoudre le nom d'adresse
 t : ports TCP
 u : ports UDP
 p : nom du programme
@@ -40,16 +74,50 @@ netstat -lntp
 
 * watch
 
+** Options
+
+n : intervalle entre deux watch
+t : pas de titre
+e : freeze en cas d'erreur, quitte après pression d'une touche
+b : beep en cas d'erreur
+
 # Observer une commande toutes les secondes
-watch -n 1 'wc -lwc /var/log/*.log'
+watch -tn 1 'wc -lwc /var/log/*.log'
+
+# Oberver l'utilisation du disque en live
+watch -tn 1 du -h'
 
 * test
 
-# NB : test termine avec comme statut le résultat du test
+** Options
+
+# Existence
+d : existence d'un dossier
+e : existence d'un fichier
+f : existence d'un fichier et est un fichier régulier
+L : existence d'un fichier et est un lien symbolique
+
+# Comparaison
+eq : equal
+ne : not equald
+ge : greater or equal
+gt : greater than
+le : lower or equal
+lt : lower than
+
+# NB : il faut oberver la variable $? après l'éxecution de test
 
 # Tester l'existence d'un dossier
-# NB : $? vaut 0 ou 1 selon que foo/ existe
 test -d foo/
+
+# Tester l'existence du fichier foo.txt
+test -e foo.txt
+
+# Comparer 0 et 0, $? vaut 0
+test 0 -eq 0
+
+# # Comparer 0 et 0, $? vaut 1
+test 0 -ne 1
 
 * tail
 
@@ -83,10 +151,19 @@ head -n 20 | tail -b 10
 * du
 
 ** Options
-h : affichage humainement lisaible
+h : affichage humainement lisible
 
 # Espace utilisé du fichier foo
 du -h foo
+
+* df
+
+** Options
+
+h : affichage des systèmes de fichiers humainement lisible
+
+# Affiche les système de fichiers, la taille, utilisé, % utilisé, point de montage
+df -h
 
 * xargs
 
