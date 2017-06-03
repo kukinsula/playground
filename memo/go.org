@@ -8,3 +8,6 @@ godoc -http :6060
 # Recompiler go
 cd /usr/lib/go/src
 GOROOT_BOOTSTRAP=/usr/lib/go ./make.bash --no-clean
+
+# Voir les optimisations du compilateur
+go build -gcflags -m main.go
