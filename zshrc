@@ -15,7 +15,7 @@ plugins=(git golang)
 
 # User configuration
 
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
+export PATH="/bin:/usr/local/sbin:/usr/local/bin:/usr/bin"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -34,7 +34,10 @@ alias -s pdf="evince "
 alias update="sudo apt-get update && sudo apt-get dist-upgrade"
 alias install="sudo apt-get install "
 
-# Go
+# Go install directory
+export PATH=$PATH:/usr/local/go/bin
+
+# Go env
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 
