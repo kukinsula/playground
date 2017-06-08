@@ -2,6 +2,7 @@
 
 # Setup
 mkdir $HOME/info/
+rmdir Public Modèles
 
 
 # Update
@@ -10,7 +11,11 @@ sudo apt-get dist-upgrade
 
 
 # Programs
-sudo apt-get install ubuntu-restricted-extras git vlc chromium-browser emacs terminator tlp tlp-rdw zsh tree source-highlight jq build-essentials
+sudo apt-get install -y ubuntu-restricted-extras git gitk vlc chromium-browser emacs terminator tlp tlp-rdw zsh tree source-highlight jq build-essential ack-grep
+
+
+# Terminator as a keyboard shortcut
+# terminator --geometry=600x845+1000+0
 
 
 # TLP
@@ -43,4 +48,4 @@ sudo updatedb
 
 
 # SSH
-ssh-keygena
+ssh-keygen
