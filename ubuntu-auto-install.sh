@@ -11,7 +11,7 @@ sudo apt-get dist-upgrade
 
 
 # Programs
-sudo apt-get install -y ubuntu-restricted-extras git gitk vlc chromium-browser emacs terminator tlp tlp-rdw zsh tree source-highlight jq build-essential ack-grep
+sudo apt-get install -y ubuntu-restricted-extras git gitk vlc chromium-browser emacs terminator tlp tlp-rdw zsh tree source-highlight jq build-essential ack-grep numix-gtk-theme gparted
 
 
 # Terminator as a keyboard shortcut
