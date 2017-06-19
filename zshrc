@@ -15,7 +15,7 @@ plugins=(git golang)
 
 # User configuration
 
-export PATH="/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/local/go/bin"
+export PATH="/bin:/sbin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/local/go/bin"
 
 source $ZSH/oh-my-zsh.sh
 
