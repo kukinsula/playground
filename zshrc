@@ -15,12 +15,9 @@ plugins=(git golang)
 
 # User configuration
 
-
-export PATH="/bin:/usr/local/sbin:/usr/local/bin:/usr/bin/"
-
+export PATH="/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/local/go/bin"
 
 source $ZSH/oh-my-zsh.sh
-
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
@@ -32,32 +29,24 @@ fi
 # Colors
 export TERM=xterm-256color
 
-
-# Aliases
+# aliases
 alias la="ls -a"
 alias lla='ls -la'
 alias -s pdf="evince "
 alias e="emacs -nw "
+alias update="sudo apt update && sudo apt dist-upgrade"
+alias install="sudo apt install "
+alias search="sudo apt search "
 
-alias update="sudo apt-get update && sudo apt-get dist-upgrade"
-alias install="sudo apt-get install "
-
-
-# Go install directory
-export PATH=$PATH:/usr/local/go/bin
-
-# Go env
-export GOPATH=$HOME/go
+# Go
+export GOPATH=$HOME/info/go
 export PATH=$PATH:$GOPATH/bin
 
-
 unsetopt share_history
-
 
 # less
 export LESSOPEN="| /usr/bin/source-highlight-esc.sh %s"
 export LESS='-R '
-
 
 # Shortcuts
 export PLAY=$GOPATH/src/github.com/kukinsula/playground

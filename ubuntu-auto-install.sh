@@ -32,6 +32,9 @@ wget https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzvf go1.8.3.linux-amd64.tar.gz
 mkdir $HOME/info/go
 
+go get golang.org/x/tools/cmd/...
+go get github.com/rogpeppe/godef
+
 
 # Nodejs
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -

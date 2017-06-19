@@ -12,6 +12,19 @@
   (package-initialize))
 
 
+;; Set Emacs PATH
+(defun set-exec-path-from-shell-PATH ()
+  (let ((path-from-shell (replace-regexp-in-string
+                          "[ \t\n]*$"
+                          ""
+                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+    (setenv "PATH" path-from-shell)
+    (setq eshell-path-env path-from-shell) ; for eshell users
+    (setq exec-path (split-string path-from-shell path-separator))))
+
+(when window-system (set-exec-path-from-shell-PATH))
+
+
 ;; Window bars
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -25,8 +38,12 @@
 
 
 ;; Line Number
-(global-linum-mode t)
-(setq linum-format "%d ")
+;; (global-linum-mode t)
+;; (setq linum-format "%d ")
+
+
+;; Fringe size (border size)
+(fringe-mode '(0 . 0))
 
 
 ;; Maximize window
@@ -42,7 +59,7 @@
 (dired "/home/kuk/info")
 
 
-;; Print line numbers
+;; Print curor's line numbers / columns
 (setq column-number-mode t)
 
 
@@ -67,7 +84,8 @@
    (quote
     ("4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
  '(package-selected-packages (quote (json-mode yaml-mode go-mode auto-complete)))
- '(tool-bar-mode nil))
+ '(tool-bar-mode nil)
+ '(typescript-indent-level 2))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -77,6 +95,9 @@
 
 
 ;; Golang mode
+(setenv "PATH" (concat (getenv "PATH") ":/usr/locale/go/bin"))
+(setq exec-path (append exec-path '("/usr/locale/go/bin")))
+
 (setq go-mode-hook
 '(lambda ()
   (add-hook 'before-save-hook 'gofmt-before-save)
@@ -85,6 +106,8 @@
   (setq tab-width 2)
   )
 )
+
+(setenv "GOPATH" "/home/kuk/info/go")
 
 
 ;; Tide TypeScript mode
