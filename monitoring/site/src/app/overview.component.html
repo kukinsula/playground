@@ -1,0 +1,84 @@
+<h1>{{title}}</h1>
+<nav>
+  <a routerLink="/" routerLinkActive="active">Overview</a>
+
+  <!-- <\!-- -->
+  <!--     <a routerLink="/cpu" routerLinkActive="active">CPU</a>  -->
+  <!--     <a routerLink="/mem" routerLinkActive="active">Memory</a>  -->
+  <!--     <a routerLink="/net" routerLinkActive="active">Network</a>  -->
+  <!--     <a routerLink="/disk" routerLinkActive="active">Disk</a>  -->
+  <!--     <a routerLink="/process" routerLinkActive="active">Process</a>  -->
+  <!--     <a routerLink="/history" routerLinkActive="active">History</a> -->
+  <!-- -\-> -->
+
+  <router-outlet></router-outlet>
+</nav>
+
+<div *ngIf="overviewObs | async as overview">
+  <h2>CPU</h2>
+  <div>
+    <p>
+      CPU load average: {{overview.cpu.load | number:'1.1-2'}} %
+    </p>
+
+    <ul *ngFor="let core of overview.cpu.cores; let i = index">
+      <li>CPU Core #{{i}}: {{core | number:'1.1-2'}} %</li>
+    </ul>
+
+    <ul>
+      <li>Processes: {{overview.cpu.processes}}</li>
+      <li>Procs Running: {{overview.cpu.procsRunning}}</li>
+      <li>Procs Blocked: {{overview.cpu.procsBlocked}}</li>
+      <li>Boot Time: {{overview.cpu.boottime}}</li>
+      <li>Switch Context: {{overview.cpu.switchContext}}</li>
+    </ul>
+  </div>
+
+  <h2>Memory</h2>
+  <div>
+    <ul>
+      <li>Total: {{overview.mem.total | byte:3}}</li>
+      <li>Free: {{overview.mem.free | byte:3}}</li>
+      <li>Available: {{overview.mem.available | byte:3}}</li>
+      <li>Occuppied: {{overview.mem.occupied | byte:3}}</li>
+
+      <li>SWAP Total: {{overview.mem.swapTotal | byte:3}}</li>
+      <li>SWAP Free: {{overview.mem.swapFree | byte:3}}</li>
+      <li>SWAP Occupied: {{overview.mem.swapOccupied | byte:3}}</li>
+
+      <li>VM Allocated Total: {{overview.mem.vmAllocTotal | byte:3}}</li>
+      <li>VM Allocated Free: {{overview.mem.vmAllocFree | byte:3}}</li>
+      <li>VM Allocated Occupied: {{overview.mem.vmAllocOccupied | byte:3}}</li>
+    </ul>
+  </div>
+
+  <h2>Network</h2>
+  <div>
+    <ul *ngFor="let interface of overview.net">
+      <li>{{interface.name}}:
+	<ul>
+	  <li>Upload: {{interface.upload | byte:3}}/s</li>
+  	  <li>Download: {{interface.download | byte:3}}/s</li>
+	</ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- <h2>Disk</h2> -->
+  <!-- <h2>Process</h2> -->
+</div>
+
+<canvas class="chart chart-line" chart-data="data" chart-labels="labels" 
+	chart-series="series" chart-click="onClick"></canvas> 
+
+<!-- <canvas id="myChart" width="400" height="400"></canvas> -->
+<!-- <script> -->
+<!--   console.log("LALALALALA") -->
+<!--   var ctx = document.getElementById("myChart").getContext('2d'); -->
+<!--   var myLineChart = new Chart(ctx, { -->
+<!--     type: 'line', -->
+<!--     data: [12, 19, 3, 5, 2, 3], -->
+<!--     options: options -->
+<!--   }); -->
+<!--   console.log("ICICICIC") -->
+<!-- </script> -->

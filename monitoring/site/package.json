@@ -1,0 +1,36 @@
+{
+   "name": "site",
+   "version": "1.0.0",
+   "description": "Monitoring FrontEnd",
+   "main": "index.js",
+   "dependencies": {
+      "@angular/common": "^4.4.4",
+      "@angular/compiler": "^4.4.4",
+      "@angular/core": "^4.4.4",
+      "@angular/http": "^4.4.4",
+      "@angular/platform-browser": "^4.4.4",
+      "@angular/platform-browser-dynamic": "^4.4.4",
+      "@angular/router": "^4.4.4",
+      "angular-chart.js": "^1.1.1",
+      "chart.js": "^2.7.0",
+      "es6-shim": "^0.35.3",
+      "event-source-polyfill": "^0.0.9",
+      "eventsource": "^1.0.5",
+      "ng2-charts": "^1.6.0",
+      "portfinder": "^1.0.13",
+      "reflect-metadata": "^0.1.10",
+      "rxjs": "^5.4.3"
+   },
+   "devDependencies": {},
+   "scripts": {
+      "start": "node src/main.js"
+   },
+   "keywords": [
+      "Monitoring",
+      "HTTP",
+      "API",
+      "Client"
+   ],
+   "author": "kukinsula",
+   "license": "ISC"
+}

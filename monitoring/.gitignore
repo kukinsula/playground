@@ -1,0 +1,16 @@
+*.o
+*.so
+
+# emacs
+*~
+
+<<<<<<< 81a7d330a396d6948134df7768e9617610cfe1b5
+monitoring
+
+site/node_modules
+=======
+# data files
+dat/*
+
+monitoring
+>>>>>>> feat(metric): add memory and cpu metric
