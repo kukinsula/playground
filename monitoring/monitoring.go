@@ -128,6 +128,7 @@ func (m *Monitoring) Start() error {
 
 func (m *Monitoring) Stop() {
 	m.server.Stop()
+	// TODO: stopper aussi la boucle Monitoring.Start
 }
 
 func (m *Monitoring) MarshalJSON() ([]byte, error) {

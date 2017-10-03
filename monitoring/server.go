@@ -165,8 +165,10 @@ func sseHandler(w http.ResponseWriter, req *http.Request, name string) {
 			return
 		}
 
-		_, err := fmt.Fprintf(w,
-			"id: %d\nevent: %s\ndata: %s\n\n", id, name, data)
+		_, err := fmt.Fprintf(w, `id: %d
+data: %s
+
+`, id, data)
 		if err != nil {
 			fmt.Printf("SSE Write failed: %s\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
