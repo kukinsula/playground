@@ -4,7 +4,6 @@
 ** awk
 ** ed
 ** ltrace
-** ln
 ** wc
 ** exec
 ** sort
@@ -24,6 +23,17 @@
 ** objdump
 ** mount
 ** umount
+** file
+
+* ln
+
+** Options
+
+n : pas de déréférencement
+
+# Créer un lien sans déréférencement qui pointe sur TARGET
+ln -n TARGET LINK_NAME
+
 
 * dd
 
@@ -57,7 +67,6 @@ shred -v /dev/sdX
 
 # Verbeux, 10 passes /dev/urandom, 1 dernière passe de 0
 shred -v -n 10 --random-source=/dev/urandom -z
->>>>>>> f8ddf7c8440e2e01b6dcdbda9e293dac6e144c4f
 
 * netstat
 

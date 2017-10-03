@@ -1,0 +1,10 @@
+* install
+
+* remove
+
+* autoremove
+
+* download
+
+# Lister tous les packages installés
+apt list --installed
