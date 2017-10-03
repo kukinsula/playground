@@ -16,7 +16,6 @@ var s *Server
 
 type Server struct {
 	Mux               *http.ServeMux
-	monitoring        *Monitoring
 	incoming, leaving chan *subscription
 	notify            chan []*message
 	stop              chan struct{}
@@ -41,12 +40,6 @@ func NewServer(config *metric.Config) (*Server, error) {
 		stop:     make(chan struct{}),
 	}
 
-	monitoring, err := NewMonitoring(config)
-	if err != nil {
-		return nil, err
-	}
-	server.monitoring = monitoring
-
 	server.Mux.HandleFunc("/", handleRoot)
 	server.Mux.HandleFunc("/cpu", handleCPU)
 	server.Mux.HandleFunc("/mem", handleMem)
@@ -58,7 +51,6 @@ func NewServer(config *metric.Config) (*Server, error) {
 }
 
 func (s *Server) Start() {
-	go s.monitoring.Start(s)
 	go s.listen()
 	go http.ListenAndServe(":8000", s.Mux)
 }

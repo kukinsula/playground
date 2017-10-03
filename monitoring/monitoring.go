@@ -5,40 +5,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"os/signal"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/kukinsula/playground/monitoring/metric"
 )
-
-func main() {
-	config, err := metric.NewConfig()
-	if err != nil {
-		fmt.Println("New config failed: ", err)
-		os.Exit(1)
-	}
-
-	server, err := NewServer(config)
-	if err != nil {
-		fmt.Println("New server failed: ", err)
-		os.Exit(2)
-	}
-
-	server.Start()
-
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt)
-
-	signal := <-done
-
-	fmt.Println("Caught signal %s!", signal)
-
-	server.Stop()
-
-	os.Exit(0)
-}
 
 var (
 	supportedMetrics    = []string{"cpu", "mem", "net"}
@@ -47,6 +19,7 @@ var (
 
 type Monitoring struct {
 	config  *metric.Config
+	server  *Server
 	Metrics map[string]metric.Metric
 }
 
@@ -94,13 +67,21 @@ func NewMonitoring(config *metric.Config) (*Monitoring, error) {
 		metrics[field] = m
 	}
 
+	server, err := NewServer(config)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Monitoring{
 		config:  config,
+		server:  server,
 		Metrics: metrics,
 	}, nil
 }
 
-func (m *Monitoring) Start(server *Server) error {
+func (m *Monitoring) Start() error {
+	m.server.Start()
+
 	clear()
 
 	names := make([]string, 0, len(m.Metrics))
@@ -137,12 +118,16 @@ func (m *Monitoring) Start(server *Server) error {
 			data:    m,
 		})
 
-		server.Notify(messages)
+		m.server.Notify(messages)
 		time.Sleep(1 * time.Second)
 		clear()
 	}
 
 	return nil
+}
+
+func (m *Monitoring) Stop() {
+	m.server.Stop()
 }
 
 func (m *Monitoring) MarshalJSON() ([]byte, error) {
