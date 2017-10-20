@@ -94,6 +94,19 @@
  )
 
 
+;; C-d to dupplicate the cursor's current line
+(defun duplicate-line()
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line)
+  (yank)
+  (open-line 1)
+  (next-line 1)
+  (yank)
+  )
+(global-set-key (kbd "C-d") 'duplicate-line)
+
+
 ;; Golang mode
 (setenv "PATH" (concat (getenv "PATH") ":/usr/locale/go/bin"))
 (setq exec-path (append exec-path '("/usr/locale/go/bin")))
