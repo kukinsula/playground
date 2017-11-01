@@ -38,12 +38,12 @@
 
 
 ;; Line Number
-;; (global-linum-mode t)
-;; (setq linum-format "%d ")
+(global-linum-mode t)
+(setq linum-format "%d ")
 
 
 ;; Fringe size (border size)
-(fringe-mode '(0 . 0))
+(fringe-mode '(1 . 0))
 
 
 ;; Maximize window
@@ -93,7 +93,6 @@
  ;; If there is more than one, they won't work right.
  )
 
-
 ;; C-d to dupplicate the cursor's current line
 (defun duplicate-line()
   (interactive)
@@ -105,6 +104,21 @@
   (yank)
   )
 (global-set-key (kbd "C-d") 'duplicate-line)
+
+;; Revert all buffers
+(defun revert-buffer-all ()
+  "Refreshes all open buffers from their respective files"
+  (interactive)
+  (let* ((list (buffer-list))
+	 (buffer (car list)))
+    (while buffer
+      (when (and (buffer-file-name buffer) 
+		 (not (buffer-modified-p buffer)))
+	(set-buffer buffer)
+	(revert-buffer t t t))
+      (setq list (cdr list))
+      (setq buffer (car list))))
+  (message "Refreshed open files"))
 
 
 ;; Golang mode
@@ -143,3 +157,6 @@
 (add-hook 'before-save-hook 'tide-format-before-save)
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
+
+;; JavaScript Autocompletion
+(add-hook 'js2-mode-hook 'ac-js2-mode)
