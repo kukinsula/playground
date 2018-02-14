@@ -32,8 +32,8 @@
 
 ;; scroll one line at a time (less "jumpy" than defaults)
 (setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; one line at a time
-(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling    
-(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse    
+(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 (setq scroll-step 3) ;; keyboard scroll one line at a time
 
 
@@ -43,7 +43,7 @@
 
 
 ;; Fringe size (border size)
-(fringe-mode '(1 . 0))
+(fringe-mode '(1 . 1))
 
 
 ;; Maximize window
@@ -54,9 +54,13 @@
 (set-face-attribute 'default nil :font "Mono 10")
 
 
+;; Show whitespaces
+(setq-default show-trailing-whitespace t)
+
+
 ;; Startup buffer to list files
 (setq inhibit-splash-screen t)
-(dired "/home/kuk/info")
+;; (dired "/home/kuk/info")
 
 
 ;; Print curor's line numbers / columns
@@ -93,6 +97,12 @@
  ;; If there is more than one, they won't work right.
  )
 
+;; Load Emacs session
+;;
+(desktop-load-default)
+(desktop-read)
+
+
 ;; C-d to dupplicate the cursor's current line
 (defun duplicate-line()
   (interactive)
@@ -105,6 +115,7 @@
   )
 (global-set-key (kbd "C-d") 'duplicate-line)
 
+
 ;; Revert all buffers
 (defun revert-buffer-all ()
   "Refreshes all open buffers from their respective files"
@@ -112,13 +123,13 @@
   (let* ((list (buffer-list))
 	 (buffer (car list)))
     (while buffer
-      (when (and (buffer-file-name buffer) 
+      (when (and (buffer-file-name buffer)
 		 (not (buffer-modified-p buffer)))
 	(set-buffer buffer)
 	(revert-buffer t t t))
       (setq list (cdr list))
       (setq buffer (car list))))
-  (message "Refreshed open files"))
+    (message "Refreshed open files"))
 
 
 ;; Golang mode
@@ -158,5 +169,26 @@
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
-;; JavaScript Autocompletion
-(add-hook 'js2-mode-hook 'ac-js2-mode)
+
+;; Javascript
+(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;; Better imenu
+(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+
+;; (require 'company-mode)
+(require 'company-tern)
+
+(add-to-list 'company-backends 'company-tern)
+(add-hook 'js2-mode-hook (lambda ()
+                           (tern-mode)
+                           (company-mode)))
+
+;; Syntax hignlight level
+(setq js2-highlight-level 3)
+
+;; Flycheck
+(require 'flycheck)
+(add-hook 'js-mode-hook
+          (lambda () (flycheck-mode t)))

@@ -1,5 +1,3 @@
-# Place me at /home/user/.config/terminator/config
-
 [global_config]
   enabled_plugins = CustomCommandsMenu, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   handle_size = 1
@@ -20,10 +18,11 @@
   [[default]]
     background_darkness = 0.3
     background_image = None
-    cursor_color = "#ffffff"
-    font = Sans 11
-    foreground_color = "#ffffff"
+    cursor_color = "#fffffe"
+    font = Sans 10
+    foreground_color = "#e3e3e3"
     scroll_on_output = False
-    scrollback_lines = 2048
+    scrollback_infinite = True
+    scrollback_lines = 8196
     scrollbar_position = hidden
     show_titlebar = False
