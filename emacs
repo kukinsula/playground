@@ -86,7 +86,7 @@
  '(custom-enabled-themes (quote (blackboard)))
  '(custom-safe-themes
    (quote
-    ("4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
+    ("042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
  '(package-selected-packages (quote (json-mode yaml-mode go-mode auto-complete)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
@@ -173,6 +173,7 @@
 ;; Javascript
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(setq js-indent-level 2)
 
 ;; Better imenu
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)

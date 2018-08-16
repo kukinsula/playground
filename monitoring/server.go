@@ -52,7 +52,7 @@ func NewServer(config *metric.Config) (*Server, error) {
 
 func (s *Server) Start() {
 	go s.listen()
-	go http.ListenAndServe(":8000", s.Mux)
+	go http.ListenAndServe(":8042", s.Mux)
 }
 
 func (s *Server) listen() {

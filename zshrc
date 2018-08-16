@@ -52,10 +52,6 @@ unsetopt share_history
 export LESSOPEN="| /usr/bin/source-highlight-esc.sh %s"
 export LESS='-R '
 
-export PATH=$PATH:~/Divers/robo3t-1.1.1-linux-x86_64-c93c6b0/bin
-
 # Shortcuts
 export PLAY=$GOPATH/src/github.com/kukinsula/playground
 export MONITORING=$GOPATH/src/github.com/kukinsula/monitoring
-
-export SIRENE=$HOME/info/siren/api_sirene
