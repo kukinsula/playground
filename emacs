@@ -116,6 +116,10 @@
 (global-set-key (kbd "C-d") 'duplicate-line)
 
 
+;; Get to the next buffer with C-<tab>
+(global-set-key (kbd "<C-tab>") 'other-window)
+
+
 ;; Revert all buffers
 (defun revert-buffer-all ()
   "Refreshes all open buffers from their respective files"
