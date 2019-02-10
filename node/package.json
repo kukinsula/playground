@@ -1,0 +1,28 @@
+{
+  "name": "mystream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "build": "./node_modules/.bin/tsc --outDir ./dist --target es2017 --module commonjs --sourceMap --strict --noImplicitAny",
+    "prestream": "npm run build -- ./src/stream.ts",
+    "stream": "node ./dist/stream.js",
+    "clean": "rm -rf ./dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "commander": "^2.19.0",
+    "remove": "^0.1.5",
+    "streaming": "^1.1.0",
+    "tail-stream": "^0.3.4",
+    "tailing-stream": "^0.2.0",
+    "typescript": "^3.3.3",
+    "uninstall": "0.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.24"
+  }
+}
