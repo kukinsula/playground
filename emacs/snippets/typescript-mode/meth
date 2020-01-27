@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Method
+# key: meth
+# --
+public ${name}(${arg}: ${argType}): ${returnType} {
+  ${body}
+}

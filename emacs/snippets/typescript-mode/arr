@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Array method
+# key: arr
+# --
+${array}.${method}((${arg}: ${argType}) => {
+  ${body}
+});

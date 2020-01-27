@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Express middleware
+# key: exmid
+# --
+function ${name}(req: express.Request, resp: express.Response, next: express.NextFunction) {
+  ${body}
+}
