@@ -5,7 +5,11 @@
 
 ;; Symlink of snippets
 ;;
-;; $ ln -s ~/.emacs.d/snippets /path/to/playgruond/emacs/snippets
+;; $ ln -s /path/to/playground/emacs/snippets ~/.emacs.d/snippets
+
+
+;; Debug
+;; (debug 1)
 
 
 ;; MELPA
@@ -13,6 +17,11 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
 
+
+;; Use-package
+(eval-when-compile
+  (add-to-list 'load-path "<path where use-package is installed>")
+  (require 'use-package))
 
 ;; Themes
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
@@ -40,6 +49,21 @@
 (set-face-attribute 'default nil :font "Mono 10")
 
 
+;; Set frame title to opened buffer name
+(setq frame-title-format
+  (list (format "%s %%S: %%j " (system-name))
+    '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+
+
+;; Mode-line
+(set-face-foreground 'mode-line "black")
+(set-face-foreground 'mode-line-inactive "white")
+(set-face-background 'mode-line-inactive "grey10")
+
+;; Minions
+(use-package minions :config (minions-mode 1))
+
+
 ;; Scroll 3 lines at a time (less "jumpy" than defaults)
 (setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; one line at a time
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
@@ -53,12 +77,6 @@
 
 ;; Print cursor's line numbers/columns
 (setq column-number-mode t)
-
-
-;; Set frame title to opened buffer name
-(setq frame-title-format
-  (list (format "%s %%S: %%j " (system-name))
-    '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
 
 
 ;; Ask before close
@@ -81,10 +99,10 @@
 ;; Dashboard
 (require 'dashboard)
 (dashboard-setup-startup-hook)
-(setq dashboard-startup-banner "~/.emacs.d/emacs-logo.png")
-(setq dashboard-items '((recents  . 30) (projects . 10)))
-(setq dashboard-set-footer nil)
-(setq dashboard-set-init-info nil)
+;; (setq (dashboard-startup-banner "~/.emacs.d/emacs-logo.png"))
+;; (setq (dashboard-items '((recents  . 30) (projects . 10))))
+;; (setq (dashboard-set-footer nil))
+;; (setq (dashboard-set-init-info nil))
 
 
 ;; Projectile
@@ -100,33 +118,10 @@
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 
-;; Code snippets
+;; YAS code snippets
 (add-to-list 'load-path "~/.emacs.d/snippets")
 (require 'yasnippet)
 (yas-global-mode 1)
-
-
-;; Disable git inside emacs
-(setq vc-handled-backends ())
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
- '(custom-enabled-themes (quote (blackboard)))
- '(custom-safe-themes
-   (quote
-    ("042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
- '(nil nil t)
- '(package-selected-packages
-   (quote
-    (projectile dashboard yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode auto-complete)))
- '(tool-bar-mode nil)
- '(typescript-indent-level 2))
 
 
 ;; Company-mode
@@ -219,6 +214,24 @@
 ;; JSON
 (add-hook 'json-mode-hook #'flycheck-mode)
 
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
+ '(custom-enabled-themes (quote (blackboard)))
+ '(custom-safe-themes
+   (quote
+    ("042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
+ '(nil nil t)
+ '(package-selected-packages
+   (quote
+    (minions use-package projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode auto-complete)))
+ '(tool-bar-mode nil)
+ '(typescript-indent-level 2))
 
 
 (custom-set-faces
