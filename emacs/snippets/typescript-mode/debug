@@ -2,4 +2,4 @@
 # name: Console log object
 # key: debug
 # --
-console.log('${message}', JSON.stringify(${object}, undefined, 2);
+console.log('${message}', JSON.stringify(${object}, undefined, 2));
