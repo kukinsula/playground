@@ -118,7 +118,7 @@
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode auto-complete)))
+    (markdown-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode auto-complete)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -249,7 +249,18 @@
 
 
 ;; JSON
-(add-hook 'json-mode-hook #'flycheck-mode)
+(add-hook 'json-mode-hook
+	  #'flycheck-mode
+	  (setq js-indent-level 2))
+
+
+;; Markdown
+(use-package markdown-mode
+  :ensure t
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
 
 
 
