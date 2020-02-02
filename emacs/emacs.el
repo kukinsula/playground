@@ -1,0 +1,435 @@
+;;; emacs.el --- My personnal Emacs configuration
+
+;;; Commentary:
+;;
+;; Emacs dependencies: company dashboard multiple-cursors projectile tide typescript-mode yasnippet go-mode web-mode
+;; External dependencies: multimarkdown
+;;
+;; Symlinks
+;;
+;; $ ln -s /path/to/playground/emacs/emacs.el ~/.emacs.el
+;; $ ln -s /path/to/playground/emacs/snippets ~/.emacs.d/snippets
+;;
+;; Daemon
+;;
+;; $ cp /path/to/playground/emacs/emacs.service ~/.config/systemd/user
+;; $ systemct start emacs.service
+;; $ emacsclient --create-frame --quiet -n
+
+;;; TODO:
+;;
+;; Documentation
+;;
+;; Modes
+;;   Markdown (with preview and style)
+;;   ORG
+;;   YAML
+;;
+;; Profiler
+
+;;; Code:
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           ;;
+;;          General          ;;
+;;                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Memory
+(setq gc-cons-threshold 50000000)
+(setq large-file-warning-threshold 100000000)
+
+;; Answer y or n
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Packages manager
+(require 'package)
+(setq package-archives '(("org"   . "http://orgmode.org/elpa/")
+                         ("gnu"   . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
+(setq package-enable-at-startup nil)
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(defvar use-package-always-ensure t)
+
+(eval-when-compile
+  (require 'use-package))
+
+(defun compile-init-file nil
+  "Compile itself if ~/.emacs."
+  (interactive)
+  (require 'bytecomp)
+  (let ((dotemacs (file-truename user-init-file)))
+    (if (string= (buffer-file-name) (file-chase-links dotemacs))
+	(byte-compile-file dotemacs))))
+
+(defun compile-init-file-on-save ()
+  "Test."
+  (when (string= (file-truename user-init-file)
+                 (file-truename (buffer-file-name)))
+    (let ((debug-on-error t))
+      (compile-init-file))))
+(add-hook 'after-save-hook #'compile-init-file-on-save)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           ;;
+;;           DEBUG           ;;
+;;                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (setq message-log-max t)
+
+;; (use-package esup
+;;   :ensure t
+;;   :pin melpa
+;;   :commands (esup))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           ;;
+;;         INTERFACE         ;;
+;;                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Themes
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+
+;; Window bars
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+
+;; Highlight current cursor's line
+(global-hl-line-mode +1)
+
+;; Line number
+(line-number-mode +1)
+(global-display-line-numbers-mode 1)
+(column-number-mode t)
+
+;; Fringe size (border size)
+(fringe-mode '(1 . 1))
+
+;; Maximize window
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; Set font
+(set-face-attribute 'default nil
+                    :family "Source Code Pro"
+                    :height 100
+                    :weight 'normal
+                    :width 'normal)
+
+;; Set frame title to opened buffer name
+(setq frame-title-format
+  (list (format "%%S %%j ")
+    '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+
+;; Mode-line
+(set-face-foreground 'mode-line "black")
+(set-face-foreground 'mode-line-inactive "grey80")
+(set-face-background 'mode-line-inactive "grey10")
+
+;; Scroll
+(setq scroll-margin 0
+      scroll-conservatively 100000
+      scroll-preserve-screen-position 1
+      mouse-wheel-scroll-amount '(3 ((shift) . 3))
+      scroll-step 3
+      mouse-wheel-follow-mouse 't
+      mouse-wheel-progressive-speed nil)
+
+;; Show whitespaces
+(setq-default show-trailing-whitespace t)
+
+;; Print cursor's line numbers/columns
+(setq column-number-mode t)
+
+;; Highlight matching parenthesis
+(use-package smartparens
+  :config
+  (progn
+    (require 'smartparens-config)
+    (smartparens-global-mode 1)
+    (show-paren-mode t)))
+
+;; Ask before close
+(setq confirm-kill-emacs 'y-or-n-p)
+
+;; Get to the next buffer with C-<TAB>
+(global-set-key (kbd "<C-tab>") 'other-window)
+
+;; Undo
+(global-set-key (kbd "C-z") 'undo)
+
+;; Desktop
+;; (desktop-save-mode 1)
+;; (desktop-save-frameset 1)
+;; (desktop--check-dont-save 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                          ;;
+;;         PACKAGES         ;;
+;;                          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Disable git mode
+(setq vc-handled-backends ())
+
+;; Minions
+(use-package minions
+  :config (minions-mode 1))
+
+;; Automatically insert closing delimiter
+(electric-pair-mode 1)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
+ '(custom-enabled-themes (quote (blackboard)))
+ '(custom-safe-themes
+   (quote
+    ("042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
+ '(nil nil t)
+ '(package-selected-packages
+   (quote
+    (markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+ '(tool-bar-mode nil)
+ '(typescript-indent-level 2))
+
+;; Dashboard
+(use-package dashboard
+  :config
+  (dashboard-setup-startup-hook)
+
+  (setq dashboard-startup-banner 'logo)
+  ;; (setq dashboard-startup-banner "~/.emacs.d/emacs-logo.png")
+  (setq dashboard-items '((recents  . 30) (projects . 10)))
+  (setq dashboard-set-footer nil)
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+  )
+
+;; Projectile
+(use-package projectile
+  :config
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1))
+
+;; Multiple cursors
+(use-package projectile
+  :config
+  (global-set-key (kbd "C-c m c") 'mc/edit-lines)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+
+;; YAS code snippets
+(add-to-list 'load-path "~/.emacs.d/snippets")
+(use-package yasnippet
+  :config
+  (yas-global-mode 1))
+
+;; Company-mode
+(use-package company
+  :config
+  (setq company-tooltip-align-annotations t)
+
+  (custom-set-faces
+   '(company-echo-common ((t (:underline t))))
+   '(company-preview ((t (:inherit shadow))))
+   '(company-preview-common ((t (:inherit company-preview :underline t))))
+   '(company-scrollbar-bg ((t (:inherit company-tooltip :background "SteelBlue3"))))
+   '(company-scrollbar-fg ((t (:background "DeepSkyBlue4"))))
+   '(company-template-field ((t (:background "DeepSkyBlue3" :foreground "black"))))
+   '(company-tooltip ((t (:background "LightSteelBlue1" :foreground "dark slate gray"))))
+   '(company-tooltip-annotation ((t (:inherit company-tooltip :foreground "slate gray"))))
+   '(company-tooltip-annotation-selection ((t (:inherit company-tooltip-annotation :background "LightSteelBlue3"))))
+   '(company-tooltip-common ((t (:inherit company-tooltip :underline t))))
+   '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline t))))
+   '(company-tooltip-mouse ((t (:inherit company-tooltip-selection))))
+   '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3")))))
+
+  (add-hook 'after-init-hook 'global-company-mode))
+
+;; Flycheck
+(use-package flycheck
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                        ;;
+;;         CUSTOM         ;;
+;;                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun duplicate-line()
+  "Dupplicate the cursor's current line."
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line)
+  (yank)
+  (open-line 1)
+  (forward-line 1)
+  (yank))
+(global-set-key (kbd "C-d") 'duplicate-line)
+
+(defun revert-buffer-all ()
+  "Refreshes all open buffers from their respective files."
+  (interactive)
+  (let* ((list (buffer-list))
+	 (buffer (car list)))
+    (while buffer
+      (when (and (buffer-file-name buffer)
+		 (not (buffer-modified-p buffer)))
+	(set-buffer buffer)
+	(revert-buffer t t t))
+      (setq list (cdr list))
+      (setq buffer (car list))))
+  (message "Refreshed open files"))
+
+(defun move-text-internal (arg)
+  "Move region ARG up or down."
+  (cond
+   ((and mark-active transient-mark-mode)
+    (if (> (point) (mark))
+	(exchange-point-and-mark))
+    (let ((column (current-column))
+	  (text (delete-and-extract-region (point) (mark))))
+      (forward-line arg)
+      (move-to-column column t)
+      (set-mark (point))
+      (insert text)
+      (exchange-point-and-mark)
+      (setq deactivate-mark nil)))
+   (t
+    (beginning-of-line)
+    (when (or (> arg 0) (not (bobp)))
+      (forward-line)
+      (when (or (< arg 0) (not (eobp)))
+	(transpose-lines arg))
+      (forward-line -1)))))
+
+(defun move-text-down (arg)
+  "Move region or current line ARG lines down."
+  (interactive "*p")
+  (move-text-internal arg))
+
+(defun move-text-up (arg)
+  "Move region or current line ARG lines up."
+  (interactive "*p")
+  (move-text-internal (- arg)))
+
+(global-set-key (kbd "M-<up>") 'move-text-up)
+(global-set-key (kbd "M-<down>") 'move-text-down)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                          ;;
+;;         LANGAGES         ;;
+;;                          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Typescript
+(use-package tide
+  :config
+  (setq company-tooltip-align-annotations t)
+  (add-hook 'before-save-hook 'tide-format-before-save)
+
+  (defun setup-tide-mode ()
+    "Set up a full typescript environment."
+    (interactive)
+    (tide-setup)
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+
+  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+
+;; Golang
+(use-package go-mode
+  :config
+  (defun setup-go-mode ()
+    "Define function to call on go-mode."
+
+    (setenv "GOROOT" (shell-command-to-string ". ~/.zshrc; echo -n $GOROOT"))
+    (setenv "GOPATH" (shell-command-to-string ". ~/.zshrc; echo -n $GOPATH"))
+
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (defvar gofmt-command "goimports")
+    (if (not (string-match "go" compile-command))
+	(set (make-local-variable 'compile-command)
+	     "go build -v && go vet -v"))
+
+    (go-guru-hl-identifier-mode)
+
+    (setq tab-width 2)
+    (setq indent-tabs-mode 1)
+
+    (local-set-key (kbd "M-.") 'godef-jump)
+    (local-set-key (kbd "M-,") 'pop-tag-mark)
+    (local-set-key (kbd "M-p") 'compile)
+    (local-set-key (kbd "M-P") 'recompile)
+    (local-set-key (kbd "M-[") 'previous-error)
+    (local-set-key (kbd "M-]") 'next-error)
+
+    (set (make-local-variable 'company-backends) '(company-go))
+
+    (go-eldoc-setup))
+
+  (add-hook 'go-mode-hook 'setup-go-mode))
+
+;; Web-mode (Javascript/PHP/HTML/CSS)
+(use-package web-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-style-padding 1)
+  (setq web-mode-script-padding 1)
+  (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-enable-current-column-highlight t)
+  (setq web-mode-enable-auto-indentation t))
+
+;; JSON
+(add-hook 'json-mode-hook (defvar js-indent-level 2))
+
+;; Markdown
+(use-package markdown-mode
+  :mode
+  (("README\\.md\\'" . markdown-mode)
+   ("\\.md\\'" . markdown-mode)
+   ("\\.markdown\\'" . markdown-mode))
+  :init
+  (setq markdown-command "multimarkdown"))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-echo-common ((t (:underline t))))
+ '(company-preview ((t (:inherit shadow))))
+ '(company-preview-common ((t (:inherit company-preview :underline t))))
+ '(company-scrollbar-bg ((t (:inherit company-tooltip :background "SteelBlue3"))))
+ '(company-scrollbar-fg ((t (:background "DeepSkyBlue4"))))
+ '(company-template-field ((t (:background "DeepSkyBlue3" :foreground "black"))))
+ '(company-tooltip ((t (:background "LightSteelBlue1" :foreground "dark slate gray"))))
+ '(company-tooltip-annotation ((t (:inherit company-tooltip :foreground "slate gray"))))
+ '(company-tooltip-annotation-selection ((t (:inherit company-tooltip-annotation :background "LightSteelBlue3"))))
+ '(company-tooltip-common ((t (:inherit company-tooltip :underline t))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline t))))
+ '(company-tooltip-mouse ((t (:inherit company-tooltip-selection))))
+ '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3")))))
+
+;;; emacs.el ends here
