@@ -28,6 +28,8 @@
 ;; Profiler
 ;;
 ;; line-num seulement en programmation
+;;
+;; Compile dependencies
 
 ;;; Code:
 
@@ -220,7 +222,7 @@
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -233,8 +235,7 @@
   ;; (setq dashboard-startup-banner "~/.emacs.d/emacs-logo.png")
   (setq dashboard-items '((recents  . 30) (projects . 10)))
   (setq dashboard-set-footer nil)
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-  )
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
 
 ;; Projectile
 (use-package projectile
@@ -447,6 +448,10 @@
    ("\\.markdown\\'" . markdown-mode))
   :init
   (setq markdown-command "multimarkdown"))
+
+;; LateX
+(latex-preview-pane-enable)
+(add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
