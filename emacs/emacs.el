@@ -2,12 +2,12 @@
 
 ;;; Commentary:
 ;;
-;; Emacs dependencies: company dashboard multiple-cursors projectile tide typescript-mode yasnippet go-mode web-mode
-;; External dependencies: multimarkdown
+;; Emacs dependencies: company dashboard multiple-cursors projectile tide typescript-mode yasnippet go-mode go-guru go-eldoc web-mode esup
+;; External dependencies: multimarkdown go godef
 ;;
 ;; Symlinks
 ;;
-;; $ ln -s /path/to/playground/emacs/emacs.el ~/.emacs.el
+;; $ ln -s /path/to/playground/emacs/emacs.el ~/.emacs
 ;; $ ln -s /path/to/playground/emacs/snippets ~/.emacs.d/snippets
 ;;
 ;; Daemon
@@ -22,10 +22,12 @@
 ;;
 ;; Modes
 ;;   Markdown (with preview and style)
+;;   LateX (with preview and style)
 ;;   ORG
-;;   YAML
 ;;
 ;; Profiler
+;;
+;; line-num seulement en programmation
 
 ;;; Code:
 
@@ -58,8 +60,28 @@
 (eval-when-compile
   (require 'use-package))
 
+;; auto-package-update
+(use-package auto-package-update
+  :ensure t
+  :commands (auto-package-update-maybe)
+  :config
+  (setq auto-package-update-delete-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (setq auto-package-update-interval 30)
+  (auto-package-update-maybe)
+  (add-hook 'auto-package-update-before-hook
+	    (lambda () (message "I will update packages now"))))
+
+;; Init file compilation$
+(defun init-file-dest (filename)
+  "FILENAME compilation destination."
+  (concat "~/."
+          (file-name-sans-extension (file-name-nondirectory filename))
+          ".elc"))
+(setq byte-compile-dest-file-function 'init-file-dest)
+
 (defun compile-init-file nil
-  "Compile itself if ~/.emacs."
+  "Compile init file."
   (interactive)
   (require 'bytecomp)
   (let ((dotemacs (file-truename user-init-file)))
@@ -67,7 +89,7 @@
 	(byte-compile-file dotemacs))))
 
 (defun compile-init-file-on-save ()
-  "Test."
+  "Compile init file when saved."
   (when (string= (file-truename user-init-file)
                  (file-truename (buffer-file-name)))
     (let ((debug-on-error t))
@@ -82,10 +104,10 @@
 
 ;; (setq message-log-max t)
 
-;; (use-package esup
-;;   :ensure t
-;;   :pin melpa
-;;   :commands (esup))
+(use-package esup
+  :ensure t
+  :pin melpa
+  :commands (esup))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -140,19 +162,14 @@
       mouse-wheel-follow-mouse 't
       mouse-wheel-progressive-speed nil)
 
-;; Show whitespaces
+;; Trailing whitespaces
 (setq-default show-trailing-whitespace t)
+(add-hook 'before-save-hook
+          (lambda ()
+            (delete-trailing-whitespace)))
 
 ;; Print cursor's line numbers/columns
 (setq column-number-mode t)
-
-;; Highlight matching parenthesis
-(use-package smartparens
-  :config
-  (progn
-    (require 'smartparens-config)
-    (smartparens-global-mode 1)
-    (show-paren-mode t)))
 
 ;; Ask before close
 (setq confirm-kill-emacs 'y-or-n-p)
@@ -181,8 +198,13 @@
 (use-package minions
   :config (minions-mode 1))
 
-;; Automatically insert closing delimiter
-(electric-pair-mode 1)
+;; Highlight matching parenthesis
+(use-package smartparens
+  :config
+  (progn
+    (require 'smartparens-config)
+    (smartparens-global-mode 1)
+    (show-paren-mode t)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -198,7 +220,7 @@
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -217,12 +239,11 @@
 ;; Projectile
 (use-package projectile
   :config
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1))
 
 ;; Multiple cursors
-(use-package projectile
+(use-package multiple-cursors
   :config
   (global-set-key (kbd "C-c m c") 'mc/edit-lines)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -239,6 +260,8 @@
 (use-package company
   :config
   (setq company-tooltip-align-annotations t)
+  (setq company-minimum-prefix-length 2)
+  (setq company-idle-delay 0)
 
   (custom-set-faces
    '(company-echo-common ((t (:underline t))))
@@ -334,6 +357,13 @@
 ;;                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Highlight some keywords in prog-mode
+(add-hook 'prog-mode-hook
+          (lambda ()
+	    (font-lock-add-keywords nil
+	     '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
+		1 font-lock-warning-face t)))))
+
 ;; Typescript
 (use-package tide
   :config
@@ -403,6 +433,11 @@
 
 ;; JSON
 (add-hook 'json-mode-hook (defvar js-indent-level 2))
+
+;; YAML
+(use-package yaml-mode
+  :ensure t
+  :mode (".yml" ".yaml"))
 
 ;; Markdown
 (use-package markdown-mode
