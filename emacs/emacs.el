@@ -232,7 +232,6 @@
   (dashboard-setup-startup-hook)
 
   (setq dashboard-startup-banner 'logo)
-  ;; (setq dashboard-startup-banner "~/.emacs.d/emacs-logo.png")
   (setq dashboard-items '((recents  . 30) (projects . 10)))
   (setq dashboard-set-footer nil)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
