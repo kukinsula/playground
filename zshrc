@@ -12,7 +12,7 @@ plugins=(zsh-autosuggestions zsh-syntax-highlighting colored-man-pages)
 source $ZSH/oh-my-zsh.sh
 
 export EDITOR='emacsclient --create-frame --quiet -nw '
-export VISUAL='emacsclient --create-frame --quiet -nw '
+export VISUAL=$EDITOR
 
 # Colors
 export TERM=xterm-256color
