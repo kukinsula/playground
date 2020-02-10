@@ -30,6 +30,7 @@ alias log="tail -f "
 export GOPATH=$HOME/info/go
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:/usr/bin/vendor_perl
+export PATH=$PATH:~/info/deployer_shell_script_alias
 
 unsetopt share_history
 
