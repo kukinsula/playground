@@ -1,3 +1,5 @@
+# cp /path/to/playground/emacs/emacs.service ~/.config/systemd/user/emacs.service
+
 [Unit]
 Description=Emacs text editor
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
