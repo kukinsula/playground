@@ -49,7 +49,8 @@ sudo pacman -S \
   redshift \
   source-highlight \
   time \
-  libreoffice-still
+  libreoffice-still \
+  libreoffice-still-fr
 
 # YaY
 git clone https://aur.archlinux.org/yay.git $HOME/info/yay
@@ -82,7 +83,7 @@ go get github.com/rogpeppe/godef
 sudo pacman -Rns $(pacman -Qtdq)
 
 # /etc/hosts
-sudo curl https://github.com/StevenBlack/hosts --output /etc/hosts
+sudo curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts --output /etc/hosts
 
 # Backup
 sudo rsync -aAXvP --delete --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* --exclude=/run/* --exclude=/mnt/* --exclude=/media/* --exclude=/lost+found / /mnt/backup
