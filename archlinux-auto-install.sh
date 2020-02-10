@@ -16,7 +16,40 @@ sudo pacman install linux-lts-headers
 sudo pacman -Rs linux
 
 # Programs
-sudo pacman -S git tk vlc chromium emacs terminator tlp tlp-rdw zsh tree source-highlight jq ack gparted go nodejs ack redis wine texlive-core npm postfix
+sudo pacman -S \
+  git \
+  tk \
+  vlc \
+  chromium \
+  emacs \
+  terminator \
+  tlp \
+  tlp-rdw \
+  zsh \
+  tree \
+  source-highlight \
+  jq \
+  ack \
+  gparted \
+  go \
+  nodejs \
+  ack \
+  redis \
+  wine \
+  texlive-core \
+  npm \
+  postfix \
+  keepassxc \
+  android-tools \
+  evince \
+  filezilla \
+  gparted \
+  httpie \
+  jq \
+  redshift \
+  source-highlight \
+  time \
+  libreoffice-still
 
 # YaY
 git clone https://aur.archlinux.org/yay.git $HOME/info/yay
@@ -24,7 +57,12 @@ cd $HOME/info/yay
 makepkg -si
 cd $HOME
 
-yay -S mongodb-bin mongodb-tools-bin postman-bin robo3t-bin keepassx
+yay -S \
+  mongodb-bin \
+  mongodb-tools-bin \
+  postman-bin \
+  robo3t-bin \
+  rambox-bin
 
 # TLP
 sudo tlp start
@@ -34,7 +72,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 sudo chsh -s /bin/zsh
 
 # Node
-sudo npm install -g c8 eslint flamebearer npm-check-updates typescript tslint yarn
+sudo npm install -g c8 eslint flamebearer npm-check-updates typescript tslint yarn pm2
 
 # Golang
 go get golang.org/x/tools/cmd/...
@@ -42,6 +80,9 @@ go get github.com/rogpeppe/godef
 
 # Cleanup
 sudo pacman -Rns $(pacman -Qtdq)
+
+# /etc/hosts
+sudo curl https://github.com/StevenBlack/hosts --output /etc/hosts
 
 # Backup
 sudo rsync -aAXvP --delete --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* --exclude=/run/* --exclude=/mnt/* --exclude=/media/* --exclude=/lost+found / /mnt/backup

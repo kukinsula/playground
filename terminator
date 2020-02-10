@@ -1,8 +1,9 @@
 [global_config]
   enabled_plugins = CustomCommandsMenu, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
-  extra_styling = False
   handle_size = 2
   suppress_multiple_term_dialog = True
+  title_font = Source Code Pro 10
+  title_use_system_font = False
 [keybindings]
 [layouts]
   [[default]]

@@ -21,11 +21,12 @@ export TERM=xterm-256color
 # aliases
 alias ll='ls -l'
 alias la='ls -la'
-alias -s pdf="evince "
-alias e="emacsclient --create-frame --quiet -nw "
-alias watch="watch -tn 1"
-alias seqSL="seq 10 | xargs -Iz sl"
-alias log="tail -f "
+alias -s pdf='evince'
+alias e='emacsclient --create-frame --quiet -nw'
+alias watch='watch -tn 1'
+alias seqSL='seq 10 | xargs -Iz sl'
+alias log='tail -f'
+alias pacman='pacman --color=always'
 
 export GOPATH=$HOME/info/go
 export PATH=$PATH:$GOPATH/bin

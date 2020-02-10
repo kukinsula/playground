@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;;
-;; Emacs dependencies: company dashboard multiple-cursors projectile tide typescript-mode yasnippet go-mode go-guru go-eldoc web-mode esup
+;; Emacs dependencies: company dashboard multiple-cursors projectile tide typescript-mode yasnippet go-mode go-guru go-eldoc web-mode esup bug-hunter
 ;; External dependencies: multimarkdown go godef
 ;;
 ;; Symlinks
@@ -74,29 +74,8 @@
   (add-hook 'auto-package-update-before-hook
 	    (lambda () (message "I will update packages now"))))
 
-;; Init file compilation$
-(defun init-file-dest (filename)
-  "FILENAME compilation destination."
-  (concat "~/."
-          (file-name-sans-extension (file-name-nondirectory filename))
-          ".elc"))
-(setq byte-compile-dest-file-function 'init-file-dest)
-
-(defun compile-init-file nil
-  "Compile init file."
-  (interactive)
-  (require 'bytecomp)
-  (let ((dotemacs (file-truename user-init-file)))
-    (if (string= (buffer-file-name) (file-chase-links dotemacs))
-	(byte-compile-file dotemacs))))
-
-(defun compile-init-file-on-save ()
-  "Compile init file when saved."
-  (when (string= (file-truename user-init-file)
-                 (file-truename (buffer-file-name)))
-    (let ((debug-on-error t))
-      (compile-init-file))))
-(add-hook 'after-save-hook #'compile-init-file-on-save)
+;; Replace highlighted text
+(delete-selection-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -248,7 +227,8 @@
   (global-set-key (kbd "C-c m c") 'mc/edit-lines)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click))
 
 ;; YAS code snippets
 (add-to-list 'load-path "~/.emacs.d/snippets")
@@ -351,11 +331,11 @@
 (global-set-key (kbd "M-<up>") 'move-text-up)
 (global-set-key (kbd "M-<down>") 'move-text-down)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                          ;;
-;;         LANGAGES         ;;
-;;                          ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           ;;
+;;         LANGUAGES         ;;
+;;                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Highlight some keywords in prog-mode
 (add-hook 'prog-mode-hook
