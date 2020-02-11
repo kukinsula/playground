@@ -158,8 +158,13 @@
 ;; Get to the next buffer with C-<TAB>
 (global-set-key (kbd "<C-tab>") 'other-window)
 
-;; Undo
-(global-set-key (kbd "C-z") 'undo)
+;; Undo/Redo
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode 1)
+  (global-set-key (kbd "C-z") 'undo)
+  (defalias 'redo 'undo-tree-redo)
+  (global-set-key (kbd "C-S-z") 'redo))
 
 ;; Desktop
 ;; (desktop-save-mode 1)
@@ -201,7 +206,7 @@
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (zenburn-theme undo-tree latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -295,7 +300,7 @@
       (setq list (cdr list))
       (setq buffer (car list))))
   (message "Refreshed open files"))
-
+e
 (defun move-text-internal (arg)
   "Move region ARG up or down."
   (cond
