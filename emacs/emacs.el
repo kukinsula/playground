@@ -97,7 +97,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Themes
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+(use-package base16-theme
+  :ensure t
+  :config
+  (load-theme 'base16-horizon-terminal-dark t))
 
 ;; Window bars
 (menu-bar-mode -1)
@@ -130,9 +133,9 @@
     '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
 
 ;; Mode-line
-(set-face-foreground 'mode-line "black")
-(set-face-foreground 'mode-line-inactive "grey80")
-(set-face-background 'mode-line-inactive "grey10")
+;; (set-face-foreground 'mode-line "black")
+;; (set-face-foreground 'mode-line-inactive "grey80")
+;; (set-face-background 'mode-line-inactive "grey10")
 
 ;; Scroll
 (setq scroll-margin 0
@@ -197,16 +200,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
+ '(company-quickhelp-color-background "#4F4F4F")
+ '(company-quickhelp-color-foreground "#DCDCCC")
  '(custom-enabled-themes (quote (blackboard)))
  '(custom-safe-themes
    (quote
-    ("042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
+    ("679ee3b86b4b34661a68ba45bbd373eab0284caee6249139b2a090c9ddd35ce0" "7aaee3a00f6eb16836f5b28bdccde9e1079654060d26ce4b8f49b56689c51904" "042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (zenburn-theme undo-tree latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (base16-theme sunburn-theme zenburn-theme latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -300,7 +303,7 @@
       (setq list (cdr list))
       (setq buffer (car list))))
   (message "Refreshed open files"))
-e
+
 (defun move-text-internal (arg)
   "Move region ARG up or down."
   (cond
