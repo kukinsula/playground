@@ -172,7 +172,10 @@
 (use-package highlight-indent-guides
   :config
   (setq highlight-indent-guides-method 'character)
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  (set-face-background 'highlight-indent-guides-odd-face "gray50")
+  (set-face-background 'highlight-indent-guides-even-face "gray80")
+  (set-face-foreground 'highlight-indent-guides-character-face "gray100"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                          ;;
@@ -213,7 +216,7 @@
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (base16-theme sunburn-theme zenburn-theme latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (bug-hunter base16-theme sunburn-theme zenburn-theme latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
