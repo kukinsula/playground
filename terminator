@@ -20,11 +20,11 @@
 [plugins]
 [profiles]
   [[default]]
-    background_color = "#171717"
+    background_color = "#1c1c1c"
     cursor_color = "#ffffff"
     cursor_color_fg = False
     font = Source Code Pro 11
-    foreground_color = "#ffffff"
+    foreground_color = "#d3d7cf"
     scrollback_infinite = True
     scrollbar_position = hidden
     show_titlebar = False

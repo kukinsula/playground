@@ -63,7 +63,8 @@ yay -S \
   mongodb-tools-bin \
   postman-bin \
   robo3t-bin \
-  rambox-bin
+  rambox-bin \
+  usb-creator
 
 # TLP
 sudo tlp start
@@ -73,7 +74,15 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 sudo chsh -s /bin/zsh
 
 # Node
-sudo npm install -g c8 eslint flamebearer npm-check-updates typescript tslint yarn pm2
+sudo npm install -g \
+  c8 \
+  eslint \
+  flamebearer \
+  npm-check-updates \
+  typescript \
+  tslint \
+  yarn \
+  pm2
 
 # Golang
 go get golang.org/x/tools/cmd/...

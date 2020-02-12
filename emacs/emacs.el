@@ -98,7 +98,6 @@
 
 ;; Themes
 (use-package base16-theme
-  :ensure t
   :config
   (load-theme 'base16-horizon-terminal-dark t))
 
@@ -131,11 +130,6 @@
 (setq frame-title-format
   (list (format "%%S %%j ")
     '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
-
-;; Mode-line
-;; (set-face-foreground 'mode-line "black")
-;; (set-face-foreground 'mode-line-inactive "grey80")
-;; (set-face-background 'mode-line-inactive "grey10")
 
 ;; Scroll
 (setq scroll-margin 0
@@ -174,6 +168,12 @@
 ;; (desktop-save-frameset 1)
 ;; (desktop--check-dont-save 1)
 
+;; Indentation hightlight
+(use-package highlight-indent-guides
+  :config
+  (setq highlight-indent-guides-method 'character)
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                          ;;
 ;;         PACKAGES         ;;
@@ -200,12 +200,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
+ '(ansi-term-color-vector
+   [unspecified "#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
  '(company-quickhelp-color-background "#4F4F4F")
  '(company-quickhelp-color-foreground "#DCDCCC")
- '(custom-enabled-themes (quote (blackboard)))
+ '(custom-enabled-themes (quote (base16-horizon-terminal-dark)))
  '(custom-safe-themes
    (quote
-    ("679ee3b86b4b34661a68ba45bbd373eab0284caee6249139b2a090c9ddd35ce0" "7aaee3a00f6eb16836f5b28bdccde9e1079654060d26ce4b8f49b56689c51904" "042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
+    ("043c8375cad0cf1d5c42f5d85cbed601075caf09594da04a74712510e9437d2b" "679ee3b86b4b34661a68ba45bbd373eab0284caee6249139b2a090c9ddd35ce0" "7aaee3a00f6eb16836f5b28bdccde9e1079654060d26ce4b8f49b56689c51904" "042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
  '(nil nil t)
  '(package-selected-packages
    (quote
@@ -272,6 +276,11 @@
 (use-package flycheck
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
+
+;; Persistent *scratch*
+(use-package persistent-scratch
+  :config
+  (persistent-scratch-setup-default))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                        ;;
