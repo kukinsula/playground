@@ -99,7 +99,8 @@
 ;; Themes
 (use-package base16-theme
   :config
-  (load-theme 'base16-horizon-terminal-dark t))
+  (load-theme 'base16-horizon-terminal-dark t)
+  (defvar base16-highlight-mode-line 'contrast))
 
 ;; Window bars
 (menu-bar-mode -1)
@@ -170,12 +171,12 @@
 
 ;; Indentation hightlight
 (use-package highlight-indent-guides
-  :config
+  :init
   (setq highlight-indent-guides-method 'character)
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-  (set-face-background 'highlight-indent-guides-odd-face "gray50")
-  (set-face-background 'highlight-indent-guides-even-face "gray80")
-  (set-face-foreground 'highlight-indent-guides-character-face "gray100"))
+  (setq highlight-indent-guides-character ?\|)
+  :config
+  (add-hook 'prog-mode-hook #'highlight-indent-guides-mode)
+  (set-face-foreground 'highlight-indent-guides-character-face "#FFFFFF"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                          ;;
@@ -216,7 +217,7 @@
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (bug-hunter base16-theme sunburn-theme zenburn-theme latex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (elpy bug-hunter base16-themelatex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -285,6 +286,9 @@
   :config
   (persistent-scratch-setup-default))
 
+;; Common Lisp
+(use-package cl)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                        ;;
 ;;         CUSTOM         ;;
@@ -315,6 +319,20 @@
       (setq list (cdr list))
       (setq buffer (car list))))
   (message "Refreshed open files"))
+
+(defun kill-all-buffers ()
+  "Kill all buffers except *Messages* *dashboard* *scratch*."
+  (interactive)
+  (mapc 'kill-buffer
+	(remove-if
+	 (lambda (x)
+	   (or
+	    (string-equal "*Messages*" (buffer-name x))
+	    (string-equal "*dashboard*" (buffer-name x))
+	    (string-equal "*scratch*" (buffer-name x))))
+	 (buffer-list)))
+  (delete-other-windows nil)
+  (delete-other-frames nil))
 
 (defun move-text-internal (arg)
   "Move region ARG up or down."
@@ -351,11 +369,11 @@
 (global-set-key (kbd "M-<up>") 'move-text-up)
 (global-set-key (kbd "M-<down>") 'move-text-down)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                           ;;
-;;         LANGUAGES         ;;
-;;                           ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                              ;;
+;;         ENVIRONMENTS         ;;
+;;                              ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Highlight some keywords in prog-mode
 (add-hook 'prog-mode-hook
@@ -470,5 +488,11 @@
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline t))))
  '(company-tooltip-mouse ((t (:inherit company-tooltip-selection))))
  '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3")))))
+
+;; Python
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
 
 ;;; emacs.el ends here

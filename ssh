@@ -1,0 +1,6 @@
+Host *
+     IdentityFile /path/to/identity_file
+     ServerAliveInterval 240
+     Hostname 0.0.0.0
+     Port 22
+     User user
