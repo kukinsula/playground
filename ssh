@@ -1,6 +1,20 @@
-Host *
-     IdentityFile /path/to/identity_file
-     ServerAliveInterval 240
-     Hostname 0.0.0.0
-     Port 22
-     User user
+# cp /path/to/playground/ssh ~/.ssh
+
+# Global user config
+#
+# Host *
+#      IdentityFile /path/to/identity_file
+#      ServerAliveInterval 240
+
+# Template
+#
+# Host domain
+#      IdentityFile /path/to/identity_file
+#      ServerAliveInterval 240
+#      Hostname IP
+#      Port PORT
+#      User USER
+
+
+# Host github.com
+#      IdentityFile /path/to/identity_file

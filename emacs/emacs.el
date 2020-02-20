@@ -20,9 +20,12 @@
 ;;
 ;; Documentation
 ;;
+;; emacs mode texte avec thème plus lisible
+;;
+;; M-x package-install RET list-of-packages-to-install (d'une trève)
+;;
 ;; Modes
 ;;   Markdown (with preview and style)
-;;   LateX (with preview and style)
 ;;   ORG
 ;;
 ;; Profiler
@@ -76,6 +79,19 @@
 
 ;; Replace highlighted text
 (delete-selection-mode 1)
+
+;; Save mini buffer history
+(savehist-mode 1)
+(defvar savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+
+;; Transparently open compressed files
+(auto-compression-mode t)
+
+;; UTF-8
+(prefer-coding-system 'utf-8)
+
+;; Default browser
+(setq browse-url-browser-function 'browse-url-chromium)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -217,7 +233,7 @@
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (elpy bug-hunter base16-themelatex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (smex rainbow-mode blacken elpy bug-hunter base16-themelatex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -289,6 +305,21 @@
 ;; Common Lisp
 (use-package cl)
 
+;; Sets background color to strings that match color names, e.g. #0000ff
+(use-package rainbow-mode
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-mode)
+  (add-hook 'css-mode-hook 'rainbow-mode)
+  (add-hook 'html-mode-hook 'rainbow-mode)
+  (add-hook 'js2-mode-hook 'rainbow-mode))
+
+(use-package smex
+  :config
+  (defvar smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
+  (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex)
+  (global-set-key (kbd "M-X") 'smex-major-mode-commands))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                        ;;
 ;;         CUSTOM         ;;
@@ -320,7 +351,7 @@
       (setq buffer (car list))))
   (message "Refreshed open files"))
 
-(defun kill-all-buffers ()
+(defun reset-session ()
   "Kill all buffers except *Messages* *dashboard* *scratch*."
   (interactive)
   (mapc 'kill-buffer
@@ -360,14 +391,57 @@
   "Move region or current line ARG lines down."
   (interactive "*p")
   (move-text-internal arg))
-
 (defun move-text-up (arg)
   "Move region or current line ARG lines up."
   (interactive "*p")
   (move-text-internal (- arg)))
-
 (global-set-key (kbd "M-<up>") 'move-text-up)
 (global-set-key (kbd "M-<down>") 'move-text-down)
+
+;; Copy filename to clipboard
+(defun copy-filename-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+		      default-directory
+		    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+;; file size
+(defun file-size-human-readable (file-size &optional flavor)
+  "Produce a string showing FILE-SIZE in human-readable form.
+
+Optional second argument FLAVOR controls the units and the display format:
+
+ If FLAVOR is nil or omitted, each kilobyte is 1024 bytes and the produced
+    suffixes are \"k\", \"M\", \"G\", \"T\", etc.
+ If FLAVOR is `si', each kilobyte is 1000 bytes and the produced suffixes
+    are \"k\", \"M\", \"G\", \"T\", etc.
+ If FLAVOR is `iec', each kilobyte is 1024 bytes and the produced suffixes
+    are \"KiB\", \"MiB\", \"GiB\", \"TiB\", etc."
+  (let ((power (if (or (null flavor) (eq flavor 'iec))
+		   1024.0
+		 1000.0))
+	(post-fixes
+	 ;; none, kilo, mega, giga, tera, peta, exa, zetta, yotta
+	 (list "" "k" "M" "G" "T" "P" "E" "Z" "Y")))
+    (while (and (>= file-size power) (cdr post-fixes))
+      (setq file-size (/ file-size power)
+	    post-fixes (cdr post-fixes)))
+    (format "%.0f%s%s" file-size
+	    (if (and (eq flavor 'iec) (string= (car post-fixes) "k"))
+		"K"
+	      (car post-fixes))
+	    (if (eq flavor 'iec) "iB" ""))))
+
+(defun get-filesize ()
+  "Prompt user to enter a file name, with completion and history support."
+  (interactive)
+  (let* ((data (file-attributes (read-file-name "Enter file name:")))
+	 (d (nth 7 data)))
+    (message "Size is %s" (file-size-human-readable d))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
@@ -491,7 +565,6 @@
 
 ;; Python
 (use-package elpy
-  :ensure t
   :init
   (elpy-enable))
 

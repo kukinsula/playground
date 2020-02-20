@@ -50,7 +50,8 @@ sudo pacman -S \
   source-highlight \
   time \
   libreoffice-still \
-  libreoffice-still-fr
+  libreoffice-still-fr \
+  python-pip
 
 # YaY
 git clone https://aur.archlinux.org/yay.git $HOME/info/yay
@@ -99,3 +100,6 @@ sudo rsync -aAXvP --delete --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* -
 
 # Restore backup
 # rsync -aAXv --delete --exclude="lost+found" /mnt/usb/ /mnt/system/
+
+# Python
+sudo pip install black rope jedi flake8 importmagic autopep8 yapf
