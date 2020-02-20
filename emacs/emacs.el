@@ -5,12 +5,12 @@
 ;; Emacs dependencies: company dashboard multiple-cursors projectile tide typescript-mode yasnippet go-mode go-guru go-eldoc web-mode esup bug-hunter
 ;; External dependencies: multimarkdown go godef
 ;;
-;; Symlinks
+;; * Symlinks
 ;;
 ;; $ ln -s /path/to/playground/emacs/emacs.el ~/.emacs
 ;; $ ln -s /path/to/playground/emacs/snippets ~/.emacs.d/snippets
 ;;
-;; Daemon
+;; * Daemon
 ;;
 ;; $ cp /path/to/playground/emacs/emacs.service ~/.config/systemd/user
 ;; $ systemct start emacs.service
@@ -18,7 +18,7 @@
 
 ;;; TODO:
 ;;
-;; Documentation
+;; Code documentation
 ;;
 ;; emacs mode texte avec thème plus lisible
 ;;
@@ -31,8 +31,6 @@
 ;; Profiler
 ;;
 ;; line-num seulement en programmation
-;;
-;; Compile dependencies
 
 ;;; Code:
 
@@ -308,10 +306,7 @@
 ;; Sets background color to strings that match color names, e.g. #0000ff
 (use-package rainbow-mode
   :config
-  (add-hook 'emacs-lisp-mode-hook 'rainbow-mode)
-  (add-hook 'css-mode-hook 'rainbow-mode)
-  (add-hook 'html-mode-hook 'rainbow-mode)
-  (add-hook 'js2-mode-hook 'rainbow-mode))
+  (add-hook 'prog-mode-hook 'rainbow-mode))
 
 (use-package smex
   :config

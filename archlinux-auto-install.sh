@@ -95,11 +95,20 @@ sudo pacman -Rns $(pacman -Qtdq)
 # /etc/hosts
 sudo curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts --output /etc/hosts
 
+# Python
+sudo pip \
+  install \
+  black \
+  rope \
+  jedi \
+  flake8 \
+  importmagic \
+  autopep8 \
+  yapf
+
+
 # Backup
-sudo rsync -aAXvP --delete --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* --exclude=/run/* --exclude=/mnt/* --exclude=/media/* --exclude=/lost+found / /mnt/backup
+# sudo rsync -aAXvP --delete --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* --exclude=/run/* --exclude=/mnt/* --exclude=/media/* --exclude=/lost+found / /mnt/backup
 
 # Restore backup
 # rsync -aAXv --delete --exclude="lost+found" /mnt/usb/ /mnt/system/
-
-# Python
-sudo pip install black rope jedi flake8 importmagic autopep8 yapf
