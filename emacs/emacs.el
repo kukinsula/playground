@@ -28,9 +28,19 @@
 ;;   Markdown (with preview and style)
 ;;   ORG
 ;;
-;; Profiler
-;;
 ;; line-num seulement en programmation
+;;
+;; refactor all hooks e.g prog-mode-hook
+;;
+;; disable C-_
+;;
+;; revert-buffer shortcut (C-R ?)
+;;
+;; LSP => tester emacs27
+;;
+;; fonction pour trier une région par ordre alphabétique
+;;
+;; Fix exec-path-from-shell
 
 ;;; Code:
 
@@ -65,14 +75,13 @@
 
 ;; auto-package-update
 (use-package auto-package-update
-  :ensure t
   :commands (auto-package-update-maybe)
   :config
   (setq auto-package-update-delete-old-versions t)
   (setq auto-package-update-hide-results t)
   (setq auto-package-update-interval 30)
   (auto-package-update-maybe)
-  (add-hook 'auto-package-update-before-hook
+	(add-hook 'auto-package-update-before-hook
 	    (lambda () (message "I will update packages now"))))
 
 ;; Replace highlighted text
@@ -86,10 +95,19 @@
 (auto-compression-mode t)
 
 ;; UTF-8
+(set-charset-priority 'unicode)
+(set-language-environment "UTF-8")
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
 ;; Default browser
 (setq browse-url-browser-function 'browse-url-chromium)
+
+;; PATH
+;; (setq exec-path-from-shell-arguments nil)
+(exec-path-from-shell-initialize)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -99,10 +117,10 @@
 
 ;; (setq message-log-max t)
 
-(use-package esup
-  :ensure t
-  :pin melpa
-  :commands (esup))
+;; (use-package esup
+;;   :ensure t
+;;   :pin melpa
+;;   :commands (esup))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -127,6 +145,9 @@
 (line-number-mode +1)
 (global-display-line-numbers-mode 1)
 (column-number-mode t)
+
+;; Print cursor's line numbers/columns
+(setq column-number-mode t)
 
 ;; Fringe size (border size)
 (fringe-mode '(1 . 1))
@@ -161,9 +182,6 @@
           (lambda ()
             (delete-trailing-whitespace)))
 
-;; Print cursor's line numbers/columns
-(setq column-number-mode t)
-
 ;; Ask before close
 (setq confirm-kill-emacs 'y-or-n-p)
 
@@ -191,6 +209,25 @@
   :config
   (add-hook 'prog-mode-hook #'highlight-indent-guides-mode)
   (set-face-foreground 'highlight-indent-guides-character-face "#FFFFFF"))
+
+;; Tabs
+(setq custom-tab-width 2)
+
+(defun enable-tabs  ()
+  (local-set-key (kbd "TAB") 'tab-to-tab-stop)
+  (setq indent-tabs-mode t)
+  (setq tab-width custom-tab-width))
+
+(add-hook 'prog-mode-hook 'enable-tabs)
+
+(setq-default python-indent-offset custom-tab-width)
+(setq-default js-indent-level custom-tab-width)
+
+;; Making electric-indent behave sanely
+(setq-default electric-indent-inhibit t)
+
+;; Make the backspace properly erase the tab
+(setq backward-delete-char-untabify-method 'hungry)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                          ;;
@@ -222,16 +259,13 @@
    ["#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
  '(ansi-term-color-vector
    [unspecified "#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
- '(company-quickhelp-color-background "#4F4F4F")
  '(company-quickhelp-color-foreground "#DCDCCC")
  '(custom-enabled-themes (quote (base16-horizon-terminal-dark)))
- '(custom-safe-themes
-   (quote
-    ("043c8375cad0cf1d5c42f5d85cbed601075caf09594da04a74712510e9437d2b" "679ee3b86b4b34661a68ba45bbd373eab0284caee6249139b2a090c9ddd35ce0" "7aaee3a00f6eb16836f5b28bdccde9e1079654060d26ce4b8f49b56689c51904" "042b095e7ad996515b1037162100b9cd9d3c57f1fd2d7e70ac5c57770a01cc4d" "17c312391e3a908d761d42bd71367f3f9deb45df79b13b6f82ad57064ae9eebb" "4c7a1f0559674bf6d5dd06ec52c8badc5ba6e091f954ea364a020ed702665aa1" "f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
+ '(custom-safe-themes (quote (default)))
  '(nil nil t)
  '(package-selected-packages
    (quote
-    (smex rainbow-mode blacken elpy bug-hunter base16-themelatex-preview-pane auto-package-update markdown-mode flycheck dashboard flymake-go go-autocomplete auto-complete company-go exec-path-from-shell go-guru godoctor go-eldoc go-mode esup smartparens web-mode minions projectile yasnippet multiple-cursors company typescript-mode tide json-mode yaml-mode)))
+    (go-mode tide prettier-js company-lsp typescript-mode company lsp-ui lsp-mode persistent-scratch smex rainbow-mode bug-hunter base16-themelatex-preview-pane auto-package-update dashboard exec-path-from-shell esup smartparens minions projectile yasnippet multiple-cursors)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -272,28 +306,8 @@
   (setq company-tooltip-align-annotations t)
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay 0)
-
-  (custom-set-faces
-   '(company-echo-common ((t (:underline t))))
-   '(company-preview ((t (:inherit shadow))))
-   '(company-preview-common ((t (:inherit company-preview :underline t))))
-   '(company-scrollbar-bg ((t (:inherit company-tooltip :background "SteelBlue3"))))
-   '(company-scrollbar-fg ((t (:background "DeepSkyBlue4"))))
-   '(company-template-field ((t (:background "DeepSkyBlue3" :foreground "black"))))
-   '(company-tooltip ((t (:background "LightSteelBlue1" :foreground "dark slate gray"))))
-   '(company-tooltip-annotation ((t (:inherit company-tooltip :foreground "slate gray"))))
-   '(company-tooltip-annotation-selection ((t (:inherit company-tooltip-annotation :background "LightSteelBlue3"))))
-   '(company-tooltip-common ((t (:inherit company-tooltip :underline t))))
-   '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline t))))
-   '(company-tooltip-mouse ((t (:inherit company-tooltip-selection))))
-   '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3")))))
-
+  (global-set-key (kbd "C-<space>") 'company-complete)
   (add-hook 'after-init-hook 'global-company-mode))
-
-;; Flycheck
-(use-package flycheck
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 ;; Persistent *scratch*
 (use-package persistent-scratch
@@ -314,6 +328,11 @@
   (smex-initialize)
   (global-set-key (kbd "M-x") 'smex)
   (global-set-key (kbd "M-X") 'smex-major-mode-commands))
+
+;; Flycheck
+(use-package flycheck
+  :init
+  (global-flycheck-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                        ;;
@@ -440,16 +459,47 @@ Optional second argument FLAVOR controls the units and the display format:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
-;;         ENVIRONMENTS         ;;
+;;         PROGRAMMING          ;;
 ;;                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Highlight some keywords in prog-mode
 (add-hook 'prog-mode-hook
-          (lambda ()
+	  (lambda ()
 	    (font-lock-add-keywords nil
-	     '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
-		1 font-lock-warning-face t)))))
+				    '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
+				       1 font-lock-warning-face t)))))
+
+;; Language Server Protocol
+(use-package lsp-mode
+  ;; TODO: Python, JavaScript, Lisp, Web-mode, LateX, Markdown, JSON, YAML
+
+	:init
+	(setq lsp-auto-configure t)
+  (setq lsp-log-io t)
+  (setq lsp-enable-snippet t)
+  (setq lsp-enable-completion-at-point t)
+  (setq lsp-enable-on-type-formatting t)
+  (setq lsp-enable-semantic-highlighting t)
+  (setq lsp-idle-delay 500)
+	(setq lsp-diagnostic-package :flycheck)
+	(setq lsp-enable-indentation t)
+	(setq lsp-before-save-edits t)
+
+  :hook
+  (python-mode . lsp-deferred)
+  (go-mode . lsp-deferred)
+  (javascript-mode . lsp-deferred))
+
+(use-package lsp-ui)
+
+(use-package company-lsp
+  :config
+  (push 'company-lsp company-backends)
+
+  ;; Disable client-side cache because the LSP server does a better job.
+  (setq company-transformers nil
+        company-lsp-async t
+        company-lsp-cache-candidates nil))
 
 ;; Typescript
 (use-package tide
@@ -464,103 +514,113 @@ Optional second argument FLAVOR controls the units and the display format:
     (eldoc-mode +1)
     (tide-hl-identifier-mode +1)
     (company-mode +1))
-
-  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+	(add-hook 'typescript-mode-hook #'setup-tide-mode))
 
 ;; Golang
 (use-package go-mode
   :config
-  (defun setup-go-mode ()
-    "Define function to call on go-mode."
+  :hook
+  (go-mode . lsp-deferred)
+  (before-save . lsp-format-buffer)
+  (before-save . lsp-organize-imports))
 
-    (setenv "GOROOT" (shell-command-to-string ". ~/.zshrc; echo -n $GOROOT"))
-    (setenv "GOPATH" (shell-command-to-string ". ~/.zshrc; echo -n $GOPATH"))
 
-    (add-hook 'before-save-hook 'gofmt-before-save)
-    (defvar gofmt-command "goimports")
-    (if (not (string-match "go" compile-command))
-	(set (make-local-variable 'compile-command)
-	     "go build -v && go vet -v"))
+;; (use-package typescript-mode
+;;   :config
+;;   (setq prettier-js-args '(
+;;   			   "--tab-width" "2"
+;;   			   "--trailing-comma" "all"
+;;   			   "--bracket-spacing" "false"
+;;   			   "--no-semi" "true"
+;;   			   "--single-quote" "true"
+;;   			   "--trailing-comma" "none"
+;;   			   "--no-bracket-spacing" "true"
+;;   			   "--range-start" "0"
+;;   			   "--range-end" "Infinity"))
+;;   (add-hook 'typescript-mode-hook #'prettier-js-mode))
 
-    (go-guru-hl-identifier-mode)
+;; Golang
+;; (use-package go-mode
+;;   :config
+;;   (defun setup-go-mode ()
+;;     "Define function to call on go-mode."
 
-    (setq tab-width 2)
-    (setq indent-tabs-mode 1)
+;;     (setenv "GOROOT" (shell-command-to-string ". ~/.zshrc; echo -n $GOROOT"))
+;;     (setenv "GOPATH" (shell-command-to-string ". ~/.zshrc; echo -n $GOPATH"))
 
-    (local-set-key (kbd "M-.") 'godef-jump)
-    (local-set-key (kbd "M-,") 'pop-tag-mark)
-    (local-set-key (kbd "M-p") 'compile)
-    (local-set-key (kbd "M-P") 'recompile)
-    (local-set-key (kbd "M-[") 'previous-error)
-    (local-set-key (kbd "M-]") 'next-error)
+;;     (add-hook 'before-save-hook 'gofmt-before-save)
+;;     (defvar gofmt-command "goimports")
+;;     (if (not (string-match "go" compile-command))
+;; 	(set (make-local-variable 'compile-command)
+;; 	     "go build -v && go vet -v"))
 
-    (set (make-local-variable 'company-backends) '(company-go))
+;;     (go-guru-hl-identifier-mode)
 
-    (go-eldoc-setup))
+;;     (setq tab-width 2)
+;;     (setq indent-tabs-mode 1)
 
-  (add-hook 'go-mode-hook 'setup-go-mode))
+;;     (local-set-key (kbd "M-.") 'godef-jump)
+;;     (local-set-key (kbd "M-,") 'pop-tag-mark)
+;;     (local-set-key (kbd "M-p") 'compile)
+;;     (local-set-key (kbd "M-P") 'recompile)
+;;     (local-set-key (kbd "M-[") 'previous-error)
+;;     (local-set-key (kbd "M-]") 'next-error)
+
+;;     (set (make-local-variable 'company-backends) '(company-go))
+
+;;     (go-eldoc-setup))
+
+;;   (add-hook 'go-mode-hook 'setup-go-mode))
 
 ;; Web-mode (Javascript/PHP/HTML/CSS)
-(use-package web-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+;; (use-package web-mode
+;;   :config
+;;   (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+;;   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+;;   (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+;;   (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+;;   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
 
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
-  (setq web-mode-style-padding 1)
-  (setq web-mode-script-padding 1)
-  (setq web-mode-enable-current-element-highlight t)
-  (setq web-mode-enable-current-column-highlight t)
-  (setq web-mode-enable-auto-indentation t))
+;;   (setq web-mode-markup-indent-offset 2)
+;;   (setq web-mode-css-indent-offset 2)
+;;   (setq web-mode-code-indent-offset 2)
+;;   (setq web-mode-style-padding 1)
+;;   (setq web-mode-script-padding 1)
+;;   (setq web-mode-enable-current-element-highlight t)
+;;   (setq web-mode-enable-current-column-highlight t)
+;;   (setq web-mode-enable-auto-indentation t))
 
 ;; JSON
-(add-hook 'json-mode-hook (defvar js-indent-level 2))
+;; (add-hook 'json-mode-hook (defvar js-indent-level 2))
 
 ;; YAML
-(use-package yaml-mode
-  :ensure t
-  :mode (".yml" ".yaml"))
+;; (use-package yaml-mode
+;;   :ensure t
+;;   :mode (".yml" ".yaml"))
 
 ;; Markdown
-(use-package markdown-mode
-  :mode
-  (("README\\.md\\'" . markdown-mode)
-   ("\\.md\\'" . markdown-mode)
-   ("\\.markdown\\'" . markdown-mode))
-  :init
-  (setq markdown-command "multimarkdown"))
+;; (use-package markdown-mode
+;;   :mode
+;;   (("README\\.md\\'" . markdown-mode)
+;;    ("\\.md\\'" . markdown-mode)
+;;    ("\\.markdown\\'" . markdown-mode))
+;;   :init
+;;   (setq markdown-command "multimarkdown"))
 
 ;; LateX
-(latex-preview-pane-enable)
-(add-hook 'doc-view-mode-hook 'auto-revert-mode)
+;; (latex-preview-pane-enable)
+;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+
+;; Python
+;; (use-package elpy
+;;   :init
+;;   (elpy-enable))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(company-echo-common ((t (:underline t))))
- '(company-preview ((t (:inherit shadow))))
- '(company-preview-common ((t (:inherit company-preview :underline t))))
- '(company-scrollbar-bg ((t (:inherit company-tooltip :background "SteelBlue3"))))
- '(company-scrollbar-fg ((t (:background "DeepSkyBlue4"))))
- '(company-template-field ((t (:background "DeepSkyBlue3" :foreground "black"))))
- '(company-tooltip ((t (:background "LightSteelBlue1" :foreground "dark slate gray"))))
- '(company-tooltip-annotation ((t (:inherit company-tooltip :foreground "slate gray"))))
- '(company-tooltip-annotation-selection ((t (:inherit company-tooltip-annotation :background "LightSteelBlue3"))))
- '(company-tooltip-common ((t (:inherit company-tooltip :underline t))))
- '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline t))))
- '(company-tooltip-mouse ((t (:inherit company-tooltip-selection))))
- '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3")))))
-
-;; Python
-(use-package elpy
-  :init
-  (elpy-enable))
+ )
 
 ;;; emacs.el ends here

@@ -1,12 +1,12 @@
 # ln -s /path/to/playground/zshrc ~/.zshrc
 
-export ZSH=$HOME/.oh-my-zsh
-
-ZSH_THEME="robbyrussell"
-
 # git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 # git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 # git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
+
+export ZSH=$HOME/.oh-my-zsh
+
+ZSH_THEME="robbyrussell"
 
 plugins=(zsh-autosuggestions zsh-syntax-highlighting colored-man-pages)
 
@@ -28,8 +28,11 @@ alias seqSL='seq 10 | xargs -Iz sl'
 alias log='tail -f'
 alias pacman='pacman --color=always'
 
+# Golang
 export GOPATH=$HOME/info/go
 export PATH=$PATH:$GOPATH/bin
+export GO111MODULE=on
+
 export PATH=$PATH:/usr/bin/vendor_perl
 export PATH=$PATH:~/info/deployer_shell_script_alias
 

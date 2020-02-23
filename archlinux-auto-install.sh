@@ -51,7 +51,9 @@ sudo pacman -S \
   time \
   libreoffice-still \
   libreoffice-still-fr \
-  python-pip
+  python-pip \
+  net-tools \
+  etcher
 
 # YaY
 git clone https://aur.archlinux.org/yay.git $HOME/info/yay
@@ -106,9 +108,23 @@ sudo pip \
   autopep8 \
   yapf
 
+# Git
+git config --global user.email ""
+git config --global user.name ""
 
 # Backup
-# sudo rsync -aAXvP --delete --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* --exclude=/run/* --exclude=/mnt/* --exclude=/media/* --exclude=/lost+found / /mnt/backup
+# sudo rsync -aAXvP \
+#   --delete \
+#   --exclude=/dev/* \
+#   --exclude=/proc/* \
+#   --exclude=/sys/* \
+#   --exclude=/tmp/* \
+#   --exclude=/run/* \
+#   --exclude=/mnt/* \
+#   --exclude=/media/* \
+#   --exclude=/lost+found \
+#   / \
+#   /mnt/backup
 
 # Restore backup
 # rsync -aAXv --delete --exclude="lost+found" /mnt/usb/ /mnt/system/
