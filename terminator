@@ -51,7 +51,7 @@
       ratio = 0.5
       type = VPaned
     [[[terminal2]]]
-      command = npm run dev
+      command = ""
       directory = /home/kuk/info/api.nec.freelance.com
       order = 0
       parent = child1
@@ -60,39 +60,39 @@
       type = Terminal
       uuid = f66dc962-3c65-44e5-bdf7-1524fbaded30
     [[[terminal4]]]
-      command = npm run dev
+      command = ""
       directory = /home/kuk/info/api.login.freelance.com
-      title = LOGIN
       order = 0
       parent = child3
       profile = default
+      title = LOGIN
       type = Terminal
       uuid = 2c7f5fca-b914-432f-a349-11d76794917c
     [[[terminal6]]]
-      command = npm run dev
+      command = ""
       directory = /home/kuk/info/api.inside.freelance.com
-      title = INSIDE
       order = 0
       parent = child5
       profile = default
+      title = INSIDE
       type = Terminal
       uuid = cc745f3b-47cb-4b60-898f-e09716d4d4fe
     [[[terminal8]]]
-      command = npm run dev
+      command = ""
       directory = /home/kuk/info/api.sirene.freelance.com
-      title = SIRENE
       order = 0
       parent = child7
       profile = default
+      title = SIRENE
       type = Terminal
       uuid = 3a8ed941-1ade-4a15-bf48-52d5d3a06740
     [[[terminal9]]]
-      command = npm start
+      command = ""
       directory = /home/kuk/info/nec.freelance.com
-      title = FRONT NEC
       order = 1
       parent = child7
       profile = default
+      title = FRONT NEC
       type = Terminal
       uuid = 29699a96-bafe-4288-99b5-437f3aaac6b2
 [plugins]

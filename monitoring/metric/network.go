@@ -102,7 +102,7 @@ func (n *Network) MarshalCSV() ([]byte, error) {
 	i, length := 0, len(n.measures)
 
 	for _, v := range n.measures {
-		str += fmt.Sprintf("%f,%f", v.Download, v.Upload)
+		str += fmt.Sprintf("%d,%d", v.Download, v.Upload)
 
 		if i != length-1 {
 			str += ","

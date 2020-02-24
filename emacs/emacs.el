@@ -20,27 +20,19 @@
 ;;
 ;; Code documentation
 ;;
-;; emacs mode texte avec thème plus lisible
-;;
 ;; M-x package-install RET list-of-packages-to-install (d'une trève)
-;;
-;; Modes
-;;   Markdown (with preview and style)
-;;   ORG
-;;
-;; line-num seulement en programmation
 ;;
 ;; refactor all hooks e.g prog-mode-hook
 ;;
 ;; disable C-_
 ;;
-;; revert-buffer shortcut (C-R ?)
-;;
 ;; LSP => tester emacs27
 ;;
-;; fonction pour trier une région par ordre alphabétique
+;; Which key ou remind-bindings
 ;;
-;; Fix exec-path-from-shell
+;; Elisp format on save
+;;
+;; Company C-space to popup
 
 ;;; Code:
 
@@ -82,7 +74,7 @@
   (setq auto-package-update-interval 30)
   (auto-package-update-maybe)
 	(add-hook 'auto-package-update-before-hook
-	    (lambda () (message "I will update packages now"))))
+						(lambda () (message "I will update packages now"))))
 
 ;; Replace highlighted text
 (delete-selection-mode 1)
@@ -106,8 +98,17 @@
 (setq browse-url-browser-function 'browse-url-chromium)
 
 ;; PATH
-;; (setq exec-path-from-shell-arguments nil)
+(defvar exec-path-from-shell-check-startup-files nil)
 (exec-path-from-shell-initialize)
+
+;; Keybindings
+(global-set-key (kbd "M-;") 'comment-line)
+(global-set-key (kbd "<f5>") 'revert-buffer)
+
+;; Disable auto-save and auto-backup
+(setq auto-save-default nil)
+(setq make-backup-files nil)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -121,6 +122,8 @@
 ;;   :ensure t
 ;;   :pin melpa
 ;;   :commands (esup))
+
+;; (use-package bug-hunter)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -142,12 +145,8 @@
 (global-hl-line-mode +1)
 
 ;; Line number
-(line-number-mode +1)
-(global-display-line-numbers-mode 1)
+(add-hook 'prog-mode-hook '(lambda () (linum-on)))
 (column-number-mode t)
-
-;; Print cursor's line numbers/columns
-(setq column-number-mode t)
 
 ;; Fringe size (border size)
 (fringe-mode '(1 . 1))
@@ -164,8 +163,8 @@
 
 ;; Set frame title to opened buffer name
 (setq frame-title-format
-  (list (format "%%S %%j ")
-    '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+			(list (format "%%S %%j ")
+						'(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
 
 ;; Scroll
 (setq scroll-margin 0
@@ -208,13 +207,13 @@
   (setq highlight-indent-guides-character ?\|)
   :config
   (add-hook 'prog-mode-hook #'highlight-indent-guides-mode)
-  (set-face-foreground 'highlight-indent-guides-character-face "#FFFFFF"))
+	(set-face-foreground 'highlight-indent-guides-character-face "#FFFFFF"))
 
 ;; Tabs
-(setq custom-tab-width 2)
+(defvar custom-tab-width 2)
 
 (defun enable-tabs  ()
-  (local-set-key (kbd "TAB") 'tab-to-tab-stop)
+  "Enable TABs."
   (setq indent-tabs-mode t)
   (setq tab-width custom-tab-width))
 
@@ -255,17 +254,19 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+	 [default default default italic underline success warning error])
  '(ansi-color-names-vector
-   ["#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
+	 ["#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
  '(ansi-term-color-vector
-   [unspecified "#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
+	 [unspecified "#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
  '(company-quickhelp-color-foreground "#DCDCCC")
  '(custom-enabled-themes (quote (base16-horizon-terminal-dark)))
- '(custom-safe-themes (quote (default)))
+ '(custom-safe-themes (quote (default base16-horizon-terminal-dark)))
  '(nil nil t)
  '(package-selected-packages
-   (quote
-    (go-mode tide prettier-js company-lsp typescript-mode company lsp-ui lsp-mode persistent-scratch smex rainbow-mode bug-hunter base16-themelatex-preview-pane auto-package-update dashboard exec-path-from-shell esup smartparens minions projectile yasnippet multiple-cursors)))
+	 (quote
+		(auto-base16 bug-bullets company-company-company cursors-dashboard eldoc elpy-elpygen esup-exec exec from-from go go-go go-guru hunter-jedi markdown-minions mode mode-mode mode-mode mode-multiple-org-package pane-path-path persistent preview-preview-projectile-rainbow scratch shell shell smartparens smex themelatex-tide typescript update-web-yaml-yasnippet)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -355,12 +356,12 @@
   "Refreshes all open buffers from their respective files."
   (interactive)
   (let* ((list (buffer-list))
-	 (buffer (car list)))
+				 (buffer (car list)))
     (while buffer
       (when (and (buffer-file-name buffer)
-		 (not (buffer-modified-p buffer)))
-	(set-buffer buffer)
-	(revert-buffer t t t))
+								 (not (buffer-modified-p buffer)))
+				(set-buffer buffer)
+				(revert-buffer t t t))
       (setq list (cdr list))
       (setq buffer (car list))))
   (message "Refreshed open files"))
@@ -369,13 +370,13 @@
   "Kill all buffers except *Messages* *dashboard* *scratch*."
   (interactive)
   (mapc 'kill-buffer
-	(remove-if
-	 (lambda (x)
-	   (or
-	    (string-equal "*Messages*" (buffer-name x))
-	    (string-equal "*dashboard*" (buffer-name x))
-	    (string-equal "*scratch*" (buffer-name x))))
-	 (buffer-list)))
+				(remove-if
+				 (lambda (x)
+					 (or
+						(string-equal "*Messages*" (buffer-name x))
+						(string-equal "*dashboard*" (buffer-name x))
+						(string-equal "*scratch*" (buffer-name x))))
+				 (buffer-list)))
   (delete-other-windows nil)
   (delete-other-frames nil))
 
@@ -384,9 +385,9 @@
   (cond
    ((and mark-active transient-mark-mode)
     (if (> (point) (mark))
-	(exchange-point-and-mark))
+				(exchange-point-and-mark))
     (let ((column (current-column))
-	  (text (delete-and-extract-region (point) (mark))))
+					(text (delete-and-extract-region (point) (mark))))
       (forward-line arg)
       (move-to-column column t)
       (set-mark (point))
@@ -398,7 +399,7 @@
     (when (or (> arg 0) (not (bobp)))
       (forward-line)
       (when (or (< arg 0) (not (eobp)))
-	(transpose-lines arg))
+				(transpose-lines arg))
       (forward-line -1)))))
 
 (defun move-text-down (arg)
@@ -417,8 +418,8 @@
   "Copy the current buffer file name to the clipboard."
   (interactive)
   (let ((filename (if (equal major-mode 'dired-mode)
-		      default-directory
-		    (buffer-file-name))))
+											default-directory
+										(buffer-file-name))))
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
@@ -436,26 +437,33 @@ Optional second argument FLAVOR controls the units and the display format:
  If FLAVOR is `iec', each kilobyte is 1024 bytes and the produced suffixes
     are \"KiB\", \"MiB\", \"GiB\", \"TiB\", etc."
   (let ((power (if (or (null flavor) (eq flavor 'iec))
-		   1024.0
-		 1000.0))
-	(post-fixes
-	 ;; none, kilo, mega, giga, tera, peta, exa, zetta, yotta
-	 (list "" "k" "M" "G" "T" "P" "E" "Z" "Y")))
+									 1024.0
+								 1000.0))
+				(post-fixes
+				 ;; none, kilo, mega, giga, tera, peta, exa, zetta, yotta
+				 (list "" "k" "M" "G" "T" "P" "E" "Z" "Y")))
     (while (and (>= file-size power) (cdr post-fixes))
       (setq file-size (/ file-size power)
-	    post-fixes (cdr post-fixes)))
+						post-fixes (cdr post-fixes)))
     (format "%.0f%s%s" file-size
-	    (if (and (eq flavor 'iec) (string= (car post-fixes) "k"))
-		"K"
-	      (car post-fixes))
-	    (if (eq flavor 'iec) "iB" ""))))
+						(if (and (eq flavor 'iec) (string= (car post-fixes) "k"))
+								"K"
+							(car post-fixes))
+						(if (eq flavor 'iec) "iB" ""))))
 
 (defun get-filesize ()
   "Prompt user to enter a file name, with completion and history support."
   (interactive)
   (let* ((data (file-attributes (read-file-name "Enter file name:")))
-	 (d (nth 7 data)))
+				 (d (nth 7 data)))
     (message "Size is %s" (file-size-human-readable d))))
+
+(defun sort-words (reverse beg end)
+	"Sort words in region alphabetically, in REVERSE if negative.
+    Prefixed with negative \\[universal-argument], sorts in reverse."
+	(interactive "*P\nr")
+	(sort-regexp-fields reverse "\\w+" "\\&" beg end))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
@@ -464,42 +472,10 @@ Optional second argument FLAVOR controls the units and the display format:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (add-hook 'prog-mode-hook
-	  (lambda ()
-	    (font-lock-add-keywords nil
-				    '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
-				       1 font-lock-warning-face t)))))
-
-;; Language Server Protocol
-(use-package lsp-mode
-  ;; TODO: Python, JavaScript, Lisp, Web-mode, LateX, Markdown, JSON, YAML
-
-	:init
-	(setq lsp-auto-configure t)
-  (setq lsp-log-io t)
-  (setq lsp-enable-snippet t)
-  (setq lsp-enable-completion-at-point t)
-  (setq lsp-enable-on-type-formatting t)
-  (setq lsp-enable-semantic-highlighting t)
-  (setq lsp-idle-delay 500)
-	(setq lsp-diagnostic-package :flycheck)
-	(setq lsp-enable-indentation t)
-	(setq lsp-before-save-edits t)
-
-  :hook
-  (python-mode . lsp-deferred)
-  (go-mode . lsp-deferred)
-  (javascript-mode . lsp-deferred))
-
-(use-package lsp-ui)
-
-(use-package company-lsp
-  :config
-  (push 'company-lsp company-backends)
-
-  ;; Disable client-side cache because the LSP server does a better job.
-  (setq company-transformers nil
-        company-lsp-async t
-        company-lsp-cache-candidates nil))
+					(lambda ()
+						(font-lock-add-keywords nil
+																		'(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
+																			 1 font-lock-warning-face t)))))
 
 ;; Typescript
 (use-package tide
@@ -507,114 +483,138 @@ Optional second argument FLAVOR controls the units and the display format:
   (setq company-tooltip-align-annotations t)
   (add-hook 'before-save-hook 'tide-format-before-save)
 
-  (defun setup-tide-mode ()
-    "Set up a full typescript environment."
-    (interactive)
-    (tide-setup)
-    (eldoc-mode +1)
-    (tide-hl-identifier-mode +1)
-    (company-mode +1))
-	(add-hook 'typescript-mode-hook #'setup-tide-mode))
+	(add-hook 'typescript-mode-hook (lambda ()
+																		"Set up a full typescript environment."
+																		(interactive)
+																		(tide-setup)
+																		(eldoc-mode +1)
+																		(tide-hl-identifier-mode +1)
+																		(company-mode +1))))
 
 ;; Golang
 (use-package go-mode
   :config
-  :hook
-  (go-mode . lsp-deferred)
-  (before-save . lsp-format-buffer)
-  (before-save . lsp-organize-imports))
+  (add-hook 'go-mode-hook	(lambda ()
+														"Define function to call on go-mode."
 
+														(add-hook 'before-save-hook 'gofmt-before-save)
+														(defvar gofmt-command "goimports")
+														(if (not (string-match "go" compile-command))
+																(set (make-local-variable 'compile-command)
+																		 "go build -v && go vet -v"))
 
-;; (use-package typescript-mode
-;;   :config
-;;   (setq prettier-js-args '(
-;;   			   "--tab-width" "2"
-;;   			   "--trailing-comma" "all"
-;;   			   "--bracket-spacing" "false"
-;;   			   "--no-semi" "true"
-;;   			   "--single-quote" "true"
-;;   			   "--trailing-comma" "none"
-;;   			   "--no-bracket-spacing" "true"
-;;   			   "--range-start" "0"
-;;   			   "--range-end" "Infinity"))
-;;   (add-hook 'typescript-mode-hook #'prettier-js-mode))
+														(go-guru-hl-identifier-mode)
 
-;; Golang
-;; (use-package go-mode
-;;   :config
-;;   (defun setup-go-mode ()
-;;     "Define function to call on go-mode."
+														(setq tab-width 2)
+														(setq indent-tabs-mode 1)
 
-;;     (setenv "GOROOT" (shell-command-to-string ". ~/.zshrc; echo -n $GOROOT"))
-;;     (setenv "GOPATH" (shell-command-to-string ". ~/.zshrc; echo -n $GOPATH"))
+														(local-set-key (kbd "M-.") 'godef-jump)
+														(local-set-key (kbd "M-,") 'pop-tag-mark)
+														(local-set-key (kbd "M-p") 'compile)
+														(local-set-key (kbd "M-P") 'recompile)
+														(local-set-key (kbd "M-[") 'previous-error)
+														(local-set-key (kbd "M-]") 'next-error)
 
-;;     (add-hook 'before-save-hook 'gofmt-before-save)
-;;     (defvar gofmt-command "goimports")
-;;     (if (not (string-match "go" compile-command))
-;; 	(set (make-local-variable 'compile-command)
-;; 	     "go build -v && go vet -v"))
+														(set (make-local-variable 'company-backends) '(company-go))
 
-;;     (go-guru-hl-identifier-mode)
-
-;;     (setq tab-width 2)
-;;     (setq indent-tabs-mode 1)
-
-;;     (local-set-key (kbd "M-.") 'godef-jump)
-;;     (local-set-key (kbd "M-,") 'pop-tag-mark)
-;;     (local-set-key (kbd "M-p") 'compile)
-;;     (local-set-key (kbd "M-P") 'recompile)
-;;     (local-set-key (kbd "M-[") 'previous-error)
-;;     (local-set-key (kbd "M-]") 'next-error)
-
-;;     (set (make-local-variable 'company-backends) '(company-go))
-
-;;     (go-eldoc-setup))
-
-;;   (add-hook 'go-mode-hook 'setup-go-mode))
+														(go-eldoc-setup))))
 
 ;; Web-mode (Javascript/PHP/HTML/CSS)
-;; (use-package web-mode
-;;   :config
-;;   (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+(use-package web-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
 
-;;   (setq web-mode-markup-indent-offset 2)
-;;   (setq web-mode-css-indent-offset 2)
-;;   (setq web-mode-code-indent-offset 2)
-;;   (setq web-mode-style-padding 1)
-;;   (setq web-mode-script-padding 1)
-;;   (setq web-mode-enable-current-element-highlight t)
-;;   (setq web-mode-enable-current-column-highlight t)
-;;   (setq web-mode-enable-auto-indentation t))
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-style-padding 1)
+  (setq web-mode-script-padding 1)
+  (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-enable-current-column-highlight t)
+  (setq web-mode-enable-auto-indentation t))
 
 ;; JSON
-;; (add-hook 'json-mode-hook (defvar js-indent-level 2))
+(add-hook 'json-mode-hook (defvar js-indent-level 2))
 
 ;; YAML
-;; (use-package yaml-mode
-;;   :ensure t
-;;   :mode (".yml" ".yaml"))
+(use-package yaml-mode
+  :ensure t
+  :mode (".yml" ".yaml"))
 
 ;; Markdown
-;; (use-package markdown-mode
-;;   :mode
-;;   (("README\\.md\\'" . markdown-mode)
-;;    ("\\.md\\'" . markdown-mode)
-;;    ("\\.markdown\\'" . markdown-mode))
-;;   :init
-;;   (setq markdown-command "multimarkdown"))
+(use-package markdown-mode
+  :init
+  (setq markdown-command "multimarkdown")
+  :mode
+  (("README\\.md\\'" . markdown-mode)
+   ("\\.md\\'" . markdown-mode)
+   ("\\.markdown\\'" . markdown-mode))
+	:config
+	(local-set-key (kbd "M-p") 'markdown-preview-mode)
+	(defvar markdown-preview-stylesheets
+		(list "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.9.0/github-markdown.min.css"
+					"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css")))
 
 ;; LateX
-;; (latex-preview-pane-enable)
-;; (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+(latex-preview-pane-enable)
+(add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
 ;; Python
-;; (use-package elpy
-;;   :init
-;;   (elpy-enable))
+(use-package elpy
+  :init
+  (elpy-enable)
+	(when (load "flycheck" t t)
+		(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+		(add-hook 'elpy-mode-hook 'flycheck-mode))
+	:config
+	(add-hook 'elpy-mode-hook
+						(lambda ()
+							(add-hook 'before-save-hook 'elpy-format-code nil t)))
+
+	(add-to-list 'company-backends 'company-jedi)
+	(setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
+
+	(eval-after-load "elpy"
+		'(cl-dolist (key '("C-<up>" "C-<down>" "C-<left>" "C-<right>" "M-<up>" "M-<down>" "M-<left>" "M-<right>"))
+			 (define-key elpy-mode-map (kbd key) nil))))
+
+(use-package org
+  :config
+	(setq org-hide-emphasis-markers t)
+	(font-lock-add-keywords 'org-mode
+													'(("^ *\\([-]\\) "
+														 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+	(let* ((variable-tuple
+					(cond ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+								((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+								((x-list-fonts "Verdana")         '(:font "Verdana"))
+								((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+								(nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+				 (base-font-color     (face-foreground 'default nil 'default))
+				 (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+		(custom-theme-set-faces
+		 'user
+		 `(org-level-8 ((t (,@headline ,@variable-tuple))))
+		 `(org-level-7 ((t (,@headline ,@variable-tuple))))
+		 `(org-level-6 ((t (,@headline ,@variable-tuple))))
+		 `(org-level-5 ((t (,@headline ,@variable-tuple))))
+		 `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+		 `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+		 `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+		 `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+		 `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+
+	(add-hook 'org-mode-hook 'visual-line-mode))
+
+(use-package org-bullets
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

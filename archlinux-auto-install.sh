@@ -53,7 +53,11 @@ sudo pacman -S \
   libreoffice-still-fr \
   python-pip \
   net-tools \
-  etcher
+  etcher \
+  dia
+
+## RSA keys
+ssh-keygen -b 4096
 
 # YaY
 git clone https://aur.archlinux.org/yay.git $HOME/info/yay
@@ -67,7 +71,8 @@ yay -S \
   postman-bin \
   robo3t-bin \
   rambox-bin \
-  usb-creator
+  usb-creator \
+  multimarkdown
 
 # TLP
 sudo tlp start
@@ -87,7 +92,7 @@ sudo npm install -g \
   yarn \
   pm2
 
-# Golang
+# Golang1
 go get golang.org/x/tools/cmd/...
 go get github.com/rogpeppe/godef
 
@@ -98,8 +103,7 @@ sudo pacman -Rns $(pacman -Qtdq)
 sudo curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts --output /etc/hosts
 
 # Python
-sudo pip \
-  install \
+sudo pip install \
   black \
   rope \
   jedi \
@@ -111,6 +115,11 @@ sudo pip \
 # Git
 git config --global user.email ""
 git config --global user.name ""
+
+# Base16 theme
+git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
+# base16_<TAB>_<TAB
+base16_helios
 
 # Backup
 # sudo rsync -aAXvP \
