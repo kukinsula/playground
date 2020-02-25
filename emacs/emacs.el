@@ -30,9 +30,7 @@
 ;;
 ;; Which key ou remind-bindings
 ;;
-;; Elisp format on save
-;;
-;; Company C-space to popup
+;; use-package : utiliser proprement les tags :config, :bind, :hook, ...
 
 ;;; Code:
 
@@ -108,7 +106,6 @@
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil)
 (setq make-backup-files nil)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
@@ -266,7 +263,7 @@
  '(nil nil t)
  '(package-selected-packages
 	 (quote
-		(auto-base16 bug-bullets company-company-company cursors-dashboard eldoc elpy-elpygen esup-exec exec from-from go go-go go-guru hunter-jedi markdown-minions mode mode-mode mode-mode mode-multiple-org-package pane-path-path persistent preview-preview-projectile-rainbow scratch shell shell smartparens smex themelatex-tide typescript update-web-yaml-yasnippet)))
+		(bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smartparens smex themelatex-tide typescript update-web-yaml-yasnippet)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -278,9 +275,18 @@
   (setq dashboard-startup-banner 'logo)
   (setq dashboard-items '((recents  . 30) (projects . 10)))
   (setq dashboard-set-footer nil)
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 
-;; Projectile
+	(setq dashboard-set-heading-icons t)
+	(setq dashboard-set-file-icons t)
+	(dashboard-modify-heading-icons '((recents . "file-text")
+																		(bookmarks . "book"))))
+
+(use-package all-the-icons
+	:config
+	(add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+
+;; Projectil*e
 (use-package projectile
   :config
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
@@ -307,7 +313,6 @@
   (setq company-tooltip-align-annotations t)
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay 0)
-  (global-set-key (kbd "C-<space>") 'company-complete)
   (add-hook 'after-init-hook 'global-company-mode))
 
 ;; Persistent *scratch*
@@ -464,7 +469,6 @@ Optional second argument FLAVOR controls the units and the display format:
 	(interactive "*P\nr")
 	(sort-regexp-fields reverse "\\w+" "\\&" beg end))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
 ;;         PROGRAMMING          ;;
@@ -477,52 +481,54 @@ Optional second argument FLAVOR controls the units and the display format:
 																		'(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
 																			 1 font-lock-warning-face t)))))
 
+(defun setup-tide-mode ()
+	"Set up a full typescript environment."
+	(interactive)
+	(tide-setup)
+	(eldoc-mode +1)
+	(tide-hl-identifier-mode +1)
+	(company-mode +1))
+
 ;; Typescript
 (use-package tide
-  :config
-  (setq company-tooltip-align-annotations t)
-  (add-hook 'before-save-hook 'tide-format-before-save)
+  :hook ((typescript-mode . tide-setup)
+         (before-save . tide-format-before-save)))
 
-	(add-hook 'typescript-mode-hook (lambda ()
-																		"Set up a full typescript environment."
-																		(interactive)
-																		(tide-setup)
-																		(eldoc-mode +1)
-																		(tide-hl-identifier-mode +1)
-																		(company-mode +1))))
+;; JavaScript
+(add-hook 'js-mode-hook #'setup-tide-mode)
+
+(defun setup-go-mode ()
+	"Define function to call on go-mode."
+	(add-hook 'before-save-hook 'gofmt-before-save)
+	(defvar gofmt-command "goimports")
+	(if (not (string-match "go" compile-command))
+			(set (make-local-variable 'compile-command)
+					 "go build -v && go vet -v"))
+
+	(go-guru-hl-identifier-mode)
+
+	(setq tab-width 2)
+	(setq indent-tabs-mode 1)
+
+	(local-set-key (kbd "M-.") 'godef-jump)
+	(local-set-key (kbd "M-,") 'pop-tag-mark)
+	(local-set-key (kbd "M-p") 'compile)
+	(local-set-key (kbd "M-P") 'recompile)
+	(local-set-key (kbd "M-[") 'previous-error)
+	(local-set-key (kbd "M-]") 'next-error)
+
+	(set (make-local-variable 'company-backends) '(company-go))
+
+	(go-eldoc-setup))
 
 ;; Golang
 (use-package go-mode
   :config
-  (add-hook 'go-mode-hook	(lambda ()
-														"Define function to call on go-mode."
+  (add-hook 'go-mode-hook	#'setup-go-mode))
 
-														(add-hook 'before-save-hook 'gofmt-before-save)
-														(defvar gofmt-command "goimports")
-														(if (not (string-match "go" compile-command))
-																(set (make-local-variable 'compile-command)
-																		 "go build -v && go vet -v"))
-
-														(go-guru-hl-identifier-mode)
-
-														(setq tab-width 2)
-														(setq indent-tabs-mode 1)
-
-														(local-set-key (kbd "M-.") 'godef-jump)
-														(local-set-key (kbd "M-,") 'pop-tag-mark)
-														(local-set-key (kbd "M-p") 'compile)
-														(local-set-key (kbd "M-P") 'recompile)
-														(local-set-key (kbd "M-[") 'previous-error)
-														(local-set-key (kbd "M-]") 'next-error)
-
-														(set (make-local-variable 'company-backends) '(company-go))
-
-														(go-eldoc-setup))))
-
-;; Web-mode (Javascript/PHP/HTML/CSS)
+;; Web-mode (PHP/HTML/CSS)
 (use-package web-mode
   :config
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
@@ -538,7 +544,15 @@ Optional second argument FLAVOR controls the units and the display format:
   (setq web-mode-enable-auto-indentation t))
 
 ;; JSON
-(add-hook 'json-mode-hook (defvar js-indent-level 2))
+(use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
+  :config
+	;; (add-hook 'json-mode-hook
+	;; 					(lambda ()
+	;; 						(add-hook 'before-save-hook 'json-pretty-print-buffer nil t)))
+  (defvar json-reformat:indent-width 2)
+  (defvar json-reformat:pretty-string? t)
+  (defvar js-indent-level 2))
 
 ;; YAML
 (use-package yaml-mode
@@ -560,28 +574,57 @@ Optional second argument FLAVOR controls the units and the display format:
 					"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css")))
 
 ;; LateX
-(latex-preview-pane-enable)
-(add-hook 'doc-view-mode-hook 'auto-revert-mode)
+(use-package latex-preview-pane
+	:config
+	(latex-preview-pane-enable)
+	(add-hook 'doc-view-mode-hook 'auto-revert-mode))
+
 
 ;; Python
+(add-hook 'python-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (defvar python-indent-guess-indent-offset nil)
+            (defvar python-indent-offset 4)))
+
+(use-package python
+  :mode
+  ("\\.py" . python-mode))
+
 (use-package elpy
   :init
-  (elpy-enable)
-	(when (load "flycheck" t t)
-		(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-		(add-hook 'elpy-mode-hook 'flycheck-mode))
-	:config
+  (advice-add 'python-mode :before 'elpy-enable)
+  :mode
+  ("\\.py$" . python-mode)
+  :config
+  (defvar elpy-rpc-backend "jedi")
 	(add-hook 'elpy-mode-hook
 						(lambda ()
 							(add-hook 'before-save-hook 'elpy-format-code nil t)))
 
-	(add-to-list 'company-backends 'company-jedi)
-	(setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
-
 	(eval-after-load "elpy"
 		'(cl-dolist (key '("C-<up>" "C-<down>" "C-<left>" "C-<right>" "M-<up>" "M-<down>" "M-<left>" "M-<right>"))
-			 (define-key elpy-mode-map (kbd key) nil))))
+			 (define-key elpy-mode-map (kbd key) nil)))
 
+  :bind
+  (:map elpy-mode-map
+        ("M-." . elpy-goto-definition)
+        ("M-," . pop-tag-mark)))
+
+(setq auto-mode-alist
+      (append '(("SConstruct\\'" . python-mode)
+                ("SConscript\\'" . python-mode))
+              auto-mode-alist))
+
+(use-package pip-requirements
+  :hook
+  (pip-requirements-mode-hook . pip-requirements-auto-complete-setup))
+
+(use-package py-autopep8)
+
+(use-package pyvenv)
+
+;; Org
 (use-package org
   :config
 	(setq org-hide-emphasis-markers t)
@@ -621,6 +664,14 @@ Optional second argument FLAVOR controls the units and the display format:
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-document-title ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 2.0 :underline nil))))
+ '(org-level-1 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.75))))
+ '(org-level-2 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.5))))
+ '(org-level-3 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.25))))
+ '(org-level-4 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.1))))
+ '(org-level-5 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
+ '(org-level-6 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
+ '(org-level-7 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
+ '(org-level-8 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif")))))
 
 ;;; emacs.el ends here

@@ -15,6 +15,12 @@ sudo pacman -S linux-lts
 sudo pacman install linux-lts-headers
 sudo pacman -Rs linux
 
+# Add to /etc/pacman.conf in Misc Options
+# Color
+# TotalDownload
+# CheckSpace
+# ILoveCandy
+
 # Programs
 sudo pacman -S \
   git \
@@ -27,9 +33,7 @@ sudo pacman -S \
   tlp-rdw \
   zsh \
   tree \
-  source-highlight \
   jq \
-  ack \
   gparted \
   go \
   nodejs \
@@ -45,7 +49,6 @@ sudo pacman -S \
   filezilla \
   gparted \
   httpie \
-  jq \
   redshift \
   source-highlight \
   time \
@@ -54,7 +57,8 @@ sudo pacman -S \
   python-pip \
   net-tools \
   etcher \
-  dia
+  dia \
+	transmission-gtk
 
 ## RSA keys
 ssh-keygen -b 4096
@@ -72,7 +76,8 @@ yay -S \
   robo3t-bin \
   rambox-bin \
   usb-creator \
-  multimarkdown
+  multimarkdown \
+	nodejs-tern
 
 # TLP
 sudo tlp start

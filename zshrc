@@ -29,6 +29,7 @@ alias watch='watch -tn 1'
 alias seqSL='seq 10 | xargs -Iz sl'
 alias log='tail -f'
 alias pacman='pacman --color=always'
+alias diff='diff --color=auto'
 
 # Golang
 export GOPATH=$HOME/info/go
