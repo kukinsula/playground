@@ -22,15 +22,17 @@
 ;;
 ;; M-x package-install RET list-of-packages-to-install (d'une trève)
 ;;
-;; refactor all hooks e.g prog-mode-hook
-;;
-;; disable C-_
-;;
 ;; LSP => tester emacs27
 ;;
 ;; Which key ou remind-bindings
 ;;
 ;; use-package : utiliser proprement les tags :config, :bind, :hook, ...
+;;
+;; minions VS use-package's diminish or delight
+;;
+;; company-quickhelp
+;;
+;; web-mode VS HTML/CSS/PHP modes
 
 ;;; Code:
 
@@ -99,10 +101,6 @@
 (defvar exec-path-from-shell-check-startup-files nil)
 (exec-path-from-shell-initialize)
 
-;; Keybindings
-(global-set-key (kbd "M-;") 'comment-line)
-(global-set-key (kbd "<f5>") 'revert-buffer)
-
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil)
 (setq make-backup-files nil)
@@ -130,9 +128,10 @@
 
 ;; Themes
 (use-package base16-theme
+	:init
+  (setq base16-highlight-mode-line 'contrast)
   :config
-  (load-theme 'base16-horizon-terminal-dark t)
-  (defvar base16-highlight-mode-line 'contrast))
+  (load-theme 'base16-horizon-terminal-dark t))
 
 ;; Window bars
 (menu-bar-mode -1)
@@ -181,16 +180,13 @@
 ;; Ask before close
 (setq confirm-kill-emacs 'y-or-n-p)
 
-;; Get to the next buffer with C-<TAB>
-(global-set-key (kbd "<C-tab>") 'other-window)
-
 ;; Undo/Redo
 (use-package undo-tree
   :config
   (global-undo-tree-mode 1)
-  (global-set-key (kbd "C-z") 'undo)
   (defalias 'redo 'undo-tree-redo)
-  (global-set-key (kbd "C-S-z") 'redo))
+	:bind (("C-z" . 'undo)
+				 ("C-S-z" . 'redo)))
 
 ;; Desktop
 ;; (desktop-save-mode 1)
@@ -202,9 +198,8 @@
   :init
   (setq highlight-indent-guides-method 'character)
   (setq highlight-indent-guides-character ?\|)
-  :config
-  (add-hook 'prog-mode-hook #'highlight-indent-guides-mode)
-	(set-face-foreground 'highlight-indent-guides-character-face "#FFFFFF"))
+	:hook
+	(prog-mode . highlight-indent-guides-mode))
 
 ;; Tabs
 (defvar custom-tab-width 2)
@@ -216,14 +211,14 @@
 
 (add-hook 'prog-mode-hook 'enable-tabs)
 
-(setq-default python-indent-offset custom-tab-width)
-(setq-default js-indent-level custom-tab-width)
-
 ;; Making electric-indent behave sanely
 (setq-default electric-indent-inhibit t)
 
 ;; Make the backspace properly erase the tab
 (setq backward-delete-char-untabify-method 'hungry)
+
+;; Show pairing parenthesis and brackets
+(show-paren-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                          ;;
@@ -231,20 +226,15 @@
 ;;                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Auto-refresh dired on file change
+(add-hook 'dired-mode-hook 'auto-revert-mode)
+
 ;; Disable git mode
 (setq vc-handled-backends ())
 
 ;; Minions
 (use-package minions
   :config (minions-mode 1))
-
-;; Highlight matching parenthesis
-(use-package smartparens
-  :config
-  (progn
-    (require 'smartparens-config)
-    (smartparens-global-mode 1)
-    (show-paren-mode t)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -263,7 +253,7 @@
  '(nil nil t)
  '(package-selected-packages
 	 (quote
-		(bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smartparens smex themelatex-tide typescript update-web-yaml-yasnippet)))
+		(company-css company-web-html company-web go-eldoc bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smex themelatex-tide typescript update-web-yaml-yasnippet)))
  '(tool-bar-mode nil)
  '(typescript-indent-level 2))
 
@@ -271,40 +261,38 @@
 (use-package dashboard
   :config
   (dashboard-setup-startup-hook)
-
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
   (setq dashboard-startup-banner 'logo)
   (setq dashboard-items '((recents  . 30) (projects . 10)))
   (setq dashboard-set-footer nil)
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-
 	(setq dashboard-set-heading-icons t)
 	(setq dashboard-set-file-icons t)
 	(dashboard-modify-heading-icons '((recents . "file-text")
 																		(bookmarks . "book"))))
-
+;; Icons
+;; M-x all-the-icons-install-fonts
 (use-package all-the-icons
-	:config
+	:init
 	(add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
-;; Projectil*e
+;; Projectile
 (use-package projectile
-  :config
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (projectile-mode +1))
+  :bind-keymap
+  ("C-c p" . projectile-command-map))
 
 ;; Multiple cursors
 (use-package multiple-cursors
-  :config
-  (global-set-key (kbd "C-c m c") 'mc/edit-lines)
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-  (global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click))
+  :bind (("C-c m c" . mc/edit-lines)
+				 ("C->" . mc/mark-next-like-this)
+				 ("C-<" . mc/mark-previous-like-this)
+				 ("C-c C-<" . mc/mark-all-like-this)
+				 ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
 
 ;; YAS code snippets
-(add-to-list 'load-path "~/.emacs.d/snippets")
 (use-package yasnippet
-  :config
+  :init
+	(add-to-list 'load-path "~/.emacs.d/snippets")
+	:config
   (yas-global-mode 1))
 
 ;; Company-mode
@@ -313,11 +301,11 @@
   (setq company-tooltip-align-annotations t)
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay 0)
-  (add-hook 'after-init-hook 'global-company-mode))
+	(global-company-mode +1))
 
 ;; Persistent *scratch*
 (use-package persistent-scratch
-  :config
+  :init
   (persistent-scratch-setup-default))
 
 ;; Common Lisp
@@ -325,15 +313,15 @@
 
 ;; Sets background color to strings that match color names, e.g. #0000ff
 (use-package rainbow-mode
-  :config
-  (add-hook 'prog-mode-hook 'rainbow-mode))
+  :hook prog-mode)
 
 (use-package smex
-  :config
+  :init
   (defvar smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
+  :config
   (smex-initialize)
-  (global-set-key (kbd "M-x") 'smex)
-  (global-set-key (kbd "M-X") 'smex-major-mode-commands))
+	:bind (("M-x" . smex)
+				 ("M-X" . smex-major-mode-commands)))
 
 ;; Flycheck
 (use-package flycheck
@@ -355,7 +343,6 @@
   (open-line 1)
   (forward-line 1)
   (yank))
-(global-set-key (kbd "C-d") 'duplicate-line)
 
 (defun revert-buffer-all ()
   "Refreshes all open buffers from their respective files."
@@ -415,8 +402,6 @@
   "Move region or current line ARG lines up."
   (interactive "*p")
   (move-text-internal (- arg)))
-(global-set-key (kbd "M-<up>") 'move-text-up)
-(global-set-key (kbd "M-<down>") 'move-text-down)
 
 ;; Copy filename to clipboard
 (defun copy-filename-to-clipboard ()
@@ -469,6 +454,22 @@ Optional second argument FLAVOR controls the units and the display format:
 	(interactive "*P\nr")
 	(sort-regexp-fields reverse "\\w+" "\\&" beg end))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                  ;;
+;;           KE YBINDINGS           ;;
+;;                                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "M-;") 'comment-line)
+(global-set-key (kbd "<f5>") 'revert-buffer)
+
+;; Get to the next buffer with C-<TAB>
+(global-set-key (kbd "<C-tab>") 'other-window)
+
+(global-set-key (kbd "C-d") 'duplicate-line)
+
+(global-set-key (kbd "M-<up>") 'move-text-up)
+(global-set-key (kbd "M-<down>") 'move-text-down)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
 ;;         PROGRAMMING          ;;
@@ -489,51 +490,57 @@ Optional second argument FLAVOR controls the units and the display format:
 	(tide-hl-identifier-mode +1)
 	(company-mode +1))
 
-;; Typescript
+;; Typescript/JavaScript
 (use-package tide
   :hook ((typescript-mode . tide-setup)
+				 (js-mode . tide-setup)
          (before-save . tide-format-before-save)))
-
-;; JavaScript
-(add-hook 'js-mode-hook #'setup-tide-mode)
-
-(defun setup-go-mode ()
-	"Define function to call on go-mode."
-	(add-hook 'before-save-hook 'gofmt-before-save)
-	(defvar gofmt-command "goimports")
-	(if (not (string-match "go" compile-command))
-			(set (make-local-variable 'compile-command)
-					 "go build -v && go vet -v"))
-
-	(go-guru-hl-identifier-mode)
-
-	(setq tab-width 2)
-	(setq indent-tabs-mode 1)
-
-	(local-set-key (kbd "M-.") 'godef-jump)
-	(local-set-key (kbd "M-,") 'pop-tag-mark)
-	(local-set-key (kbd "M-p") 'compile)
-	(local-set-key (kbd "M-P") 'recompile)
-	(local-set-key (kbd "M-[") 'previous-error)
-	(local-set-key (kbd "M-]") 'next-error)
-
-	(set (make-local-variable 'company-backends) '(company-go))
-
-	(go-eldoc-setup))
 
 ;; Golang
 (use-package go-mode
-  :config
-  (add-hook 'go-mode-hook	#'setup-go-mode))
+	:config
+	(use-package company-go)
+	(use-package go-eldoc)
+	(use-package go-guru)
+
+	(defun setup-go-mode ()
+		"Define function to call on go-mode."
+		(add-hook 'before-save-hook 'gofmt-before-save)
+		(defvar gofmt-command "goimports")
+		(if (not (string-match "go" compile-command))
+				(set (make-local-variable 'compile-command)
+						 "go build -v && go vet -v"))
+
+		(go-guru-hl-identifier-mode)
+
+		(local-set-key (kbd "M-.") 'godef-jump)
+		(local-set-key (kbd "M-,") 'pop-tag-mark)
+		(local-set-key (kbd "M-p") 'compile)
+		(local-set-key (kbd "M-P") 'recompile)
+		(local-set-key (kbd "M-[") 'previous-error)
+		(local-set-key (kbd "M-]") 'next-error)
+
+		(set (make-local-variable 'company-backends) '(company-go))
+
+		(go-eldoc-setup))
+
+	:hook ((go-mode . setup-go-mode)
+         (before-save . gofmt-before-save)))
+
+(use-package company-web
+  :hook
+	(web-mode . (lambda ()
+								(set (make-local-variable 'company-backends) '(company-web-html)))))
 
 ;; Web-mode (PHP/HTML/CSS)
 (use-package web-mode
-  :config
+  :init
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
 
+  :config
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
@@ -550,23 +557,21 @@ Optional second argument FLAVOR controls the units and the display format:
 	;; (add-hook 'json-mode-hook
 	;; 					(lambda ()
 	;; 						(add-hook 'before-save-hook 'json-pretty-print-buffer nil t)))
-  (defvar json-reformat:indent-width 2)
-  (defvar json-reformat:pretty-string? t)
-  (defvar js-indent-level 2))
+  (setq json-reformat:indent-width 2)
+  (setq json-reformat:pretty-string? t)
+  (setq js-indent-level 2))
 
 ;; YAML
 (use-package yaml-mode
-  :ensure t
   :mode (".yml" ".yaml"))
 
 ;; Markdown
 (use-package markdown-mode
   :init
   (setq markdown-command "multimarkdown")
-  :mode
-  (("README\\.md\\'" . markdown-mode)
-   ("\\.md\\'" . markdown-mode)
-   ("\\.markdown\\'" . markdown-mode))
+  :mode (("README\\.md\\'" . markdown-mode)
+				 ("\\.md\\'" . markdown-mode)
+				 ("\\.markdown\\'" . markdown-mode))
 	:config
 	(local-set-key (kbd "M-p") 'markdown-preview-mode)
 	(defvar markdown-preview-stylesheets
@@ -575,54 +580,52 @@ Optional second argument FLAVOR controls the units and the display format:
 
 ;; LateX
 (use-package latex-preview-pane
+	:init
+	(add-hook 'doc-view-mode-hook 'auto-revert-mode)
 	:config
-	(latex-preview-pane-enable)
-	(add-hook 'doc-view-mode-hook 'auto-revert-mode))
-
+	(latex-preview-pane-enable))
 
 ;; Python
-(add-hook 'python-mode-hook
-          (lambda ()
-            (setq indent-tabs-mode nil)
-            (defvar python-indent-guess-indent-offset nil)
-            (defvar python-indent-offset 4)))
-
 (use-package python
   :mode
-  ("\\.py" . python-mode))
+  ("\\.py" . python-mode)
+	:config
+	(setq indent-tabs-mode nil)
+	(defvar python-indent-guess-indent-offset nil)
+	(defvar python-indent-offset 2)
 
-(use-package elpy
-  :init
-  (advice-add 'python-mode :before 'elpy-enable)
-  :mode
-  ("\\.py$" . python-mode)
-  :config
-  (defvar elpy-rpc-backend "jedi")
-	(add-hook 'elpy-mode-hook
-						(lambda ()
-							(add-hook 'before-save-hook 'elpy-format-code nil t)))
+	(use-package elpy
+		:init
+		(advice-add 'python-mode :before 'elpy-enable)
+		:mode
+		("\\.py$" . python-mode)
+		:config
+		(defvar elpy-rpc-backend "jedi")
+		(add-hook 'elpy-mode-hook
+							(lambda ()
+								(add-hook 'before-save-hook 'elpy-format-code nil t)))
 
-	(eval-after-load "elpy"
-		'(cl-dolist (key '("C-<up>" "C-<down>" "C-<left>" "C-<right>" "M-<up>" "M-<down>" "M-<left>" "M-<right>"))
-			 (define-key elpy-mode-map (kbd key) nil)))
+		(eval-after-load "elpy"
+			'(cl-dolist (key '("C-<up>" "C-<down>" "C-<left>" "C-<right>" "M-<up>" "M-<down>" "M-<left>" "M-<right>"))
+				 (define-key elpy-mode-map (kbd key) nil)))
 
-  :bind
-  (:map elpy-mode-map
-        ("M-." . elpy-goto-definition)
-        ("M-," . pop-tag-mark)))
+		:bind
+		(:map elpy-mode-map
+					("M-." . elpy-goto-definition)
+					("M-," . pop-tag-mark)))
 
-(setq auto-mode-alist
-      (append '(("SConstruct\\'" . python-mode)
-                ("SConscript\\'" . python-mode))
-              auto-mode-alist))
+	(setq auto-mode-alist
+				(append '(("SConstruct\\'" . python-mode)
+									("SConscript\\'" . python-mode))
+								auto-mode-alist))
 
-(use-package pip-requirements
-  :hook
-  (pip-requirements-mode-hook . pip-requirements-auto-complete-setup))
+	(use-package pip-requirements
+		:hook
+		(pip-requirements-mode-hook . pip-requirements-auto-complete-setup))
 
-(use-package py-autopep8)
+	(use-package py-autopep8)
 
-(use-package pyvenv)
+	(use-package pyvenv))
 
 ;; Org
 (use-package org
