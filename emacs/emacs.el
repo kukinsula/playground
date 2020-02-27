@@ -33,6 +33,8 @@
 ;; company-quickhelp
 ;;
 ;; web-mode VS HTML/CSS/PHP modes
+;;
+;; KBD C-S-e/C-S-o separation vertical/horizontal
 
 ;;; Code:
 
