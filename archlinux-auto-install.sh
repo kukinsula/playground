@@ -58,7 +58,8 @@ sudo pacman -S \
   net-tools \
   etcher \
   dia \
-	transmission-gtk
+	transmission-gtk \
+	redshift
 
 ## RSA keys
 ssh-keygen -b 4096
@@ -77,7 +78,8 @@ yay -S \
   rambox-bin \
   usb-creator \
   multimarkdown \
-	nodejs-tern
+	nodejs-tern \
+	popcorntime-bin
 
 # TLP
 sudo tlp start

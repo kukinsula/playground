@@ -15,26 +15,23 @@
 ;; $ cp /path/to/playground/emacs/emacs.service ~/.config/systemd/user
 ;; $ systemct start emacs.service
 ;; $ emacsclient --create-frame --quiet -n
-
+;;
+;; * Setup
+;;
+;; - M-x all-the-icons-install-fonts
+;;
 ;;; TODO:
 ;;
 ;; Code documentation
 ;;
-;; M-x package-install RET list-of-packages-to-install (d'une trève)
-;;
 ;; LSP => tester emacs27
 ;;
-;; Which key ou remind-bindings
+;; checker tout de qui est enable en global (voir si c'est nécessaire ?)
 ;;
-;; use-package : utiliser proprement les tags :config, :bind, :hook, ...
+;; use-package : ensure-system-package
+;;   :ensure-system-package (tern . "npm install -g tern")
 ;;
-;; minions VS use-package's diminish or delight
-;;
-;; company-quickhelp
-;;
-;; web-mode VS HTML/CSS/PHP modes
-;;
-;; KBD C-S-e/C-S-o separation vertical/horizontal
+;; C-c C-c compile pour tous les modes
 
 ;;; Code:
 
@@ -100,8 +97,11 @@
 (setq browse-url-browser-function 'browse-url-chromium)
 
 ;; PATH
-(defvar exec-path-from-shell-check-startup-files nil)
-(exec-path-from-shell-initialize)
+(use-package exec-path-from-shell
+  :init
+	(defvar exec-path-from-shell-check-startup-files nil)
+  :config
+  (exec-path-from-shell-initialize))
 
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil)
@@ -129,11 +129,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Themes
-(use-package base16-theme
-	:init
-  (setq base16-highlight-mode-line 'contrast)
+(use-package doom-themes
   :config
-  (load-theme 'base16-horizon-terminal-dark t))
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  (load-theme 'doom-challenger-deep t)
+  (doom-themes-org-config))
 
 ;; Window bars
 (menu-bar-mode -1)
@@ -146,7 +147,7 @@
 (add-hook 'prog-mode-hook '(lambda () (linum-on)))
 (column-number-mode t)
 
-;; Fringe size (border size)
+;; Fringe size (border size)+
 (fringe-mode '(1 . 1))
 
 ;; Maximize window
@@ -250,14 +251,44 @@
  '(ansi-term-color-vector
 	 [unspecified "#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
  '(company-quickhelp-color-foreground "#DCDCCC")
- '(custom-enabled-themes (quote (base16-horizon-terminal-dark)))
- '(custom-safe-themes (quote (default base16-horizon-terminal-dark)))
+ '(custom-enabled-themes (quote (doom-challenger-deep)))
+ '(custom-safe-themes (quote (base16-horizon-terminal-dark)))
+ '(fci-rule-color "#4E4E4E")
+ '(jdee-db-active-breakpoint-face-colors (cons "#D0D0E3" "#009B7C"))
+ '(jdee-db-requested-breakpoint-face-colors (cons "#D0D0E3" "#005F00"))
+ '(jdee-db-spec-breakpoint-face-colors (cons "#D0D0E3" "#4E4E4E"))
  '(nil nil t)
+ '(objed-cursor-color "#D70000")
  '(package-selected-packages
 	 (quote
-		(company-css company-web-html company-web go-eldoc bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smex themelatex-tide typescript update-web-yaml-yasnippet)))
+		(base16-theme go-mode tide flycheck rainbow-mode persistent-scratch yasnippet multiple-cursors dashboard doom-themes all-the-icons-dired ac-php php-mode company-quickhelp go-guru company-go latex-preview-pane markdown-mode yaml-mode json-mode company-css company-web-html company-web go-eldoc bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smex themelatex-tide typescript update-web-yaml-yasnippet)))
+ '(pdf-view-midnight-colors (cons "#0F1019" "#F5F5F9"))
+ '(rustic-ansi-faces
+	 ["#F5F5F9" "#D70000" "#005F00" "#AF8700" "#1F55A0" "#AF005F" "#007687" "#0F1019"])
  '(tool-bar-mode nil)
- '(typescript-indent-level 2))
+ '(typescript-indent-level 2)
+ '(vc-annotate-background "#F5F5F9")
+ '(vc-annotate-color-map
+	 (list
+		(cons 20 "#005F00")
+		(cons 40 "#3a6c00")
+		(cons 60 "#747900")
+		(cons 80 "#AF8700")
+		(cons 100 "#bc7900")
+		(cons 120 "#c96c00")
+		(cons 140 "#D75F00")
+		(cons 160 "#c93f1f")
+		(cons 180 "#bc1f3f")
+		(cons 200 "#AF005F")
+		(cons 220 "#bc003f")
+		(cons 240 "#c9001f")
+		(cons 260 "#D70000")
+		(cons 280 "#b41313")
+		(cons 300 "#922727")
+		(cons 320 "#703a3a")
+		(cons 340 "#4E4E4E")
+		(cons 360 "#4E4E4E")))
+ '(vc-annotate-very-old-color nil))
 
 ;; Dashboard
 (use-package dashboard
@@ -271,6 +302,9 @@
 	(setq dashboard-set-file-icons t)
 	(dashboard-modify-heading-icons '((recents . "file-text")
 																		(bookmarks . "book"))))
+
+(use-package all-the-icons-dired)
+
 ;; Icons
 ;; M-x all-the-icons-install-fonts
 (use-package all-the-icons
@@ -303,7 +337,45 @@
   (setq company-tooltip-align-annotations t)
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay 0)
-	(global-company-mode +1))
+	(global-company-mode +1)
+
+	;; (company-show-numbers t)
+	)
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-echo-common ((t (:underline t))))
+ '(company-preview ((t (:inherit shadow))))
+ '(company-preview-common ((t (:inherit company-preview :underline t))))
+ '(company-scrollbar-bg ((t (:inherit company-tooltip :background "SteelBlue3"))))
+ '(company-scrollbar-fg ((t (:background "DeepSkyBlue4"))))
+ '(company-template-field ((t (:background "DeepSkyBlue3" :foreground "black"))))
+ '(company-tooltip ((t (:background "LightSteelBlue1" :foreground "dark slate gray"))))
+ '(company-tooltip-annotation ((t (:inherit company-tooltip :foreground "slate gray"))))
+ '(company-tooltip-annotation-selection ((t (:inherit company-tooltip-annotation :background "LightSteelBlue3"))))
+ '(company-tooltip-common ((t (:inherit company-tooltip :underline t))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline t))))
+ '(company-tooltip-mouse ((t (:inherit company-tooltip-selection))))
+ '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3"))))
+ '(org-document-title ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 2.0 :underline nil))))
+ '(org-level-1 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.75))))
+ '(org-level-2 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.5))))
+ '(org-level-3 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.25))))
+ '(org-level-4 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.1))))
+ '(org-level-5 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
+ '(org-level-6 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
+ '(org-level-7 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
+ '(org-level-8 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif")))))
+
+;; Company Quickhelp
+(use-package company-quickhelp
+	:config
+	(company-quickhelp-mode)
+	(setq company-quickhelp-color-background "LightSteelBlue1")
+	(setq company-quickhelp-color-foreground "dark slate gray"))
 
 ;; Persistent *scratch*
 (use-package persistent-scratch
@@ -472,6 +544,12 @@ Optional second argument FLAVOR controls the units and the display format:
 (global-set-key (kbd "M-<up>") 'move-text-up)
 (global-set-key (kbd "M-<down>") 'move-text-down)
 
+(global-set-key (kbd "M-b") 'switch-to-buffer)
+
+;; Split windows
+(global-set-key (kbd "C-S-e") 'split-window-horizontally)
+(global-set-key (kbd "C-S-o") 'split-window-vertically)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
 ;;         PROGRAMMING          ;;
@@ -507,7 +585,6 @@ Optional second argument FLAVOR controls the units and the display format:
 
 	(defun setup-go-mode ()
 		"Define function to call on go-mode."
-		(add-hook 'before-save-hook 'gofmt-before-save)
 		(defvar gofmt-command "goimports")
 		(if (not (string-match "go" compile-command))
 				(set (make-local-variable 'compile-command)
@@ -529,39 +606,32 @@ Optional second argument FLAVOR controls the units and the display format:
 	:hook ((go-mode . setup-go-mode)
          (before-save . gofmt-before-save)))
 
-(use-package company-web
-  :hook
-	(web-mode . (lambda ()
-								(set (make-local-variable 'company-backends) '(company-web-html)))))
-
-;; Web-mode (PHP/HTML/CSS)
-(use-package web-mode
-  :init
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-
+;; HTML
+(use-package sgml-mode
   :config
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
-  (setq web-mode-style-padding 1)
-  (setq web-mode-script-padding 1)
-  (setq web-mode-enable-current-element-highlight t)
-  (setq web-mode-enable-current-column-highlight t)
-  (setq web-mode-enable-auto-indentation t))
+  (setq sgml-basic-offset 2)
+	(setq sgml-quick-keys 'close)
+  (add-hook 'sgml-mode-hook 'sgml-electric-tag-pair-mode))
+
+;; PHP
+(use-package php-mode
+	:config
+	(defun setup-php-mode ()
+		(use-package company-php)
+		(ac-php-core-eldoc-setup)
+
+		(set (make-local-variable 'company-backends)
+				 '((company-ac-php-backend company-dabbrev-code)
+					 company-capf company-files))
+
+		(define-key php-mode-map (kbd "M-.") 'ac-php-find-symbol-at-point)
+		(define-key php-mode-map (kbd "M-,") 'ac-php-location-stack-back))
+
+	:hook (php-mode . setup-php-mode))
 
 ;; JSON
 (use-package json-mode
-  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
-  :config
-	;; (add-hook 'json-mode-hook
-	;; 					(lambda ()
-	;; 						(add-hook 'before-save-hook 'json-pretty-print-buffer nil t)))
-  (setq json-reformat:indent-width 2)
-  (setq json-reformat:pretty-string? t)
-  (setq js-indent-level 2))
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'")
 
 ;; YAML
 (use-package yaml-mode
@@ -664,19 +734,6 @@ Optional second argument FLAVOR controls the units and the display format:
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 2.0 :underline nil))))
- '(org-level-1 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.75))))
- '(org-level-2 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.5))))
- '(org-level-3 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.25))))
- '(org-level-4 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.1))))
- '(org-level-5 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
- '(org-level-6 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
- '(org-level-7 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
- '(org-level-8 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif")))))
+
 
 ;;; emacs.el ends here
