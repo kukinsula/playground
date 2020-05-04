@@ -24,6 +24,7 @@ sudo pacman -Rs linux
 # Programs
 sudo pacman -S \
   git \
+  tig \
   tk \
   vlc \
   chromium \
@@ -59,7 +60,17 @@ sudo pacman -S \
   etcher \
   dia \
 	transmission-gtk \
-	redshift
+	redshift \
+	graphviz \
+	docker \
+	docker-compose \
+	netcat \
+	gnome-system-monitor \
+	nano-syntax-highlighting \
+  pm2 \
+  npm-check-updates \
+  yarn \
+	typescript
 
 ## RSA keys
 ssh-keygen -b 4096
@@ -79,7 +90,8 @@ yay -S \
   usb-creator \
   multimarkdown \
 	nodejs-tern \
-	popcorntime-bin
+	popcorntime-bin \
+	apache-tools
 
 # TLP
 sudo tlp start
@@ -88,16 +100,14 @@ sudo tlp start
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 sudo chsh -s /bin/zsh
 
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
+
 # Node
 sudo npm install -g \
   c8 \
-  eslint \
-  flamebearer \
-  npm-check-updates \
-  typescript \
-  tslint \
-  yarn \
-  pm2
+  flamebearer
 
 # Golang1
 go get golang.org/x/tools/cmd/...
@@ -122,6 +132,38 @@ sudo pip install \
 # Git
 git config --global user.email ""
 git config --global user.name ""
+
+# Source highlight
+
+## YAML
+sudo cat >> /usr/share/source-highlight/yaml.lang <<EOL
+# source-highlight's language definition file for YAML
+
+include "script_comment.lang"
+include "number.lang"
+
+keyword = "true|false|null"
+
+section start '^---'
+(symbol,name,symbol) = `(^[[:blank:]-]*)([[:alnum:]_]+)(:)`
+symbol = '^[[:blank:]]*-'
+
+# TODO:
+#   - hredoc
+#   - alias indicators
+
+string delim "\"" "\"" escape "\\"
+string delim "'" "'"  escape "\\"
+EOL
+
+## Add languages
+sudo echo "yml = yaml.lang" >> /usr/share/source-highlight/lang.map
+sudo echo "yaml = yaml.lang" >> /usr/share/source-highlight/lang.map
+sudo echo "ts = javascript.lang" >> /usr/share/source-highlight/lang.map
+sudo echo "md = sh.lang" >> /usr/share/source-highlight/lang.map
+
+# Nanorc
+echo "include /usr/share/nano-syntax-highlighting/*.nanorc" >> ~/.nanorc
 
 # Base16 theme
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell

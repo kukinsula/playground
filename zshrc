@@ -2,10 +2,6 @@
 
 # ln -s /path/to/playground/zshrc ~/.zshrc
 
-# git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-# git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-# git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
-
 export ZSH=$HOME/.oh-my-zsh
 
 ZSH_THEME="robbyrussell"
@@ -14,15 +10,15 @@ plugins=(zsh-autosuggestions zsh-syntax-highlighting colored-man-pages)
 
 source $ZSH/oh-my-zsh.sh
 
-export EDITOR='emacs --no-window-system --no-site-lisp --no-desktop --no-splash --no-site-file --no-init-file config/dev.json'
+export EDITOR='emacs --no-window-system --no-site-lisp --no-desktop --no-splash --no-site-file --no-init-file'
 export VISUAL=$EDITOR
 
 # Colors
 export TERM=xterm-256color
 
 # aliases
-alias ll='ls -l'
-alias la='ls -la'
+alias ll='ls -lh'
+alias la='ls -lah'
 alias -s pdf='evince'
 alias e=$EDITOR
 alias watch='watch -tn 1'
@@ -42,8 +38,12 @@ export PATH=$PATH:~/info/deployer_shell_script_alias
 unsetopt share_history
 
 # less
-export LESSOPEN="| /usr/bin/source-highlight-esc.sh %s"
-export LESS='-R '
+export LESSOPEN="| src-hilite-lesspipe.sh %s"
+export LESS=" -R "
+alias less='less --long-prompt --LINE-NUMBERS --HILITE-SEARCH --ignore-case -J --underline-special --SILENT'
+alias more='less'
+alias cat="src-hilite-lesspipe.sh $1"
+alias nano="nano -l"
 
 # Base16 shell theme
 BASE16_SHELL="$HOME/.config/base16-shell/"

@@ -107,6 +107,13 @@
 (setq auto-save-default nil)
 (setq make-backup-files nil)
 
+;; Automatically revert all buffers
+(auto-revert-mode 1)
+
+;; Disable bell
+(setq ring-bell-function 'ignore)
+(setq visible-bell nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
 ;;           DEBUG           ;;
@@ -156,7 +163,7 @@
 ;; Set font
 (set-face-attribute 'default nil
                     :family "Source Code Pro"
-                    :height 100
+                    :height 110
                     :weight 'normal
                     :width 'normal)
 
@@ -166,13 +173,12 @@
 						'(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
 
 ;; Scroll
-(setq scroll-margin 0
-      scroll-conservatively 100000
-      scroll-preserve-screen-position 1
-      mouse-wheel-scroll-amount '(3 ((shift) . 3))
-      scroll-step 3
-      mouse-wheel-follow-mouse 't
-      mouse-wheel-progressive-speed nil)
+(use-package smooth-scrolling
+  :init
+  (setq mouse-wheel-scroll-amount '(3 ((shift) . 3)))
+  (setq mouse-wheel-progressive-speed nil)
+  (setq mouse-wheel-follow-mouse 't)
+  (setq scroll-step 1))
 
 ;; Trailing whitespaces
 (setq-default show-trailing-whitespace t)
@@ -198,11 +204,16 @@
 
 ;; Indentation hightlight
 (use-package highlight-indent-guides
-  :init
+  :config
   (setq highlight-indent-guides-method 'character)
   (setq highlight-indent-guides-character ?\|)
-	:hook
-	(prog-mode . highlight-indent-guides-mode))
+	(setq highlight-indent-guides-auto-enabled nil)
+
+	(set-face-background 'highlight-indent-guides-odd-face "dimgray")
+	(set-face-background 'highlight-indent-guides-even-face "dimgray")
+	(set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+
+	:hook (prog-mode . highlight-indent-guides-mode))
 
 ;; Tabs
 (defvar custom-tab-width 2)
@@ -229,9 +240,6 @@
 ;;                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Auto-refresh dired on file change
-(add-hook 'dired-mode-hook 'auto-revert-mode)
-
 ;; Disable git mode
 (setq vc-handled-backends ())
 
@@ -252,7 +260,9 @@
 	 [unspecified "#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
  '(company-quickhelp-color-foreground "#DCDCCC")
  '(custom-enabled-themes (quote (doom-challenger-deep)))
- '(custom-safe-themes (quote (base16-horizon-terminal-dark)))
+ '(custom-safe-themes
+	 (quote
+		("3577ee091e1d318c49889574a31175970472f6f182a9789f1a3e9e4513641d86" "e074be1c799b509f52870ee596a5977b519f6d269455b84ed998666cf6fc802a" "d71aabbbd692b54b6263bfe016607f93553ea214bc1435d17de98894a5c3a086" base16-horizon-terminal-dark)))
  '(fci-rule-color "#4E4E4E")
  '(jdee-db-active-breakpoint-face-colors (cons "#D0D0E3" "#009B7C"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#D0D0E3" "#005F00"))
@@ -261,7 +271,7 @@
  '(objed-cursor-color "#D70000")
  '(package-selected-packages
 	 (quote
-		(base16-theme go-mode tide flycheck rainbow-mode persistent-scratch yasnippet multiple-cursors dashboard doom-themes all-the-icons-dired ac-php php-mode company-quickhelp go-guru company-go latex-preview-pane markdown-mode yaml-mode json-mode company-css company-web-html company-web go-eldoc bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smex themelatex-tide typescript update-web-yaml-yasnippet)))
+		(dired-subtree smooth-scrolling prettier-js helm-projectile helm dockerfile-mode tickscript-mode base16-theme go-mode tide flycheck rainbow-mode persistent-scratch yasnippet multiple-cursors dashboard doom-themes all-the-icons-dired ac-php php-mode company-quickhelp go-guru company-go latex-preview-pane markdown-mode yaml-mode json-mode company-css company-web-html company-web go-eldoc bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smex themelatex-tide typescript update-web-yaml-yasnippet)))
  '(pdf-view-midnight-colors (cons "#0F1019" "#F5F5F9"))
  '(rustic-ansi-faces
 	 ["#F5F5F9" "#D70000" "#005F00" "#AF8700" "#1F55A0" "#AF005F" "#007687" "#0F1019"])
@@ -337,10 +347,7 @@
   (setq company-tooltip-align-annotations t)
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay 0)
-	(global-company-mode +1)
-
-	;; (company-show-numbers t)
-	)
+	(global-company-mode +1))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -359,16 +366,7 @@
  '(company-tooltip-common ((t (:inherit company-tooltip :underline t))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline t))))
  '(company-tooltip-mouse ((t (:inherit company-tooltip-selection))))
- '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3"))))
- '(org-document-title ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 2.0 :underline nil))))
- '(org-level-1 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.75))))
- '(org-level-2 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.5))))
- '(org-level-3 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.25))))
- '(org-level-4 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif" :height 1.1))))
- '(org-level-5 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
- '(org-level-6 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
- '(org-level-7 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif"))))
- '(org-level-8 ((t (:inherit default :weight bold :foreground "#cbced0" :family "Sans Serif")))))
+ '(company-tooltip-selection ((t (:inherit company-tooltip :background "LightSteelBlue3")))))
 
 ;; Company Quickhelp
 (use-package company-quickhelp
@@ -380,7 +378,10 @@
 ;; Persistent *scratch*
 (use-package persistent-scratch
   :init
-  (persistent-scratch-setup-default))
+  (persistent-scratch-setup-default)
+	:config
+	(setq initial-scratch-message "")
+	(local-set-key (kbd "C-x C-s") 'persistent-scratch-save))
 
 ;; Common Lisp
 (use-package cl)
@@ -389,18 +390,47 @@
 (use-package rainbow-mode
   :hook prog-mode)
 
-(use-package smex
-  :init
-  (defvar smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
-  :config
-  (smex-initialize)
-	:bind (("M-x" . smex)
-				 ("M-X" . smex-major-mode-commands)))
+;; Helm
+(use-package helm
+	:config
+	(set-face-attribute 'helm-selection nil
+											:background "purple"
+											:foreground "black")
+
+	(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+
+	(add-to-list 'display-buffer-alist
+							 `(,(rx bos "*helm" (* not-newline) "*" eos)
+								 (display-buffer-in-side-window)
+								 (inhibit-same-window . t)
+								 (window-height . 0.4)))
+
+	(use-package helm-projectile)
+
+	:bind (("M-x" . helm-M-x)
+				 ("M-b" . helm-buffers-list)
+				 ("C-x C-f" . helm-find-files)
+				 ("C-o" . helm-find-files)
+				 ("C-x p f" . helm-projectile)
+				 ("C-x p a" . helm-projectile-ack)))
 
 ;; Flycheck
 (use-package flycheck
   :init
   (global-flycheck-mode))
+
+;; Dired-subtree
+(use-package dired-subtree
+  :config
+  (setq dired-listing-switches "-laGh1v --group-directories-first")
+
+  (bind-keys :map dired-mode-map
+             ("i" . dired-subtree-insert)
+             (";" . dired-subtree-remove)
+	           ("<tab>" . dired-subtree-toggle)))
+
+;; Auto-refresh dired on file change
+(add-hook 'dired-mode-hook 'auto-revert-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                        ;;
@@ -418,7 +448,7 @@
   (forward-line 1)
   (yank))
 
-(defun revert-buffer-all ()
+(defun revert-all-buffers ()
   "Refreshes all open buffers from their respective files."
   (interactive)
   (let* ((list (buffer-list))
@@ -523,10 +553,27 @@ Optional second argument FLAVOR controls the units and the display format:
     (message "Size is %s" (file-size-human-readable d))))
 
 (defun sort-words (reverse beg end)
-	"Sort words in region alphabetically, in REVERSE if negative.
-    Prefixed with negative \\[universal-argument], sorts in reverse."
+	"REVERSE Sort words in region alphabetically from BEG to END."
 	(interactive "*P\nr")
 	(sort-regexp-fields reverse "\\w+" "\\&" beg end))
+
+(defun rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let* ((name (buffer-name))
+				 (filename (buffer-file-name))
+				 (basename (file-name-nondirectory filename)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " (file-name-directory filename) basename nil basename)))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'"
+                   name (file-name-nondirectory new-name)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                  ;;
@@ -544,11 +591,15 @@ Optional second argument FLAVOR controls the units and the display format:
 (global-set-key (kbd "M-<up>") 'move-text-up)
 (global-set-key (kbd "M-<down>") 'move-text-down)
 
-(global-set-key (kbd "M-b") 'switch-to-buffer)
-
 ;; Split windows
 (global-set-key (kbd "C-S-e") 'split-window-horizontally)
 (global-set-key (kbd "C-S-o") 'split-window-vertically)
+
+;; Text sclae increase/decrease
+(global-unset-key (kbd "<C-mouse-4>"))
+(global-set-key (kbd "<C-mouse-4>") 'text-scale-decrease)
+(global-unset-key (kbd "<C-mouse-5>"))
+(global-set-key (kbd "<C-mouse-5>") 'text-scale-increase)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
@@ -562,6 +613,19 @@ Optional second argument FLAVOR controls the units and the display format:
 																		'(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
 																			 1 font-lock-warning-face t)))))
 
+(use-package prettier-js
+	:config
+	(defvar prettier-js-args '(
+														 "--print-width" "100"
+														 "--tab-width" "2"
+														 "--use-tabs" "false"
+														 "--no-semi" "false"
+														 "--single-quote" "true"
+														 "--quote-props" "as-needed"
+														 "--trailing-comma" "all"
+														 "--bracket-spacing" "true"
+														 "--arrow-parens" "avoid")))
+
 (defun setup-tide-mode ()
 	"Set up a full typescript environment."
 	(interactive)
@@ -570,11 +634,23 @@ Optional second argument FLAVOR controls the units and the display format:
 	(tide-hl-identifier-mode +1)
 	(company-mode +1))
 
-;; Typescript/JavaScript
+(use-package ansi-color)
+
+(defun colorize-compilation-buffer ()
+	"Apply ANSI colors to *compilation* buffer."
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
 (use-package tide
+	:config
+	(setq compile-command "tsc")
+	(setq compilation-read-command nil)
+	(local-set-key (kbd "C-c C-c") 'compile)
+
   :hook ((typescript-mode . tide-setup)
-				 (js-mode . tide-setup)
-         (before-save . tide-format-before-save)))
+         (typescript-mode . tide-hl-identifier-mode)
+				 (js-mode . tide-setup)))
 
 ;; Golang
 (use-package go-mode
@@ -702,38 +778,46 @@ Optional second argument FLAVOR controls the units and the display format:
 ;; Org
 (use-package org
   :config
-	(setq org-hide-emphasis-markers t)
-	(font-lock-add-keywords 'org-mode
-													'(("^ *\\([-]\\) "
-														 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+	(defun org-mode-setup ()
+		(setq org-hide-emphasis-markers t)
+		(font-lock-add-keywords 'org-mode
+														'(("^ *\\([-]\\) "
+															 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-	(let* ((variable-tuple
-					(cond ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
-								((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
-								((x-list-fonts "Verdana")         '(:font "Verdana"))
-								((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
-								(nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
-				 (base-font-color     (face-foreground 'default nil 'default))
-				 (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+		(let* ((variable-tuple
+						(cond ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+									(nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+					 (base-font-color     (face-foreground 'default nil 'default))
+					 (headline           `(:inherit default :foreground, base-font-color)))
 
-		(custom-theme-set-faces
-		 'user
-		 `(org-level-8 ((t (,@headline ,@variable-tuple))))
-		 `(org-level-7 ((t (,@headline ,@variable-tuple))))
-		 `(org-level-6 ((t (,@headline ,@variable-tuple))))
-		 `(org-level-5 ((t (,@headline ,@variable-tuple))))
-		 `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-		 `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
-		 `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
-		 `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
-		 `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+			(custom-set-faces
+			 'user
+			 `(org-level-8 ((t (,@headline ,@variable-tuple :height 1.3))))
+			 `(org-level-7 ((t (,@headline ,@variable-tuple :height 1.3))))
+			 `(org-level-6 ((t (,@headline ,@variable-tuple :height 1.3))))
+			 `(org-level-5 ((t (,@headline ,@variable-tuple :height 1.3))))
+			 `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.3))))
+			 `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.4))))
+			 `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.4))))
+			 `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.4))))
+			 `(org-document-title ((t (,@headline ,@variable-tuple :height 1.5 :underline nil))))))
 
-	(add-hook 'org-mode-hook 'visual-line-mode))
+		(visual-line-mode))
 
-(use-package org-bullets
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+	(local-unset-key (kbd "<C-tab>"))
 
+	(use-package org-bullets
+		:config
+		(add-hook 'org-mode-hook 'org-bullets-mode))
 
+	:hook	(after-make-frame-functions . 'org-mode-setup))
+
+;; *scratch* file with org-mode
+(defun my-scratch-hook ()
+	"Start 'org-mode' for *scratch* file."
+	(with-current-buffer "*scratch*" (org-mode)))
+(add-hook 'after-init-hook 'my-scratch-hook)
+
+(use-package tickscript-mode)
 
 ;;; emacs.el ends here
