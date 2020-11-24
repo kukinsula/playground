@@ -22,10 +22,13 @@ alias la='ls -lah'
 alias -s pdf='evince'
 alias e=$EDITOR
 alias watch='watch -tn 1'
-alias seqSL='seq 10 | xargs -Iz sl'
 alias log='tail -f'
 alias pacman='pacman --color=always'
 alias diff='diff --color=auto'
+
+# NodeJS/NPM
+npm config set prefix ~/.npm
+export PATH=$HOME/.npm/bin:$PATH
 
 # Golang
 export GOPATH=$HOME/info/go
@@ -50,3 +53,6 @@ BASE16_SHELL="$HOME/.config/base16-shell/"
 [ -n "$PS1" ] && \
     [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
     eval "$("$BASE16_SHELL/profile_helper.sh")"
+
+# Disable paste animation
+zstyle ':bracketed-paste-magic' active-widgets '.self-*'

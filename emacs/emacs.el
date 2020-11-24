@@ -108,7 +108,7 @@
 (setq make-backup-files nil)
 
 ;; Automatically revert all buffers
-(auto-revert-mode 1)
+(global-auto-revert-mode t)
 
 ;; Disable bell
 (setq ring-bell-function 'ignore)
@@ -147,8 +147,9 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 
-;; Highlight current cursor's line
+;; Highlight
 (global-hl-line-mode +1)
+(defvar global-hl-line-sticky-flag t)
 
 ;; Line number
 (add-hook 'prog-mode-hook '(lambda () (linum-on)))
@@ -209,9 +210,10 @@
   (setq highlight-indent-guides-character ?\|)
 	(setq highlight-indent-guides-auto-enabled nil)
 
-	(set-face-background 'highlight-indent-guides-odd-face "dimgray")
-	(set-face-background 'highlight-indent-guides-even-face "dimgray")
-	(set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+	;; (set-face-background 'highlight-indent-guides-odd-face "dimgray")
+	(set-face-background 'highlight-indent-guides-odd-face "Gray22")
+	(set-face-background 'highlight-indent-guides-even-face "Gray22")
+	(set-face-foreground 'highlight-indent-guides-character-face "Gray22")
 
 	:hook (prog-mode . highlight-indent-guides-mode))
 
@@ -259,10 +261,9 @@
  '(ansi-term-color-vector
 	 [unspecified "#1c1e26" "#e95678" "#29d398" "#fac29a" "#26bbd9" "#ee64ac" "#26bbd9" "#cbced0"])
  '(company-quickhelp-color-foreground "#DCDCCC")
- '(custom-enabled-themes (quote (doom-challenger-deep)))
+ '(custom-enabled-themes '(doom-challenger-deep))
  '(custom-safe-themes
-	 (quote
-		("3577ee091e1d318c49889574a31175970472f6f182a9789f1a3e9e4513641d86" "e074be1c799b509f52870ee596a5977b519f6d269455b84ed998666cf6fc802a" "d71aabbbd692b54b6263bfe016607f93553ea214bc1435d17de98894a5c3a086" base16-horizon-terminal-dark)))
+	 '("3577ee091e1d318c49889574a31175970472f6f182a9789f1a3e9e4513641d86" "e074be1c799b509f52870ee596a5977b519f6d269455b84ed998666cf6fc802a" "d71aabbbd692b54b6263bfe016607f93553ea214bc1435d17de98894a5c3a086" base16-horizon-terminal-dark))
  '(fci-rule-color "#4E4E4E")
  '(jdee-db-active-breakpoint-face-colors (cons "#D0D0E3" "#009B7C"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#D0D0E3" "#005F00"))
@@ -270,8 +271,7 @@
  '(nil nil t)
  '(objed-cursor-color "#D70000")
  '(package-selected-packages
-	 (quote
-		(dired-subtree smooth-scrolling prettier-js helm-projectile helm dockerfile-mode tickscript-mode base16-theme go-mode tide flycheck rainbow-mode persistent-scratch yasnippet multiple-cursors dashboard doom-themes all-the-icons-dired ac-php php-mode company-quickhelp go-guru company-go latex-preview-pane markdown-mode yaml-mode json-mode company-css company-web-html company-web go-eldoc bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smex themelatex-tide typescript update-web-yaml-yasnippet)))
+	 '(cl dired-subtree smooth-scrolling prettier-js helm-projectile helm dockerfile-mode tickscript-mode base16-theme go-mode tide flycheck rainbow-mode persistent-scratch yasnippet multiple-cursors dashboard doom-themes all-the-icons-dired ac-php php-mode company-quickhelp go-guru company-go latex-preview-pane markdown-mode yaml-mode json-mode company-css company-web-html company-web go-eldoc bug-hunter org-bullets py-autopep8 pip-requirements elpy auto-autopep8 base16-bug bullets-company company company-cursors dashboard-eldoc elpy-elpygen-esup exec-exec from from-go go-go go guru-hunter jedi jedi-markdown minions-mode mode-mode mode-mode mode mode-multiple org-package pane-path-path-persistent pip-preview-preview projectile py-pyenv-rainbow-requirements scratch shell shell smex themelatex-tide typescript update-web-yaml-yasnippet))
  '(pdf-view-midnight-colors (cons "#0F1019" "#F5F5F9"))
  '(rustic-ansi-faces
 	 ["#F5F5F9" "#D70000" "#005F00" "#AF8700" "#1F55A0" "#AF005F" "#007687" "#0F1019"])
@@ -306,12 +306,12 @@
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
   (setq dashboard-startup-banner 'logo)
-  (setq dashboard-items '((recents  . 30) (projects . 10)))
   (setq dashboard-set-footer nil)
 	(setq dashboard-set-heading-icons t)
 	(setq dashboard-set-file-icons t)
-	(dashboard-modify-heading-icons '((recents . "file-text")
-																		(bookmarks . "book"))))
+  (setq dashboard-items '((projects		 . 5)
+													(bookmarks	 . 5)
+													(recents		 . 30))))
 
 (use-package all-the-icons-dired)
 
@@ -581,7 +581,9 @@ Optional second argument FLAVOR controls the units and the display format:
 ;;                                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "M-;") 'comment-line)
+
 (global-set-key (kbd "<f5>") 'revert-buffer)
+(global-set-key (kbd "S-<f5>") 'revert-all-buffers)
 
 ;; Get to the next buffer with C-<TAB>
 (global-set-key (kbd "<C-tab>") 'other-window)
@@ -597,9 +599,9 @@ Optional second argument FLAVOR controls the units and the display format:
 
 ;; Text sclae increase/decrease
 (global-unset-key (kbd "<C-mouse-4>"))
-(global-set-key (kbd "<C-mouse-4>") 'text-scale-decrease)
+(global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-unset-key (kbd "<C-mouse-5>"))
-(global-set-key (kbd "<C-mouse-5>") 'text-scale-increase)
+(global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
@@ -626,14 +628,7 @@ Optional second argument FLAVOR controls the units and the display format:
 														 "--bracket-spacing" "true"
 														 "--arrow-parens" "avoid")))
 
-(defun setup-tide-mode ()
-	"Set up a full typescript environment."
-	(interactive)
-	(tide-setup)
-	(eldoc-mode +1)
-	(tide-hl-identifier-mode +1)
-	(company-mode +1))
-
+;; Compilation
 (use-package ansi-color)
 
 (defun colorize-compilation-buffer ()
@@ -642,15 +637,41 @@ Optional second argument FLAVOR controls the units and the display format:
     (ansi-color-apply-on-region (point-min) (point-max))))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
+(use-package compile
+	:config
+	(setq compilation-scroll-output t)
+	(setq	compilation-always-kill t))
+
+;; Typescript
 (use-package tide
 	:config
-	(setq compile-command "tsc")
-	(setq compilation-read-command nil)
-	(local-set-key (kbd "C-c C-c") 'compile)
+	(defun setup-tide-mode ()
+		(interactive)
+		(tide-setup)
+		(eldoc-mode +1)
+		(tide-hl-identifier-mode +1))
 
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-				 (js-mode . tide-setup)))
+	:bind (:map tide-mode-map
+							("C-c C-c" . (lambda ()
+														 (interactive)
+														 (compile "cd ~/info/rest-console && npm run build")))
+
+							("C-c C-d" . (lambda ()
+														 (interactive)
+														 (compile "cd ~/info/rest-console && npm run dev -- -- --config ./config/local.yml")))
+
+							("C-c C-t" . (lambda ()
+														 (interactive)
+														 (compile "cd ~/info/rest-console && npm run test:cmd -- --config ./config/test.yml")))
+
+							("C-c C-l" . (lambda ()
+														 (interactive)
+														 (compile "cd ~/info/rest-console && npm run lint")))
+
+							("C-c C-p" . prettier-js))
+
+	:hook ((typescript-mode . setup-tide-mode)
+         (before-save . tide-format-before-save)))
 
 ;; Golang
 (use-package go-mode

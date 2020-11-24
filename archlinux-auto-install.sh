@@ -15,7 +15,7 @@ sudo pacman -S linux-lts
 sudo pacman install linux-lts-headers
 sudo pacman -Rs linux
 
-# Add to /etc/pacman.conf in Misc Options
+# Uncomment Misc Options in /etc/pacman.conf
 # Color
 # TotalDownload
 # CheckSpace
@@ -59,18 +59,29 @@ sudo pacman -S \
   net-tools \
   etcher \
   dia \
-	transmission-gtk \
-	redshift \
-	graphviz \
-	docker \
-	docker-compose \
-	netcat \
-	gnome-system-monitor \
-	nano-syntax-highlighting \
+  transmission-gtk \
+  redshift \
+  graphviz \
+  docker \
+  docker-compose \
+  netcat \
+  gnome-system-monitor \
+  nano-syntax-highlighting \
   pm2 \
   npm-check-updates \
   yarn \
-	typescript
+  typescript \
+  simplescreenrecorder \
+  fwupd \
+	nmap \
+	strace \
+	cloc
+
+## Firmware
+fwupdmgr get-devices
+fwupdmgr refresh
+fwupdmgr get-updates
+fwupdmgr update
 
 ## RSA keys
 ssh-keygen -b 4096
@@ -105,9 +116,17 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
 
 # Node
-sudo npm install -g \
+npm install -g \
   c8 \
-  flamebearer
+  flamebearer \
+  node-gyp \
+  npm-check \
+  prettier \
+  semver \
+  tern \
+  tslint \
+  typescript \
+  yarn
 
 # Golang1
 go get golang.org/x/tools/cmd/...
