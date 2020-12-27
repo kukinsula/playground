@@ -10,7 +10,7 @@ plugins=(zsh-autosuggestions zsh-syntax-highlighting colored-man-pages)
 
 source $ZSH/oh-my-zsh.sh
 
-export EDITOR='emacs --no-window-system --no-site-lisp --no-desktop --no-splash --no-site-file --no-init-file'
+export EDITOR='emacsclient --quiet -nw'
 export VISUAL=$EDITOR
 
 # Colors
@@ -28,15 +28,12 @@ alias diff='diff --color=auto'
 
 # NodeJS/NPM
 npm config set prefix ~/.npm
-export PATH=$HOME/.npm/bin:$PATH
 
 # Golang
 export GOPATH=$HOME/info/go
-export PATH=$PATH:$GOPATH/bin
 export GO111MODULE=on
 
-export PATH=$PATH:/usr/bin/vendor_perl
-export PATH=$PATH:~/info/deployer_shell_script_alias
+export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/info/deployer_shell_script_alias:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin
 
 unsetopt share_history
 

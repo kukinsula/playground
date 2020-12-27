@@ -75,7 +75,8 @@ sudo pacman -S \
   fwupd \
 	nmap \
 	strace \
-	cloc
+	cloc \
+	speedtest-cli
 
 ## Firmware
 fwupdmgr get-devices
