@@ -39,6 +39,11 @@
 ;; Tester:
 ;;   electrum: https://github.com/raxod502/selectrum
 ;;   DAP https://github.com/emacs-lsp/dap-mode
+;;
+;; ElDoc
+;; Prisme.el
+;;
+;; C-S d => *dashboard*
 
 ;;; Code:
 
@@ -50,8 +55,8 @@
 
 ;; Memory
 (setq gc-cons-threshold (* 100 1024 1024)
-			large-file-warning-threshold 100000000
-			read-process-output-max (* 1024 1024))
+      large-file-warning-threshold 100000000
+      read-process-output-max (* 1024 1024))
 
 ;; Answer y or n
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -59,9 +64,9 @@
 ;; Packages manager
 (require 'package)
 (setq package-archives '(("melpa-stable" . "https://stable.melpa.org/packages/")
-												 ("melpa" . "https://melpa.org/packages/")
-												 ("org" . "https://orgmode.org/elpa/")
-												 ("elpa" . "https://elpa.gnu.org/packages/")))
+			 ("melpa" . "https://melpa.org/packages/")
+			 ("org" . "https://orgmode.org/elpa/")
+			 ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (setq package-enable-at-startup nil)
 (package-initialize)
@@ -87,36 +92,36 @@
 (setq buffer-file-coding-system 'utf-8)
 (setq save-buffer-coding-system 'utf-8-unix)
 (setq process-coding-system-alist
-			(cons '("grep" utf-8 . utf-8) process-coding-system-alist))
+      (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
 
 ;; Default browser
 (setq browse-url-browser-function 'browse-url-chromium)
 
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil
-			make-backup-files nil)
+      make-backup-files nil)
 
 ;; Automatically revert all buffers
 (use-package autorevert
   :ensure nil
   :diminish
-	:custom
-	(auto-revert-verbose nil)
+  :custom
+  (auto-revert-verbose nil)
   :init
-	(global-auto-revert-mode))
+  (global-auto-revert-mode))
 
 ;; Disable bell
 (setq ring-bell-function 'ignore
-			visible-bell nil)
+      visible-bell nil)
 
 (setq inhibit-startup-message t
-			inhibit-startup-echo-area-message t
-			initial-scratch-message nil)
+      inhibit-startup-echo-area-message t
+      initial-scratch-message nil)
 
 (use-package saveplace
   :ensure nil
   :init
-	(save-place-mode))
+  (save-place-mode))
 
 (setq scroll-error-top-bottom t)
 (setq track-eol t)
@@ -145,13 +150,14 @@
 ;; Enable line numbers for some modes
 (use-package display-line-numbers
   :ensure nil
+  ;; :disabled
   :hook
-	((text-mode prog-mode conf-mode) . display-line-numbers-mode)
-	(display-line-numbers-mode . column-number-mode))
+  ((text-mode prog-mode conf-mode) . display-line-numbers-mode)
+  (display-line-numbers-mode . column-number-mode))
 
 ;; Override some modes which derive from the above
 (dolist (mode '(org-mode-hook))
-	(add-hook mode (lambda () (display-line-numbers-mode 0))))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'line-number nil :height 97)
 (set-face-attribute 'line-number-current-line nil :height 97)
@@ -173,50 +179,53 @@
 
 ;; Set frame title to opened buffer name
 (setq frame-title-format
-			(list (format "%%S %%j ")
-						'(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+      (list (format "%%S %%j ")
+	    '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
 
 ;; Themes
 (use-package doom-themes
   :ensure t
-	:diminish
+  :diminish
   :config
   (load-theme 'doom-nord t)
   (doom-themes-org-config)
-	:custom
-	(doom-themes-enable-bold t)
-	(doom-themes-enable-italic t))
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t))
 
 ;; Modeline
 (use-package doom-modeline
   :ensure t
   :init
-	(doom-modeline-mode)
+  (doom-modeline-mode)
   :custom
-	(doom-modeline-buffer-file-name-style 'auto)
-	(doom-modeline-minor-modes t)
+  (doom-modeline-buffer-file-name-style 'auto)
+  (doom-modeline-minor-modes t)
   (doom-modeline-buffer-encoding nil)
   (inhibit-compacting-font-caches t)
   (doom-modeline-icon t)
   (doom-modeline-major-mode-color-icon t)
-  (doom-modeline-height 15))
+  (doom-modeline-height 15)
+	(doom-modeline-))
+
+(line-number-mode 1)
 
 (use-package minions
-	:ensure t
-	:diminish
-	:init
-	(minions-mode)
-	:custom
-	(minions-mode-line-lighter ""))
+  :ensure t
+  :diminish
+  :init
+  (minions-mode)
+  :custom
+  (minions-mode-line-lighter ""))
 
 (use-package diminish
-	:ensure t
-	:diminish)
+  :ensure t
+  :diminish)
 
 ;; Dashboard
 (use-package dashboard
   :ensure t
-	:diminish
+  :diminish
   :config
   (dashboard-setup-startup-hook)
   :custom
@@ -225,17 +234,18 @@
   (dashboard-set-footer nil)
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
-	(dashboard-center-content t)
-	(dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
-	(dashboard-page-separator "\n\n")
+  (dashboard-center-content t)
+  (dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+  (dashboard-page-separator "\n\n")
   (dashboard-items '((projects . 5)
-										 (bookmarks . 5)
-										 (recents . 20))))
+		     (bookmarks . 5)
+		     (recents . 20))))
 
 ;; Indentation hightlight
 (use-package highlight-indent-guides
   :ensure t
-	:diminish
+  ;; :disabled
+  :diminish
   :hook
   (prog-mode . highlight-indent-guides-mode)
   :config
@@ -250,9 +260,10 @@
 ;; Sets background color to strings that match color names, e.g. #0000ff
 (use-package rainbow-mode
   :ensure t
-	:diminish
+  ;; :disabled
+  :diminish
   :hook
-	(prog-mode))
+  (prog-mode))
 
 ;; TODO
 ;; (use-package selectrum-prescient
@@ -276,102 +287,119 @@
          ("RET" . ivy-alt-done)
 
 				 ;; TODO
-         ("TAB" . ivy-partial)
-				 ;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
-				 ;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-call)
+         ;; ("TAB" . ivy-partial)
+         ;; ("tab" . ivy-partial)
 				 )
   :init
   (ivy-mode)
-	:custom
+  :custom
   (ivy-use-virtual-buffers t)
   (ivy-wrap t)
   (ivy-count-format "【%d/%d】")
   (enable-recursive-minibuffers t)
-	(ivy-dynamic-exhibit-delay-ms 250))
+  (ivy-dynamic-exhibit-delay-ms 250))
 
 (use-package ivy-hydra
   :ensure t
-	:diminish
+  :diminish
   :defer t
   :after hydra)
 
 (use-package ivy-rich
   :ensure t
-	:diminish
+  :diminish
   :init
   (ivy-rich-mode))
 
 (use-package counsel-projectile
-	:ensure t)
+  :ensure t)
 
 (use-package counsel
   :ensure t
-	:diminish
-	:commands
-	(counsel-linux-app-format-function-name-only)
+  :diminish
+  :commands
+  (counsel-linux-app-format-function-name-only)
   :bind (("M-x" . counsel-M-x)
          ("M-b" . counsel-ibuffer))
   :custom
   (ivy-initial-inputs-alist nil))
 
 (use-package swiper
-	:ensure t
-	:diminish)
+  :ensure t
+  :diminish)
 
 ;; Improves sorting for fuzzy-matched results
 (use-package flx
   :ensure t
-	:diminish
+  :diminish
   :defer t
   :custom
   (ivy-flx-limit 10000))
 
 (use-package prescient
-	:ensure t
-	:diminish)
+  :ensure t
+  :diminish)
 
 (use-package ivy-prescient
-	:ensure t
-	:diminish
-	:custom
-	(ivy-prescient-sort-commands :sort))
+  :ensure t
+  :diminish
+  :custom
+  (ivy-prescient-sort-commands :sort))
 
 (use-package company-prescient
-	:ensure t
-	:diminish)
+  :ensure t
+  :diminish)
 
 (use-package smex
-	:ensure t
-	:diminish)
+  :ensure t
+  :diminish)
 
 (use-package which-key
   :ensure t
-	:diminish
-  :init
-	(which-key-mode)
   :diminish
-	(which-key-mode)
+  :init
+  (which-key-mode)
+  :diminish
+  (which-key-mode)
   :custom
-	(which-key-idle-delay 0.3))
+  (which-key-idle-delay 0.3))
 
 ;; Colors
 (use-package ansi-color
   :ensure t
-	:commands
-	(ansi-color-apply-on-region))
+  :commands
+  (ansi-color-apply-on-region))
 
-;; Get to the next buffer with C-<TAB>
+;; Get to the next window
 (global-set-key (kbd "<C-tab>") 'other-window)
+;; Get to the previsou window with C-<TAB>
+(define-key global-map (kbd "<C-iso-lefttab>") (lambda ()
+																								 (interactive)
+																								 (other-window -1)))
 
+;; Move to directionnal window
+(global-set-key (kbd "<s-up>") 'windmove-up)
+(global-set-key (kbd "<s-down>") 'windmove-down)
+(global-set-key (kbd "<s-right>") 'windmove-right)
+(global-set-key (kbd "<s-left>") 'windmove-left)
+
+;; Create a new frame
 (global-unset-key (kbd "C-S-n"))
 (global-set-key (kbd "C-S-n") 'make-frame-command)
+
+;; Jump to bookmark
+(global-set-key (kbd "C-S-b") 'bookmark-jump)
 
 ;; Split windows
 (global-set-key (kbd "C-S-e") 'split-window-horizontally)
 (global-set-key (kbd "C-S-o") 'split-window-vertically)
-(global-set-key (kbd "C-S-w") 'kill-that-buffer)
+
+(global-set-key (kbd "C-S-w") (lambda ()
+				(interactive)
+				(kill-buffer (current-buffer))))
 
 ;; Text sclae increase/decrease
+(global-set-key (kbd "<C-x =>") 'text-scale-increase)
 (global-unset-key (kbd "<C-mouse-4>"))
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-unset-key (kbd "<C-mouse-5>"))
@@ -388,9 +416,11 @@
 
 ;; Scroll
 (setq mouse-wheel-scroll-amount '(2 ((shift) . 2))	;; One line at a time
-			mouse-wheel-progressive-speed nil							;; Don't accelerate scrolling
-			mouse-wheel-follow-mouse t										;; Scroll window under mouse
-			scroll-step 1)																;; Keyboard scroll one line at a time
+      mouse-wheel-progressive-speed nil							;; Don't accelerate scrolling
+      mouse-wheel-follow-mouse t										;; Scroll window under mouse
+      scroll-step 1																;; Keyboard scroll one line at a time
+			;; scroll-conservatively 101
+			)
 
 ;; Trailing whitespaces
 ;; (setq-default show-trailing-whitespace t)
@@ -405,7 +435,7 @@
 																	tab-width custom-tab-width)))
 
 ;; Making electric-indent behave sanely
-(setq-default electric-indent-inhibit t)
+(electric-indent-mode +1)
 
 (use-package smart-hungry-delete
   :ensure t
@@ -413,7 +443,7 @@
 				 ("<deletchar>" . smart-hungry-delete-forward-char))
   :defer nil ;; dont defer so we can add our functions to hooks
   :config
-	(smart-hungry-delete-add-default-hooks))
+  (smart-hungry-delete-add-default-hooks))
 
 ;; Show pairing parenthesis and brackets
 (show-paren-mode t)
@@ -421,33 +451,33 @@
 ;; Undo/Redo
 (use-package undo-tree
   :ensure t
-	:diminish
-	:commands
-	(redo remove-if)
+  :diminish
+  :commands
+  (redo remove-if)
   :config
   (global-undo-tree-mode 1)
   (defalias 'redo 'undo-tree-redo)
-	:bind (("C-z" . 'undo)
+  :bind (("C-z" . 'undo)
 				 ("C-S-z" . 'redo)))
 
 (use-package rainbow-delimiters
   :ensure t
-	:diminish
+  :diminish
   :hook
-	(prog-mode . rainbow-delimiters-mode))
+  (prog-mode . rainbow-delimiters-mode))
 
 (use-package aggressive-indent
-	:ensure t
+  :ensure t
   :diminish
-	(aggressive-indent-mode)
+  (aggressive-indent-mode)
   :hook
-	(emacs-lisp-mode . aggressive-indent-mode))
+  (emacs-lisp-mode . aggressive-indent-mode))
 
 ;; Multiple cursors
 (use-package multiple-cursors
   :ensure t
-	:diminish
-  :bind (("C-c m c" . mc/edit-lines)
+  :diminish
+  :bind (("C-c m c" . mc/edit-lines) ;; TODO: marche pu
 				 ("C->" . mc/mark-next-like-this)
 				 ("C-<" . mc/mark-previous-like-this)
 				 ("C-c C-<" . mc/mark-all-like-this)
@@ -458,9 +488,9 @@
   (cond
    ((and mark-active transient-mark-mode)
     (if (> (point) (mark))
-				(exchange-point-and-mark))
+	(exchange-point-and-mark))
     (let ((column (current-column))
-					(text (delete-and-extract-region (point) (mark))))
+	  (text (delete-and-extract-region (point) (mark))))
       (forward-line arg)
       (move-to-column column t)
       (set-mark (point))
@@ -472,7 +502,7 @@
     (when (or (> arg 0) (not (bobp)))
       (forward-line)
       (when (or (< arg 0) (not (eobp)))
-				(transpose-lines arg))
+	(transpose-lines arg))
       (forward-line -1)))))
 
 (defun move-text-down (arg)
@@ -500,8 +530,8 @@
 (global-set-key (kbd "C-d") 'duplicate-line)
 (global-set-key (kbd "M-;") 'comment-line)
 (global-set-key (kbd "C-k") (lambda ()
-															(interactive)
-															(kill-line 1)))
+			      (interactive)
+			      (kill-line 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                              ;;
@@ -512,8 +542,8 @@
 ;; Company-mode
 (use-package company
   :ensure t
-	:diminish
-	:bind (("C-c c" . company-complete))
+  :diminish
+  :bind (("C-c <tab>" . company-complete))
   :config
   (global-company-mode 1)
   :custom
@@ -524,7 +554,7 @@
   (company-selection-wrap-around t)
   (company-transformers '(company-sort-by-occurrence
 													company-sort-by-backend-importance))
-	(company-dabbrev-downcase nil)
+  (company-dabbrev-downcase nil)
   (company-dabbrev-code-everywhere t)
   (company-dabbrev-code-modes t)
   (company-dabbrev-code-ignore-case t))
@@ -533,11 +563,11 @@
   :ensure t
   :diminish
   :hook
-	(company-mode . company-box-mode)
+  (company-mode . company-box-mode)
   :init
-	(setq company-box-icons-alist 'company-box-icons-all-the-icons)
-	:preface
-	(defun company-box-icons--elisp (candidate)
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  :preface
+  (defun company-box-icons--elisp (candidate)
     (when (derived-mode-p 'emacs-lisp-mode)
       (let ((sym (intern candidate)))
         (cond ((fboundp sym) 'Function)
@@ -589,23 +619,25 @@
 (use-package company-quickhelp
   :defines company-quickhelp-delay
   :hook
-	(global-company-mode . company-quickhelp-mode)
+  (global-company-mode . company-quickhelp-mode)
   :custom
-	(company-quickhelp-delay 1))
+  (company-quickhelp-delay 1))
 
 ;; Flycheck
 (use-package flycheck
   :ensure t
-	:diminish
+  :diminish
   :init
-  (global-flycheck-mode))
+  (global-flycheck-mode)
+	:custom
+	(flycheck-check-syntax-automatically '(idle-change save)))
 
 ;; YAS code snippets
 (use-package yasnippet
   :ensure t
-	:diminish
-	:commands
-	(yas-reload-all)
+  :diminish
+  :commands
+  (yas-reload-all)
   :config
   (yas-global-mode 1)
   (yas-reload-all))
@@ -625,24 +657,25 @@
 
 ;; Colorise some keywords
 (add-hook 'prog-mode-hook
-					(lambda ()
-						(font-lock-add-keywords nil
-																		'(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
-																			 1 font-lock-warning-face t)))))
+	  (lambda ()
+	    (font-lock-add-keywords nil
+				    '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
+				       1 font-lock-warning-face t)))))
 
 ;; Version Control
 (use-package vc
-	:diminish
-	:custom
-	(auto-revert-check-vc-info t)
-	(vc-follow-symlinks t))
+  :ensure nil
+  :diminish
+  :custom
+  (auto-revert-check-vc-info t)
+  (vc-follow-symlinks nil))
 
 (use-package magit
   :ensure t
-	:diminish t
+  :diminish t
   :commands
-	(magit-status magit-get-current-branch magit-display-buffer-same-window-except-diff-v1)
-	:bind (("C-c g s" . magit-status)
+  (magit-status magit-get-current-branch magit-display-buffer-same-window-except-diff-v1)
+  :bind (("C-c g s" . magit-status)
 				 ("C-c g l" . magit-log-all))
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -650,110 +683,103 @@
 ;; Projectile
 (use-package projectile
   :ensure t
-	:diminish
+  :diminish
   :bind-keymap
-	("C-c p" . projectile-command-map)
-	:bind (("C-S-f" . projectile-find-file)
-				 ("C-S-s" . projectile-grep)
-				 ("C-S-P" . projectile-switch-project))
-	:commands
-	(projectile-register-project-type)
-	:config
-	(projectile-register-project-type 'npm '("package.json")
-																		:project-file "package.json"
-																		:test "npm test"
-																		:run "npm start"))
+  ("C-c p" . projectile-command-map)
+  :bind (("C-S-f" . projectile-find-file)
+	 ("C-S-s" . projectile-grep)
+	 ("C-S-P" . projectile-switch-project))
+  :commands
+  (projectile-register-project-type)
+  :config
+  (projectile-register-project-type 'npm '("package.json")
+				    :project-file "package.json"
+				    :test "npm test"
+				    :run "npm start"))
 
 (use-package prettier-js
   :ensure t
-	:diminish
+  :diminish
   :custom
   (prettier-js-show-errors nil))
 
 (use-package add-node-modules-path
   :ensure t)
 
-(defun setup-tide-mode ()
-	"Set up tide-mode."
-	(interactive)
-	(tide-setup)
-	(setq flycheck-check-syntax-automatically '(save mode-enabled)))
-
 ;; Typescript
 (use-package tide
   :ensure t
-	:diminish
+  :diminish
   :custom
-	(typescript-indent-level 2)
-  :hook ((typescript-mode . setup-tide-mode)
-         (typescript-mode . tide-hl-identifier-mode)
-				 (typescript-mode . prettier-js-mode))
-	:commands
-	(tide-rename-symbol tide-rename-file tide-references)
-	:bind (("C-c C-t r s" . 'tide-rename-symbol)
-				 ("C-c C-t r f" . 'tide-rename-file)
-				 ("C-c C-t f r" . 'tide-references)))
+  (typescript-indent-level 2)
+	:config
+  :hook ((typescript-mode . tide-setup)
+				 (typescript-mode . tide-hl-identifier-mode)
+				 (before-save . tide-format-before-save))
+  :commands
+  (tide-rename-symbol tide-rename-file tide-references prettier-js)
+  :bind (("C-c C-t r s" . tide-rename-symbol)
+				 ("C-c C-t r f" . tide-rename-file)
+				 ("C-c C-t f r" . tide-references)
+				 ("C-c C-p" . prettier-js)))
 
 (use-package npm-mode
   :ensure t
-	:diminish
+  :diminish
   :hook ((typescript-mode . npm-mode)
          (javascript-mode . npm-mode)))
 
 ;; JSON
 (use-package json-mode
-	:ensure t
-	:hook
-	(json-mode . prettier-js-mode)
-	:custom
-	(make-local-variable 'js-indent-level)
+  :ensure t
+  :hook
+  (json-mode . prettier-js-mode)
+  :custom
+  (make-local-variable 'js-indent-level)
   (js-indent-level 2))
 
 ;; YAML
 (use-package yaml-mode
-	:ensure t
+  :ensure t
   :mode
-	(".yml" ".yaml")
-	:hook ((yaml-mode . prettier-js-mode)
-				 (yaml-mode . highlight-indent-guides-mode)))
+  (".yml" ".yaml")
+  :hook ((yaml-mode . prettier-js-mode)
+	 (yaml-mode . highlight-indent-guides-mode)))
 
 ;; CSV
 (use-package csv-mode
-	:ensure t
-	:custom
-	(csv-separators '("," ";" "|" "\t")))
+  :ensure t
+  :custom
+  (csv-separators '("," ";" "|" "\t")))
 
 (use-package org
-	:hook
-	(org-mode . org-indent-mode)
-	:config
-	(define-key org-mode-map (kbd "<C-tab>") 'other-window)
-	:custom-face
-  `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))
-	`(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
-	`(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
-	`(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
-	`(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-	:custom
-	(org-hide-emphasis-markers t))
+  :ensure nil
+  :config
+  (define-key org-mode-map (kbd "<C-tab>") 'other-window)
+  :hook
+  (org-mode . org-indent-mode)
+  (org-mode . visual-line-mode)
+  :custom
+  (org-hide-emphasis-markers t))
 
 (use-package org-superstar
-	:after org
-	:hook
-	(org-mode . org-superstar-mode)
-	:custom
-	(org-superstar-remove-leading-stars t)
-	(org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+  :ensure t
+  :after org
+  :hook
+  (org-mode . org-superstar-mode)
+  :custom
+  (org-superstar-remove-leading-stars t)
+  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (use-package dockerfile-mode
   :ensure t
-	:mode
-	("Dockerfile"))
+  :mode
+  ("Dockerfile"))
 
 (use-package docker-compose-mode
   :ensure t
   :hook
-	(docker-compose-mode . company-mode))
+  (docker-compose-mode . company-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                             ;;
@@ -764,15 +790,15 @@
 ;; auto-package-update
 (use-package auto-package-update
   :ensure t
-	:diminish
+  :diminish
   :commands
-	(auto-package-update-maybe)
+  (auto-package-update-maybe)
   :config
   (auto-package-update-maybe)
-	(add-hook 'auto-package-update-before-hook
-						(lambda () (message "I will update packages now")))
-	:custom
-	(auto-package-update-delete-old-versions t)
+  (add-hook 'auto-package-update-before-hook
+	    (lambda () (message "I will update packages now")))
+  :custom
+  (auto-package-update-delete-old-versions t)
   (auto-package-update-hide-results t)
   (auto-package-update-interval 30))
 
@@ -780,54 +806,54 @@
 (use-package savehist
   :ensure nil
   :init
-	(savehist-mode)
-	:custom
-	(savehist-additional-variables '(kill-ring
-																	 search-ring
-																	 regexp-search-ring
-																	 npm-mode-npm-run
-																	 package-install
-																	 package-delete)))
+  (savehist-mode)
+  :custom
+  (savehist-additional-variables '(kill-ring
+				   search-ring
+				   regexp-search-ring
+				   npm-mode-npm-run
+				   package-install
+				   package-delete)))
 
 ;; Environment variables
 (use-package exec-path-from-shell
   :ensure t
-	:diminish
+  :diminish
   :config
   (exec-path-from-shell-initialize)
-	:custom
-	(exec-path-from-shell-check-startup-files nil))
+  :custom
+  (exec-path-from-shell-check-startup-files nil))
 
 ;; Emacs Start Up Profiler
 (use-package esup
   :ensure t
-	:diminish
-	:defer t
+  :diminish
+  :defer t
   :commands
-	(esup)
-	:custom
-	(message-log-max t))
+  (esup)
+  :custom
+  (message-log-max t))
 
 ;; Init fil debugger
 (use-package bug-hunter
   :ensure t
-	:diminish
-	:defer t)
+  :diminish
+  :defer t)
 
 (use-package all-the-icons-dired
   :ensure t
-	:diminish)
+  :diminish)
 
 ;; Icons: M-x all-the-icons-install-fonts
 (use-package all-the-icons
   :ensure t
-	:diminish
-	:hook
-	((dired-mode . all-the-icons-dired-mode)))
+  :diminish
+  :hook
+  ((dired-mode . all-the-icons-dired-mode)))
 
 (use-package recentf
   :ensure t
-	:diminish
+  :diminish
   :custom
   (recentf-max-menu-items 100)
   :config
@@ -835,59 +861,59 @@
 
 ;; Common Lisp
 (use-package cl-lib
-	:ensure t
-	:diminish)
+  :ensure t
+  :diminish)
 
 ;; Dired-subtree
 (use-package dired-subtree
   :ensure t
   :custom
   (dired-listing-switches "-laGh1v --group-directories-first")
-	:bind ("<tab>" . dired-subtree-toggle)
-	:hook
-	(dired-mode . auto-revert-mode))
+  :bind ("<tab>" . dired-subtree-toggle)
+  :hook
+  (dired-mode . auto-revert-mode))
 
 (use-package golden-ratio
   :ensure t
-	:diminish
+  :diminish
   :disabled
-	(golden-ratio-mode)
+  (golden-ratio-mode)
   :init
   (golden-ratio-mode))
 
 (use-package restclient
-	:ensure t)
+  :ensure t)
 
 (use-package dimmer
-	:ensure t
-	:diminish
-	:config
-	(dimmer-mode)
-	:custom
-	(dimmer-adjustment-mode :foreground)
-	(dimmer-fraction 0.17))
+  :ensure t
+  :diminish
+  :config
+  (dimmer-mode)
+  :custom
+  (dimmer-adjustment-mode :foreground)
+  (dimmer-fraction 0.17))
 
 (use-package writeroom-mode
-	:ensure t
-	:diminish
-	:commands
-	(writeroom-adjust-width)
-	:preface
-	(defun writeroom-toggle-on  ()
-		(writeroom-adjust-width 40) ;; Width = 80 + 40
-		(display-line-numbers-mode -1)
-		(highlight-indent-guides-mode -1)
-		(text-scale-increase 1))
-	(defun writeroom-toggle-off  ()
-		(display-line-numbers-mode 1)
-		(highlight-indent-guides-mode 1)
-		(text-scale-decrease 1))
-	:bind ("<f6>" . writeroom-mode)
-	:custom
-	(writeroom-restore-window-config 1)
-	:config
-	(add-hook 'writeroom-mode-enable-hook 'writeroom-toggle-on)
-	(add-hook 'writeroom-mode-disable-hook 'writeroom-toggle-off))
+  :ensure t
+  :diminish
+  :commands
+  (writeroom-adjust-width)
+  :preface
+  (defun writeroom-toggle-on  ()
+    (writeroom-adjust-width 40) ;; Width = 80 + 40
+    (display-line-numbers-mode -1)
+    (highlight-indent-guides-mode -1)
+    (text-scale-increase 1))
+  (defun writeroom-toggle-off  ()
+    (display-line-numbers-mode 1)
+    (highlight-indent-guides-mode 1)
+    (text-scale-decrease 1))
+  :bind ("<f6>" . writeroom-mode)
+  :custom
+  (writeroom-restore-window-config 1)
+  :config
+  (add-hook 'writeroom-mode-enable-hook 'writeroom-toggle-on)
+  (add-hook 'writeroom-mode-disable-hook 'writeroom-toggle-off))
 
 (use-package uuidgen
   :ensure t)
@@ -896,12 +922,12 @@
   "Refreshes all open buffers from their respective files."
   (interactive)
   (let* ((list (buffer-list))
-				 (buffer (car list)))
+	 (buffer (car list)))
     (while buffer
       (when (and (buffer-file-name buffer)
-								 (not (buffer-modified-p buffer)))
-				(set-buffer buffer)
-				(revert-buffer t t t))
+		 (not (buffer-modified-p buffer)))
+	(set-buffer buffer)
+	(revert-buffer t t t))
       (setq list (cdr list))
       (setq buffer (car list))))
   (message "Refreshed open files"))
@@ -913,12 +939,12 @@
   "Kill all buffers except *Messages* *scratch*."
   (interactive)
   (mapc 'kill-buffer
-				(remove-if
-				 (lambda (x)
-					 (or
-						(string-equal "*Messages*" (buffer-name x))
-						(string-equal "*scratch*" (buffer-name x))))
-				 (buffer-list)))
+	(remove-if
+	 (lambda (x)
+	   (or
+	    (string-equal "*Messages*" (buffer-name x))
+	    (string-equal "*scratch*" (buffer-name x))))
+	 (buffer-list)))
   (delete-other-windows nil)
   (delete-other-frames nil))
 
@@ -927,23 +953,23 @@
   "Copy the current buffer file name to the clipboard."
   (interactive)
   (let ((filename (if (equal major-mode 'dired-mode)
-											default-directory
-										(buffer-file-name))))
+		      default-directory
+		    (buffer-file-name))))
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
 (defun sort-words (reverse beg end)
-	"REVERSE Sort words in region alphabetically from BEG to END."
-	(interactive "*P\nr")
-	(sort-regexp-fields reverse "\\w+" "\\&" beg end))
+  "REVERSE Sort words in region alphabetically from BEG to END."
+  (interactive "*P\nr")
+  (sort-regexp-fields reverse "\\w+" "\\&" beg end))
 
 (defun rename-current-buffer-file ()
   "Renames current buffer and file it is visiting."
   (interactive)
   (let* ((name (buffer-name))
-				 (filename (buffer-file-name))
-				 (basename (file-name-nondirectory filename)))
+	 (filename (buffer-file-name))
+	 (basename (file-name-nondirectory filename)))
     (if (not (and filename (file-exists-p filename)))
         (error "Buffer '%s' is not visiting a file!" name)
       (let ((new-name (read-file-name "New name: " (file-name-directory filename) basename nil basename)))
@@ -955,13 +981,6 @@
           (set-buffer-modified-p nil)
           (message "File '%s' successfully renamed to '%s'"
                    name (file-name-nondirectory new-name)))))))
-
-(defun kill-that-buffer ()
-  "Kill the current buffer."
-  (interactive)
-  (kill-buffer (current-buffer)))
-
-(global-set-key (kbd "C-x k") 'kill-that-buffer)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1080,12 +1099,64 @@
 
 ;; 	(use-package pyvenv))
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(org-superstar
+     esup
+     uuidgen
+     writeroom-mode
+     dimmer
+     restclient
+     dired-subtree
+     all-the-icons-dired
+     exec-path-from-shell
+     auto-package-update
+     docker-compose-mode
+     dockerfile-mode
+     csv-mode
+     yaml-mode
+     json-mode
+     npm-mode
+     tide
+     add-node-modules-path
+     prettier-js
+     magit
+     yasnippet
+     flycheck
+     company-box
+     multiple-cursors
+     aggressive-indent
+     rainbow-delimiters
+     undo-tree
+     smart-hungry-delete
+     which-key
+     smex
+     company-prescient
+     ivy-prescient
+     prescient
+     flx
+     counsel-projectile
+     ivy-rich
+     ivy-hydra
+     ivy
+     rainbow-mode
+     highlight-indent-guides
+     dashboard
+     diminish
+     minions
+     doom-modeline
+     doom-themes
+     use-package)))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(\` (org-document-title ((t ((\,@ headline) (\,@ variable-tuple) :height 2.0 :underline nil)))))
  '(company-tooltip ((t (:family "Iosevka"))))
  '(dashboard-items-face ((t nil)))
  '(doom-modeline-bar ((t (:background "black"))))
@@ -1093,14 +1164,16 @@
  '(ivy-minibuffer-match-face-2 ((t (:inherit ivy-minibuffer-match-face-1 :background "#292F37" :foreground "magenta" :weight bold))))
  '(ivy-minibuffer-match-face-3 ((t (:inherit ivy-minibuffer-match-face-2 :foreground "magenta" :weight bold))))
  '(ivy-minibuffer-match-face-4 ((t (:inherit ivy-minibuffer-match-face-2 :foreground "magenta" :weight bold))))
+ '(org-document-title ((t :height 2.0)))
+ '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)))
+ '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)))
+ '(org-level-3 ((t :inherit outline-3 :weight bold :height 1.1)))
+ '(org-level-4 ((t :inherit outline-4 :weight bold :height 1.0)))
+ '(org-level-5 ((t :inherit outline-5 :weight semi-bold :height 1.0)))
+ '(org-level-6 ((t :inherit outline-6 :weight semi-bold :height 1.0)))
+ '(org-level-7 ((t :inherit outline-7 :weight semi-bold)))
+ '(org-level-8 ((t :inherit outline-8 :weight semi-bold)))
  '(tide-hl-identifier-face ((t (:background "gray11" :underline t :weight bold)))))
 
 (provide 'emacs)
 ;;; emacs ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-	 '(esup uuidgen writeroom-mode dimmer restclient dired-subtree all-the-icons-dired exec-path-from-shell auto-package-update docker-compose-mode dockerfile-mode csv-mode yaml-mode json-mode npm-mode tide add-node-modules-path prettier-js magit yasnippet flycheck company-box multiple-cursors aggressive-indent rainbow-delimiters undo-tree smart-hungry-delete which-key smex company-prescient ivy-prescient prescient flx counsel-projectile ivy-rich ivy-hydra ivy rainbow-mode highlight-indent-guides dashboard diminish minions doom-modeline doom-themes use-package)))
