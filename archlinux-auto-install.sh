@@ -73,10 +73,10 @@ sudo pacman -S \
   typescript \
   simplescreenrecorder \
   fwupd \
-	nmap \
-	strace \
-	cloc \
-	speedtest-cli
+  map \
+  trace \
+  loc \
+  peedtest-cli
 
 ## Firmware
 fwupdmgr get-devices
