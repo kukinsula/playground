@@ -17,9 +17,9 @@
 ;;   Text mode: emacsclient --create-frame --quiet -nw
 ;;   GUI mode: emacsclient --create-frame --quiet
 ;;
-;; *
+;; * all-the-icons-install
 ;;
-;; - M-x all-the-icons-install-fonts
+;;   - M-x all-the-icons-install-fonts
 ;;
 ;;; TODO:
 ;;
@@ -64,6 +64,8 @@
 ;; Conserver la text scale après un revert-buffer/revert-all-buffers F5
 ;;
 ;; all-this-icons: https://github.com/domtronn/all-the-icons.el/issues/120
+;;
+;; Popper.el
 
 ;;; Code:
 
@@ -650,7 +652,7 @@
 (add-hook 'prog-mode-hook
 					(lambda ()
 						(font-lock-add-keywords nil
-																		'(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\)"
+																		'(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)"
 																			 1 font-lock-warning-face t)))))
 
 ;; Version Control
@@ -887,10 +889,12 @@
     (writeroom-adjust-width 40) ;; Width = 80 + 40
     (display-line-numbers-mode -1)
     (highlight-indent-guides-mode -1)
+    (text-scale-increase 1)
     (text-scale-increase 1))
   (defun writeroom-toggle-off  ()
     (display-line-numbers-mode 1)
     (highlight-indent-guides-mode 1)
+    (text-scale-decrease 1)
     (text-scale-decrease 1))
   :bind ("<f6>" . writeroom-mode)
   :custom (writeroom-restore-window-config 1)
@@ -1088,8 +1092,42 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+	 ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
+ '(custom-safe-themes
+	 '("a3b6a3708c6692674196266aad1cb19188a6da7b4f961e1369a68f06577afa16" "f2927d7d87e8207fa9a0a003c0f222d45c948845de162c885bf6ad2a255babfd" "990e24b406787568c592db2b853aa65ecc2dcd08146c0d22293259d400174e37" default))
+ '(fci-rule-color "#505050")
+ '(jdee-db-active-breakpoint-face-colors (cons "#1b1d1e" "#fc20bb"))
+ '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
+ '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
+ '(objed-cursor-color "#d02b61")
  '(package-selected-packages
-	 '(cl-libify org-superstar esup uuidgen writeroom-mode dimmer restclient dired-subtree all-the-icons-dired exec-path-from-shell auto-package-update docker-compose-mode dockerfile-mode csv-mode yaml-mode json-mode npm-mode tide add-node-modules-path prettier-js magit yasnippet flycheck company-box multiple-cursors aggressive-indent rainbow-delimiters undo-tree smart-hungry-delete which-key smex company-prescient ivy-prescient prescient flx counsel-projectile ivy-rich ivy-hydra ivy rainbow-mode highlight-indent-guides dashboard diminish minions doom-modeline doom-themes use-package)))
+	 '(cl-libify org-superstar esup uuidgen writeroom-mode dimmer restclient dired-subtree all-the-icons-dired exec-path-from-shell auto-package-update docker-compose-mode dockerfile-mode csv-mode yaml-mode json-mode npm-mode tide add-node-modules-path prettier-js magit yasnippet flycheck company-box multiple-cursors aggressive-indent rainbow-delimiters undo-tree smart-hungry-delete which-key smex company-prescient ivy-prescient prescient flx counsel-projectile ivy-rich ivy-hydra ivy rainbow-mode highlight-indent-guides dashboard diminish minions doom-modeline doom-themes use-package))
+ '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
+ '(rustic-ansi-faces
+	 ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
+ '(vc-annotate-background "#1b1d1e")
+ '(vc-annotate-color-map
+	 (list
+		(cons 20 "#60aa00")
+		(cons 40 "#859f0d")
+		(cons 60 "#aa931a")
+		(cons 80 "#d08928")
+		(cons 100 "#d38732")
+		(cons 120 "#d6863d")
+		(cons 140 "#da8548")
+		(cons 160 "#ce8379")
+		(cons 180 "#c281aa")
+		(cons 200 "#b77fdb")
+		(cons 220 "#bf63b2")
+		(cons 240 "#c74789")
+		(cons 260 "#d02b61")
+		(cons 280 "#b0345c")
+		(cons 300 "#903d58")
+		(cons 320 "#704654")
+		(cons 340 "#505050")
+		(cons 360 "#505050")))
+ '(vc-annotate-very-old-color nil))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

@@ -23,17 +23,18 @@ alias -s pdf='evince'
 alias e=$EDITOR
 alias watch='watch -tn 1'
 alias log='tail -f'
-alias pacman='pacman --color=always'
 alias diff='diff --color=auto'
-
-# NodeJS/NPM
-npm config set prefix ~/.npm
+alias pacman='pacman --color=always'
+alias aur='paru'
 
 # Golang
 export GOPATH=$HOME/info/go
 export GO111MODULE=on
 
 export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/info/deployer_shell_script_alias:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin
+
+# NodeJS/NPM
+npm config set prefix ~/.npm
 
 unsetopt share_history
 

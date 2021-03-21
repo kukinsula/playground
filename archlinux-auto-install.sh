@@ -76,7 +76,9 @@ sudo pacman -S \
   map \
   trace \
   loc \
-  peedtest-cli
+  peedtest-cli \
+  yq \
+	cloc
 
 ## Firmware
 fwupdmgr get-devices
@@ -88,12 +90,18 @@ fwupdmgr update
 ssh-keygen -b 4096
 
 # YaY
-git clone https://aur.archlinux.org/yay.git $HOME/info/yay
-cd $HOME/info/yay
+# git clone https://aur.archlinux.org/yay.git $HOME/info/yay
+# cd $HOME/info/yay
+# makepkg -si
+# cd $HOME
+
+# Paru
+git clone https://aur.archlinux.org/paru.git $HOME/info/paru
+cd $HOME/info/paru
 makepkg -si
 cd $HOME
 
-yay -S \
+paru -S \
   mongodb-bin \
   mongodb-tools-bin \
   postman-bin \
@@ -103,7 +111,8 @@ yay -S \
   multimarkdown \
 	nodejs-tern \
 	popcorntime-bin \
-	apache-tools
+	apache-tools \
+	pipes.sh
 
 # TLP
 sudo tlp start
