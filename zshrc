@@ -17,6 +17,7 @@ export VISUAL=$EDITOR
 export TERM=xterm-256color
 
 # aliases
+alias ls='logo-ls -lgG --human-readable --git-status --time-style RFC822'
 alias ll='ls -lh'
 alias la='ls -lah'
 alias -s pdf='evince'

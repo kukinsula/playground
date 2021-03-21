@@ -7,6 +7,9 @@ cd $HOME
 mkdir $HOME/info/
 rmdir $HOME/Public $HOME/Modèles
 
+# Update mirrorlist
+curl -s "https://archlinux.org/mirrorlist/?country=FR&protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | sudo rankmirrors --fasttrack
+
 # System update
 sudo pacman -Syu
 
@@ -53,8 +56,8 @@ sudo pacman -S \
   redshift \
   source-highlight \
   time \
-  libreoffice-still \
-  libreoffice-still-fr \
+  libreoffice-fresh \
+  libreoffice-fresh-fr \
   python-pip \
   net-tools \
   etcher \
@@ -64,7 +67,7 @@ sudo pacman -S \
   graphviz \
   docker \
   docker-compose \
-  netcat \
+  gnu-netcat \
   gnome-system-monitor \
   nano-syntax-highlighting \
   pm2 \
@@ -73,12 +76,11 @@ sudo pacman -S \
   typescript \
   simplescreenrecorder \
   fwupd \
-  map \
-  trace \
-  loc \
-  peedtest-cli \
+  strace \
+  speedtest-cli \
   yq \
-	cloc
+	cloc \
+	powertop \
 
 ## Firmware
 fwupdmgr get-devices
@@ -106,13 +108,12 @@ paru -S \
   mongodb-tools-bin \
   postman-bin \
   robo3t-bin \
-  rambox-bin \
-  usb-creator \
   multimarkdown \
-	nodejs-tern \
 	popcorntime-bin \
 	apache-tools \
-	pipes.sh
+	pipes.sh \
+	screenfetch \
+	nerd-fonts-complete
 
 # TLP
 sudo tlp start
@@ -141,9 +142,6 @@ npm install -g \
 # Golang1
 go get golang.org/x/tools/cmd/...
 go get github.com/rogpeppe/godef
-
-# Cleanup
-sudo pacman -Rns $(pacman -Qtdq)
 
 # /etc/hosts
 sudo curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts --output /etc/hosts
@@ -194,7 +192,30 @@ sudo echo "md = sh.lang" >> /usr/share/source-highlight/lang.map
 # Nanorc
 echo "include /usr/share/nano-syntax-highlighting/*.nanorc" >> ~/.nanorc
 
-# Base16 theme
+# Ricing
+
+sudo pacman -Ss \
+ 	gtk-engine-murrine \
+	gtk-engines \
+  lightdm-webkit2-greeter \
+	lightdm-webkit-theme-litarvan \
+	ulauncher
+
+# Theme
+git clone https://github.com/vinceliuice/Qogir-theme.git $HOME/info
+cd $HOME/info/Qogir-theme
+./install.sh
+# Set theme Qogir-manjaro-win-dark
+
+# Enable lightdm-webkit theme
+#
+# edit /etc/lightdm/lightdm.conf and set greeter-session=lightdm-webkit2-greeter
+# edit /etc/lightdm/lightdm-webkit2-greeter.conf and set theme or webkit-theme to litarvan
+
+# ULauncher
+git clone https://github.com/levonhart/materia-dark-ulauncher ~/.config/ulauncher/user-themes/materia-dark-ulauncher
+
+# Terminal base16 theme
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
 # base16_<TAB>_<TAB
 base16_helios
@@ -215,3 +236,6 @@ base16_helios
 
 # Restore backup
 # rsync -aAXv --delete --exclude="lost+found" /mnt/usb/ /mnt/system/
+
+# Cleanup
+sudo pacman -Rns $(pacman -Qtdq)
