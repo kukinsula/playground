@@ -27,6 +27,7 @@ alias log='tail -f'
 alias diff='diff --color=auto'
 alias pacman='pacman --color=always'
 alias aur='paru'
+alias open='xdg-open'
 
 # Golang
 export GOPATH=$HOME/info/go

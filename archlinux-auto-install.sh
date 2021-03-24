@@ -79,8 +79,10 @@ sudo pacman -S \
   strace \
   speedtest-cli \
   yq \
-	cloc \
-	powertop \
+  cloc \
+  powertop \
+  libqalculate \
+  conky
 
 ## Firmware
 fwupdmgr get-devices
@@ -113,7 +115,8 @@ paru -S \
 	apache-tools \
 	pipes.sh \
 	screenfetch \
-	nerd-fonts-complete
+	nerd-fonts-complete \
+	logo-ls
 
 # TLP
 sudo tlp start
@@ -214,6 +217,10 @@ cd $HOME/info/Qogir-theme
 
 # ULauncher
 git clone https://github.com/levonhart/materia-dark-ulauncher ~/.config/ulauncher/user-themes/materia-dark-ulauncher
+# Extensions
+# https://ext.ulauncher.io/-/github-hippo-o-matic-ulauncher-qalc
+# https://ext.ulauncher.io/-/github-fsevenm-ulauncher-uuid
+# https://github.com/henriqueutsch/exec-terminal
 
 # Terminal base16 theme
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
