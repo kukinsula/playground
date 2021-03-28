@@ -35,7 +35,7 @@ conky.config = {
   alignment = 'top_right',
   gap_x = 40,
   gap_y = 35,
-  minimum_width = 250, minimum_height = 600,
+  minimum_width = 350, minimum_height = 600,
   maximum_width = 520,
   draw_shades = false,
 
@@ -44,43 +44,43 @@ conky.config = {
 conky.text = [[
   ${font :BOLD}SYSTEM${font}
   ${voffset -10}${hr}
-  ${font :BOLD}Kernel ${font}${alignr}$kernel
-  ${font :BOLD}Uptime ${font}${alignr}${uptime_short}
-  ${font :BOLD}Load ${font}${alignr}${loadavg}
+  ${font :BOLD}Kernel${font}${alignr}$kernel
+  ${font :BOLD}Uptime${font}${alignr}${uptime_short}
+  ${font :BOLD}Load${font}${alignr}${loadavg}
 
   ${font :BOLD}CPU${alignr}${cpu cpu0}%${font}
   ${voffset -10}${hr}
-  ${top name 1}${alignr}${top cpu 1}%
-  ${top name 2}${alignr}${top cpu 2}%
-  ${top name 3}${alignr}${top cpu 3}%
-  ${top name 4}${alignr}${top cpu 4}%
-  ${top name 5}${alignr}${top cpu 5}%
+  ${font :BOLD}${top name 1}${font}${alignr}${top cpu 1}%
+  ${font :BOLD}${top name 2}${font}${alignr}${top cpu 2}%
+  ${font :BOLD}${top name 3}${font}${alignr}${top cpu 3}%
+  ${font :BOLD}${top name 4}${font}${alignr}${top cpu 4}%
+  ${font :BOLD}${top name 5}${font}${alignr}${top cpu 5}%
 
   ${font :BOLD}RAM${alignr}${mem}${font}
   ${voffset -10}${hr}
-  ${top_mem name 1}${alignr}${top_mem mem 1}%
-  ${top_mem name 2}${alignr}${top_mem mem 2}%
-  ${top_mem name 3}${alignr}${top_mem mem 3}%
-  ${top_mem name 4}${alignr}${top_mem mem 4}%
-  ${top_mem name 5}${alignr}${top_mem mem 5}%
+  ${font :BOLD}${top_mem name 1}${font}${alignr}${top_mem mem 1}%
+  ${font :BOLD}${top_mem name 2}${font}${alignr}${top_mem mem 2}%
+  ${font :BOLD}${top_mem name 3}${font}${alignr}${top_mem mem 3}%
+  ${font :BOLD}${top_mem name 4}${font}${alignr}${top_mem mem 4}%
+  ${font :BOLD}${top_mem name 5}${font}${alignr}${top_mem mem 5}%
 
   ${font :BOLD}DISK${font}
   ${voffset -10}${hr}
-  ${font :BOLD}Root ${font}${alignr}${fs_used /} /$color ${fs_size /} - ${fs_free_perc /}%
+  ${font :BOLD}Root${font}${alignr}${fs_used /} /$color ${fs_size /} - ${fs_free_perc /}%
   ${voffset 6}${fs_bar 12 /}
 
   ${font :BOLD}NETWORK${font}
   ${voffset -10}${hr}
-  ${font :BOLD}SSID ${font}${alignr}${wireless_essid wlp0s20f3}
-  ${font :BOLD}Down ${font}${alignr}${downspeed wlp0s20f3}
-  ${font :BOLD}Up ${font}${alignr}${upspeed wlp0s20f3}
+  ${font :BOLD}SSID${font}${alignr}${wireless_essid wlp0s20f3}
+  ${font :BOLD}Download${font}${alignr}${downspeed wlp0s20f3}
+  ${font :BOLD}Upload${font}${alignr}${upspeed wlp0s20f3}
 
   ${font :BOLD}TEMPERATURE${font}
   ${voffset -10}${hr}
-  ${font :BOLD}Core 0 ${font}${alignr}${exec sensors | sed -rn 's/.*Core 0:\s+([^ ]+).*/\1/p'}
-  ${font :BOLD}Core 1 ${font}${alignr}${exec sensors | sed -rn 's/.*Core 1:\s+([^ ]+).*/\1/p'}
-  ${font :BOLD}Core 2 ${font}${alignr}${exec sensors | sed -rn 's/.*Core 2:\s+([^ ]+).*/\1/p'}
-  ${font :BOLD}Core 3 ${font}${alignr}${exec sensors | sed -rn 's/.*Core 3:\s+([^ ]+).*/\1/p'}
+  ${font :BOLD}Core 0${font}${alignr}${exec sensors | sed -rn 's/.*Core 0:\s+([^ ]+).*/\1/p'}
+  ${font :BOLD}Core 1${font}${alignr}${exec sensors | sed -rn 's/.*Core 1:\s+([^ ]+).*/\1/p'}
+  ${font :BOLD}Core 2${font}${alignr}${exec sensors | sed -rn 's/.*Core 2:\s+([^ ]+).*/\1/p'}
+  ${font :BOLD}Core 3${font}${alignr}${exec sensors | sed -rn 's/.*Core 3:\s+([^ ]+).*/\1/p'}
 
   ${voffset 200}
 ]];

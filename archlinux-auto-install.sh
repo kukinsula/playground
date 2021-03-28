@@ -82,7 +82,17 @@ sudo pacman -S \
   cloc \
   powertop \
   libqalculate \
-  conky
+  conky \
+  obs-studio \
+  tar \
+  unzip \
+  gzip \
+  file-roller \
+  screen \
+  fortune \
+  cowsay \
+  lolcat \
+  reflector
 
 ## Firmware
 fwupdmgr get-devices
@@ -111,12 +121,13 @@ paru -S \
   postman-bin \
   robo3t-bin \
   multimarkdown \
-	popcorntime-bin \
-	apache-tools \
-	pipes.sh \
-	screenfetch \
-	nerd-fonts-complete \
-	logo-ls
+  popcorntime-bin \
+  apache-tools \
+  pipes.sh \
+  screenfetch \
+  nerd-fonts-complete \
+  logo-ls \
+  arch-silence-grub-theme-git
 
 # TLP
 sudo tlp start
@@ -227,7 +238,12 @@ git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shel
 # base16_<TAB>_<TAB
 base16_helios
 
+# GRUB
+# Edit /etc/default/grub: set GRUB_THEME="/boot/grub/themes/arch-silence/theme.txt"
+# sudo grub-mkconfig -o /boot/grub/grub.cfg
+
 # Backup
+#
 # sudo rsync -aAXvP \
 #   --delete \
 #   --exclude=/dev/* \
