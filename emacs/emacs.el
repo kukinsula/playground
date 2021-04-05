@@ -53,8 +53,6 @@
 ;;
 ;; Tide: que le serveur démarre dès qu'un fichier TS est ouvert
 ;;
-;; Company-mode case insensitive
-;;
 ;; use-package:
 ;;   :type github
 ;;   :load-path
@@ -85,10 +83,8 @@
 
 ;; Packages manager
 (require 'package)
-(setq package-archives '(("melpa-stable" . "https://stable.melpa.org/packages/")
-												 ("melpa" . "https://melpa.org/packages/")
-												 ("org" . "https://orgmode.org/elpa/")
-												 ("elpa" . "https://elpa.gnu.org/packages/")))
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.org/packages/")))
 
 (setq package-enable-at-startup nil)
 (package-initialize)
@@ -431,6 +427,9 @@
       mouse-wheel-follow-mouse t										;; Scroll window under mouse
       scroll-step 1)																;; Keyboard scroll one line at a time
 
+(fast-scroll-config)
+(fast-scroll-mode 1)
+
 ;; Trailing whitespaces
 ;; (setq-default show-trailing-whitespace t)
 (add-hook 'before-save-hook
@@ -557,7 +556,8 @@
 	(company-dabbrev-downcase nil)
 	(company-dabbrev-code-everywhere t)
 	(company-dabbrev-code-modes t)
-	(company-dabbrev-code-ignore-case t))
+	(company-dabbrev-code-ignore-case t)
+	(completion-ignore-case t))
 
 (use-package company-box
   :ensure t
@@ -685,13 +685,17 @@
   :bind-keymap ("C-c p" . projectile-command-map)
   :bind (("C-S-f" . projectile-find-file)
 				 ("C-S-s" . projectile-grep)
-				 ("C-S-P" . projectile-switch-project))
+				 ("C-S-P" . projectile-switch-project)
+				 ("C-S-r" . projectile-run-project))
   :commands (projectile-register-project-type)
   :config
 	(projectile-register-project-type 'npm '("package.json")
 																		:project-file "package.json"
 																		:test "npm test"
-																		:run "npm start")
+																		:run "npm start"
+																		:compilation-dir "packages/api"
+																		:compile "npm run build")
+
 	(setq projectile-globally-ignored-directories '("log"
 																									"logs"
 																									"node_modules"
@@ -706,21 +710,34 @@
   :ensure t
 	:defer t)
 
+(setq compilation-error-regexp-alist-alist
+      (cons '(node "^[  ]+at \\(?:[^\(\n]+ \(\\)?\\([a-zA-Z\.0-9_/-]+\\):\\([0-9]+\\):\\([0-9]+\\)\)?$"
+                   1 ;; file
+                   2 ;; line
+                   3 ;; column
+                   )
+            compilation-error-regexp-alist-alist))
+(setq compilation-error-regexp-alist
+      (cons 'node compilation-error-regexp-alist))
+
 ;; Typescript
 (use-package tide
   :ensure t
   :diminish
-  :custom (typescript-indent-level 2)
-	:config
-  :hook ((typescript-mode . tide-setup)
+	:custom ((typescript-indent-level 2)
+					 (tide-completion-ignore-case 1)
+					 (tide-server-max-response-length 1048576)
+					 (tide-hl-identifier-idle-time 0.1))
+	:hook ((typescript-mode . tide-setup)
 				 (typescript-mode . tide-hl-identifier-mode)
 				 (typescript-mode . company-mode)
 				 (before-save . tide-format-before-save))
-  :commands (tide-rename-symbol tide-rename-file tide-references prettier-js)
-  :bind (("C-c C-t r s" . tide-rename-symbol)
+	:commands (tide-rename-symbol tide-rename-file tide-references prettier-js)
+	:bind (("C-c C-t r s" . tide-rename-symbol)
 				 ("C-c C-t r f" . tide-rename-file)
 				 ("C-c C-t f r" . tide-references)
 				 ("C-c C-t i j" . tide-jsdoc-template)
+				 ("C-c C-t e" . tide-project-errors)
 				 ("C-c C-p" . prettier-js)))
 
 (use-package npm-mode
@@ -1102,7 +1119,7 @@
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
  '(objed-cursor-color "#d02b61")
  '(package-selected-packages
-	 '(cl-libify org-superstar esup uuidgen writeroom-mode dimmer restclient dired-subtree all-the-icons-dired exec-path-from-shell auto-package-update docker-compose-mode dockerfile-mode csv-mode yaml-mode json-mode npm-mode tide add-node-modules-path prettier-js magit yasnippet flycheck company-box multiple-cursors aggressive-indent rainbow-delimiters undo-tree smart-hungry-delete which-key smex company-prescient ivy-prescient prescient flx counsel-projectile ivy-rich ivy-hydra ivy rainbow-mode highlight-indent-guides dashboard diminish minions doom-modeline doom-themes use-package))
+	 '(fast-scroll nlinum ob-mongo cl-libify org-superstar esup uuidgen writeroom-mode dimmer restclient dired-subtree all-the-icons-dired exec-path-from-shell auto-package-update docker-compose-mode dockerfile-mode csv-mode yaml-mode json-mode npm-mode tide add-node-modules-path prettier-js magit yasnippet flycheck company-box multiple-cursors aggressive-indent rainbow-delimiters undo-tree smart-hungry-delete which-key smex company-prescient ivy-prescient prescient flx counsel-projectile ivy-rich ivy-hydra ivy rainbow-mode highlight-indent-guides dashboard diminish minions doom-modeline doom-themes use-package))
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
 	 ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
