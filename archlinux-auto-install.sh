@@ -92,7 +92,10 @@ sudo pacman -S \
   fortune \
   cowsay \
   lolcat \
-  reflector
+  reflector \
+  fd \
+  the_silver_searcher \
+  ripgrep \
 
 ## Firmware
 fwupdmgr get-devices
