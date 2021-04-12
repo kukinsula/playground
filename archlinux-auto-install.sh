@@ -130,7 +130,8 @@ paru -S \
   screenfetch \
   nerd-fonts-complete \
   logo-ls \
-  arch-silence-grub-theme-git
+  arch-silence-grub-theme-git \
+  icdiff
 
 # TLP
 sudo tlp start
@@ -174,8 +175,10 @@ sudo pip install \
   yapf
 
 # Git
-git config --global user.email ""
-git config --global user.name ""
+# git config --global user.email ""
+# git config --global user.name ""
+
+# git icdiff
 
 # Source highlight
 

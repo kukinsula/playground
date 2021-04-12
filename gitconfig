@@ -1,0 +1,12 @@
+# ln -s /path/to/playground/gitconfig ~/.gitconfig
+
+[user]
+  name = TEXIER-ATGER Lucas
+  email = lucas.texier-atger@dametis.com
+
+[color]
+  ui = auto
+
+[alias]
+  diff = diff --color-words
+  lg = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
