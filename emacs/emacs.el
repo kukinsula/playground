@@ -71,7 +71,7 @@
 
 ;; Memory
 (setq gc-cons-threshold (* 100 1024 1024)
-      large-file-warning-threshold 100000000
+      large-file-warning-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024))
 
 ;; Answer y or n
@@ -120,9 +120,13 @@
       process-coding-system-alist (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
 
 ;; Default browser
-;; (setq browse-url-browser-function 'google-chrome-stable)
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "google-chrome-stable")
+
+;; GC Magic Hack
+(use-package gcmh
+  :ensure t
+  :config (gcmh-mode 1))
 
 ;; Automatically revert all buffers
 (use-package autorevert
@@ -146,9 +150,6 @@
   :ensure nil
   :config
   (save-place-mode))
-
-(setq scroll-error-top-bottom t)
-(setq track-eol t)
 
 ;; Transparently open compressed files
 (auto-compression-mode t)
@@ -213,6 +214,11 @@
 (global-set-key (kbd "<M-S-left>") 'shrink-window-horizontally)
 (global-set-key (kbd "<M-S-right>") 'enlarge-window-horizontally)
 
+;; TODO: save sessions
+;; (use-package desktop
+;;   :config (desktop-save-mode)
+;;   :custom (desktop-path '("~/.emacs.d/desktops/")))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
 ;;         INTERFACE         ;;
@@ -262,10 +268,16 @@
 (size-indication-mode t)
 
 ;; Fringe size (LEFT . RIGHT)
-(set-fringe-mode '(2 . 2))
+(set-fringe-mode '(10 . 0))
 
 ;; Maximize windo
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; Set frame title to opened buffer name
+(setq frame-title-format
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
 
 ;; Set font
 (use-package font-lock
@@ -279,11 +291,15 @@
   :custom-face
   (font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold)))))
 
-;; Set frame title to opened buffer name
-(setq frame-title-format
-      '((:eval (if (buffer-file-name)
-                   (abbreviate-file-name (buffer-file-name))
-                 "%b"))))
+;; Set modeline font
+(set-face-attribute 'mode-line nil
+                    :family "Source Code Pro"
+                    :height 115
+                    :background "#161424")
+(set-face-attribute 'mode-line-inactive nil
+                    :family "Source Code Pro"
+                    :height 115
+                    :background "#191729")
 
 ;; Themes
 (use-package doom-themes
@@ -303,7 +319,7 @@
   :config
   (doom-modeline-def-modeline 'main
     '(bar matches buffer-info buffer-position selection-info)
-    '(misc-info minor-modes major-mode process checker "  "))
+    '(misc-info minor-modes major-mode process checker " "))
   :custom
   (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-minor-modes t)
@@ -360,8 +376,7 @@
 (use-package ivy
   :ensure t
   :diminish
-  :bind (("C-s" . swiper)
-	       ("M-b" . ivy-switch-buffer)
+  :bind (("M-b" . ivy-switch-buffer)
          :map ivy-minibuffer-map
          ("RET" . ivy-alt-done)
 	       ("C-r" . ivy-previous-line-or-history)
@@ -371,7 +386,7 @@
   :custom
   (ivy-use-virtual-buffers t)
   (ivy-wrap t)
-  (ivy-count-format "【%d/%d】")
+  (ivy-count-format "【%d / %d】")
   (enable-recursive-minibuffers nil)
   (ivy-dynamic-exhibit-delay-ms 250)
   :custom-face
@@ -380,6 +395,8 @@
   (ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil)))))
+
+
 
 (use-package ivy-hydra
   :ensure t
@@ -403,7 +420,8 @@
   :diminish
   :commands (counsel-linux-app-format-function-name-only)
   :bind (("M-x" . counsel-M-x)
-	       ("C-x C-f" . counsel-find-file))
+	       ("C-x C-f" . counsel-find-file)
+	       ("C-x 8 RET" . counsel-unicode-char))
   :custom (ivy-initial-inputs-alist nil))
 
 (define-key ivy-minibuffer-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
@@ -414,6 +432,7 @@
   :ensure t
   :diminish
   :after (ivy)
+  :bind ("C-s" . swiper)
   :custom-face
   (swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
   (swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
@@ -486,6 +505,22 @@
 (global-unset-key (kbd "<C-mouse-5>"))
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
 
+;; Emojis
+(use-package emojify
+  :ensure t
+  :diminish t
+  :hook (after-init . global-emojify-mode)
+  :custom
+  (if (display-graphic-p)
+	    (emojify-display-style 'image)
+	  (emojify-display-style 'unicode)))
+
+;; Dimm unfocused buffers.
+(use-package dimmer
+  :ensure t
+  :custom (dimmer-fraction 0.1)
+  :config (dimmer-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
 ;;          EDITION          ;;
@@ -496,15 +531,26 @@
 (delete-selection-mode 1)
 
 ;; Scroll
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)) ;; one line at a time
+(setq scroll-error-top-bottom t
+      track-eol t
+      mouse-wheel-scroll-amount '(2 ((shift) . 2)) ;; one line at a time
       mouse-wheel-progressive-speed nil            ;; don't accelerate scrolling
-      mouse-wheel-follow-mouse 't                  ;; scroll window under mouse
+      mouse-wheel-follow-mouse t                   ;; scroll window under mouse
       scroll-step 1)                               ;; keyboard scroll one line at a time
 
 (setq-default scroll-preserve-screen-position t)
 
 ;; Trailing whitespaces
-;; (setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace t)
+;; Disable show-trailing-whitespace in some buffers.
+(dolist (hook '(special-mode-hook
+                term-mode-hook
+                comint-mode-hook
+                compilation-mode-hook
+                minibuffer-setup-hook))
+  (add-hook hook
+            (lambda () (setq show-trailing-whitespace nil))))
+;; Remove whitespaces on save.
 (add-hook 'before-save-hook
           (lambda ()
             (delete-trailing-whitespace)))
@@ -745,6 +791,52 @@
   :config
   (flycheck-add-mode 'javascript-eslint 'tide-mode)
   (global-flycheck-mode)
+
+  ;; Error symbol to display in fringe
+  (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
+    (vector #b00000000
+            #b00000000
+            #b00000000
+            #b00000000
+            #b00000000
+            #b00000000
+            #b00010000
+            #b00111000
+            #b01111100
+            #b11111110
+            #b11111110
+            #b01111100
+            #b00111000
+            #b00010000
+            #b00000000
+            #b00000000
+            #b00000000
+            #b00000000))
+
+  (flycheck-define-error-level 'error
+    :severity 2
+    :compilation-level 2
+    :overlay-category 'flycheck-error-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-face 'flycheck-fringe-error
+    :error-list-face 'flycheck-error-list-error)
+
+  (flycheck-define-error-level 'warning
+    :severity 1
+    :compilation-level 1
+    :overlay-category 'flycheck-warning-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-face 'flycheck-fringe-warning
+    :warning-list-face 'flycheck-warning-list-warning)
+
+  (flycheck-define-error-level 'info
+    :severity 0
+    :compilation-level 0
+    :overlay-category 'flycheck-info-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-face 'flycheck-fringe-info
+    :info-list-face 'flycheck-info-list-info)
+
   :commands (flycheck-add-mode))
 
 ;; Which Function
@@ -989,14 +1081,12 @@
 
 ;; Icons: M-x all-the-icons-install-fonts
 (use-package all-the-icons
-  :if (display-graphic-p)
   :ensure t
   :diminish
   :hook (dired-mode . all-the-icons-dired-mode)
-  :custom (all-the-icons-scale-factor 1.1)
-  :config
-  (unless (member "all-the-icons" (font-family-list))
-    (all-the-icons-install-fonts t)))
+  :init (setq all-the-icons-scale-factor 1)
+  :config (unless (member "all-the-icons" (font-family-list))
+            (all-the-icons-install-fonts t)))
 
 (use-package recentf
   :ensure t
@@ -1135,7 +1225,7 @@
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
  '(objed-cursor-color "#d02b61")
  '(package-selected-packages
-   '(highlight-indent-guides stripe-buffer vterm company-statistics magit persistent-scratch yasnippet writeroom-mode which-key uuidgen use-package undo-fu tide systemd smex smart-hungry-delete rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions json-mode ivy-prescient ivy-hydra helpful flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree diminish dashboard csv-mode counsel-projectile company-quickhelp company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(dimmer gcmh highlight-indent-guides stripe-buffer vterm company-statistics magit persistent-scratch yasnippet writeroom-mode which-key uuidgen use-package undo-fu tide systemd smex smart-hungry-delete rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions json-mode ivy-prescient ivy-hydra helpful flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree diminish dashboard csv-mode counsel-projectile company-quickhelp company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
@@ -1201,6 +1291,8 @@
  '(swiper-match-face-2 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-3 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-4 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
+ '(tide-hl-identifier-face ((t (:background "gray11" :underline t :weight bold))))
+ '(trailing-whitespace ((t (:background "#39374E"))))
  '(whitespace-tab ((t (:foreground "#636363")))))
 
 (provide 'emacs)
