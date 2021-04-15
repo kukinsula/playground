@@ -149,7 +149,10 @@
 (use-package saveplace
   :ensure nil
   :config
-  (save-place-mode))
+  (save-place-mode)
+  :custom
+  (save-place-forget-unreadable-files t)
+  (save-place-limit 400))
 
 ;; Transparently open compressed files
 (auto-compression-mode t)
@@ -172,11 +175,13 @@
       kept-old-versions 2
       version-control t)
 
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets
-      uniquify-separator "/"
-      uniquify-after-kill-buffer-p t
-      uniquify-ignore-buffers-re "^\\*")
+(use-package uniquify
+  :ensure nil
+  :custom
+  (uniquify-buffer-name-style 'post-forward-angle-brackets)
+  (uniquify-separator "/")
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-ignore-buffers-re "^\\*"))
 
 (global-eldoc-mode t)
 
@@ -229,6 +234,10 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
+
+(setq
+ use-dialog-box nil
+ use-file-dialog nil)
 
 ;; Highlight
 (use-package hl-line
@@ -396,8 +405,6 @@
   (ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil)))))
 
-
-
 (use-package ivy-hydra
   :ensure t
   :diminish
@@ -408,6 +415,13 @@
 
 (use-package all-the-icons-ivy-rich
   :ensure t
+  :custom
+  (all-the-icons-ivy-file-commands
+   '(counsel-find-file
+     counsel-file-jump
+     counsel-recentf
+     counsel-projectile-find-file
+     counsel-projectile-find-dir) "Prettify more commands.")
   :config (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
@@ -454,12 +468,19 @@
 (use-package prescient
   :ensure t
   :diminish
-  :after (ivy))
+  :after (ivy)
+  :config (prescient-persist-mode 1))
+
+(use-package company-prescient
+  :ensure t
+  :diminish
+  :config (company-prescient-mode 1))
 
 (use-package ivy-prescient
   :ensure t
   :diminish
   :custom (ivy-prescient-sort-commands :sort)
+  :config (ivy-prescient-mode 1)
   :after (ivy))
 
 (use-package which-key
@@ -712,10 +733,6 @@
   :custom-face
   (company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro")))))
 
-(use-package company-prescient
-  :ensure t
-  :diminish)
-
 (use-package company-box
   :ensure t
   :diminish
@@ -787,9 +804,10 @@
 (use-package flycheck
   :ensure t
   :diminish
-  :custom (flycheck-check-syntax-automatically '(idle-change save))
+  :custom
+  (flycheck-check-syntax-automatically '(idle-change save))
+  (flycheck-javascript-eslint-executable "eslint_d")
   :config
-  (flycheck-add-mode 'javascript-eslint 'tide-mode)
   (global-flycheck-mode)
 
   ;; Error symbol to display in fringe
@@ -919,15 +937,18 @@
 (use-package tide
   :ensure t
   :diminish
-  :custom ((typescript-indent-level 2)
-	         (tide-completion-ignore-case 1)
-	         (tide-server-max-response-length 1048576)
-	         (tide-hl-identifier-idle-time 0.1))
+  :custom
+  (typescript-indent-level 2)
+	(tide-completion-ignore-case 1)
+	(tide-server-max-response-length 1048576)
+	(tide-hl-identifier-idle-time 0.1)
+  (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
   :hook ((typescript-mode . tide-setup)
 	       (typescript-mode . tide-hl-identifier-mode)
 	       (typescript-mode . company-mode)
 	       (before-save . tide-format-before-save))
-  :commands (tide-rename-symbol tide-rename-file tide-references prettier-js)
+  :commands
+  (tide-rename-symbol tide-rename-file tide-references prettier-js)
   :bind (("C-c C-t r s" . tide-rename-symbol)
 	       ("C-c C-t r f" . tide-rename-file)
 	       ("C-c C-t f r" . tide-references)
@@ -1036,7 +1057,7 @@
   (auto-package-update-hide-results t)
   (auto-package-update-interval 30))
 
-;; Save mini buffer history
+;; Save history
 (use-package savehist
   :ensure nil
   :config (savehist-mode)
@@ -1225,7 +1246,7 @@
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
  '(objed-cursor-color "#d02b61")
  '(package-selected-packages
-   '(dimmer gcmh highlight-indent-guides stripe-buffer vterm company-statistics magit persistent-scratch yasnippet writeroom-mode which-key uuidgen use-package undo-fu tide systemd smex smart-hungry-delete rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions json-mode ivy-prescient ivy-hydra helpful flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree diminish dashboard csv-mode counsel-projectile company-quickhelp company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(dimmer gcmh highlight-indent-guides vterm company-statistics magit persistent-scratch yasnippet writeroom-mode which-key uuidgen use-package undo-fu tide systemd smex rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions json-mode ivy-prescient ivy-hydra helpful flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree diminish dashboard csv-mode counsel-projectile company-quickhelp company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
