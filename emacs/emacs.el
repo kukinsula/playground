@@ -51,10 +51,6 @@
 ;;
 ;; Tide: que le serveur démarre dès qu'un fichier TS est ouvert
 ;;
-;; use-package:
-;;   :type github
-;;   :load-path
-;;
 ;; Désactiver pleins de trucs si on est en mode text
 ;;
 ;; Conserver la text scale après un revert-buffer/revert-all-buffers F5
@@ -70,9 +66,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Memory
-(setq gc-cons-threshold (* 100 1024 1024)
-      large-file-warning-threshold (* 100 1024 1024)
+(setq large-file-warning-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024))
+
+(add-hook 'emacs-startup-hook (lambda() (setq file-name-handler-alist nil)))
 
 ;; Answer y or n
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -80,15 +77,14 @@
 ;; Packages manager
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-			                   ("melpa-stable" . "https://stable.melpa.org/packages/")))
+                         ("melpa" . "https://melpa.org/packages/")))
 
 (setq package-enable-at-startup nil)
 (package-initialize)
 
 ;; use-package
 (setq-default use-package-expand-minimally t
-              use-package-verbose nil
+              use-package-verbose t
               use-package-enable-imenu-support t
               use-package-compute-statistics t)
 
@@ -126,7 +122,7 @@
 ;; GC Magic Hack
 (use-package gcmh
   :ensure t
-  :config (gcmh-mode 1))
+  :config (gcmh-mode t))
 
 ;; Automatically revert all buffers
 (use-package autorevert
@@ -135,8 +131,7 @@
   :custom
   (auto-revert-verbose nil)
   (auto-revert-interva 5)
-  :config
-  (global-auto-revert-mode))
+  :config (global-auto-revert-mode))
 
 ;; Disable bell
 (setq ring-bell-function 'ignore
@@ -148,8 +143,7 @@
 
 (use-package saveplace
   :ensure nil
-  :config
-  (save-place-mode)
+  :config (save-place-mode)
   :custom
   (save-place-forget-unreadable-files t)
   (save-place-limit 400))
@@ -174,6 +168,9 @@
       kept-new-versions 6
       kept-old-versions 2
       version-control t)
+
+;; Lockfiles
+(setq create-lockfiles nil)
 
 (use-package uniquify
   :ensure nil
@@ -211,7 +208,7 @@
 ;;   (ispell-list-command "--list"))
 
 ;; (dolist (hook '(text-mode-hook))
-;;   (add-hook hook (lambda () (flyspell-mode 1))))
+;;   (add-hook hook (lambda () (flyspell-mode t))))
 
 ;; Resize windows
 (global-set-key (kbd "<M-S-up>") 'shrink-window)
@@ -243,8 +240,7 @@
 (use-package hl-line
   :hook (prog-mode . hl-line-mode)
   :custom (global-hl-line-sticky-flag t)
-  :custom-face
-  (hl-line ((t (:extend t :background "#24213b")))))
+  :custom-face (hl-line ((t (:extend t :background "#24213b")))))
 
 ;; Indentation hightlight
 (use-package highlight-indent-guides
@@ -269,8 +265,8 @@
   :hook (prog-mode))
 
 ;; line:column in modeline
-(line-number-mode 1)
-(column-number-mode 1)
+(line-number-mode t)
+(column-number-mode t)
 (setq size-indication-mode t)
 
 ;; Display the size of the buffer
@@ -291,14 +287,13 @@
 ;; Set font
 (use-package font-lock
   :ensure nil
-  :config
-  (set-face-attribute 'default nil
-                      :family "Source Code Pro"
-                      :height 115
-                      :weight 'normal
-                      :width 'normal)
-  :custom-face
-  (font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold)))))
+  :config (set-face-attribute 'default nil
+                              :family "Source Code Pro"
+                              :height 115
+                              :weight 'normal
+                              :width 'normal)
+  :custom-face (font-lock-warning-face
+                ((t (:inherit warning :foreground "sandy brown" :weight bold)))))
 
 ;; Set modeline font
 (set-face-attribute 'mode-line nil
@@ -325,10 +320,9 @@
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode)
-  :config
-  (doom-modeline-def-modeline 'main
-    '(bar matches buffer-info buffer-position selection-info)
-    '(misc-info minor-modes major-mode process checker " "))
+  :config (doom-modeline-def-modeline 'main
+            '(bar matches buffer-info buffer-position selection-info)
+            '(misc-info minor-modes major-mode process checker " "))
   :custom
   (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-minor-modes t)
@@ -341,6 +335,7 @@
   (doom-modeline-height 25)
   :commands (doom-modeline-def-modeline)
   :custom-face
+  '(doom-modeline-bar ((t (:background "#906CFF"))))
   '(doom-modeline-bar ((t (:background "#906CFF")))))
 
 (use-package minions
@@ -372,9 +367,8 @@
 		                 (recents . 20)))
   (dashboard-set-init-info nil)
   (dashboard-banner-logo-title
-   (format "Emacs ready in %.3f seconds."
-           (float-time
-            (time-subtract after-init-time before-init-time))))
+   (format "Emacs init time %.3f seconds with %d garbage collections."
+           (float-time (time-subtract after-init-time before-init-time)) gcs-done))
   :bind ("C-S-d" . (lambda ()
 		                 (interactive)
 		                 (switch-to-buffer "*dashboard*")))
@@ -396,7 +390,7 @@
   (ivy-use-virtual-buffers t)
   (ivy-wrap t)
   (ivy-count-format "【%d / %d】")
-  (enable-recursive-minibuffers nil)
+  (enable-recursive-minibuffers t)
   (ivy-dynamic-exhibit-delay-ms 250)
   :custom-face
   (ivy-current-match ((t (:foreground "#CBE3E7" :weight bold :background "#39374E"))))
@@ -408,26 +402,49 @@
 (use-package ivy-hydra
   :ensure t
   :diminish
-  :after (ivy hydra))
-
-(use-package counsel-projectile
-  :ensure t)
+  :after(ivy hydra))
 
 (use-package all-the-icons-ivy-rich
   :ensure t
-  :custom
-  (all-the-icons-ivy-file-commands
-   '(counsel-find-file
-     counsel-file-jump
-     counsel-recentf
-     counsel-projectile-find-file
-     counsel-projectile-find-dir) "Prettify more commands.")
-  :config (all-the-icons-ivy-rich-mode 1))
+  :after (counsel)
+  :custom (all-the-icons-ivy-file-commands
+           '(counsel-find-file
+             counsel-file-jump
+             counsel-recentf
+             counsel-projectile-find-file
+             counsel-projectile-find-dir) "Prettify more commands.")
+  :config (all-the-icons-ivy-rich-mode t))
 
 (use-package ivy-rich
   :ensure t
   :diminish
-  :config (ivy-rich-mode 1))
+  :config
+  (ivy-rich-mode t)
+  (progn
+    (defvar ek/ivy-rich-cache
+      (make-hash-table :test 'equal))
+
+    (defun ek/ivy-rich-cache-lookup (delegate candidate)
+      (let ((result (gethash candidate ek/ivy-rich-cache)))
+        (unless result
+          (setq result (funcall delegate candidate))
+          (puthash candidate result ek/ivy-rich-cache))
+        result))
+
+    (defun ek/ivy-rich-cache-reset ()
+      (clrhash ek/ivy-rich-cache))
+
+    (defun ek/ivy-rich-cache-rebuild ()
+      (mapc (lambda (buffer)
+              (ivy-rich--ivy-switch-buffer-transformer (buffer-name buffer)))
+            (buffer-list)))
+
+    (defun ek/ivy-rich-cache-rebuild-trigger ()
+      (ek/ivy-rich-cache-reset)
+      (run-with-idle-timer 1 nil 'ek/ivy-rich-cache-rebuild))
+
+    (advice-add 'ivy-rich--ivy-switch-buffer-transformer :around 'ek/ivy-rich-cache-lookup)
+    (advice-add 'ivy-switch-buffer :after 'ek/ivy-rich-cache-rebuild-trigger)))
 
 (use-package counsel
   :ensure t
@@ -438,6 +455,9 @@
 	       ("C-x 8 RET" . counsel-unicode-char))
   :custom (ivy-initial-inputs-alist nil))
 
+(use-package counsel-projectile
+  :ensure t)
+
 (define-key ivy-minibuffer-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
 (define-key swiper-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
 (global-set-key (kbd "<M-backspace>") 'backward-kill-word)
@@ -447,6 +467,7 @@
   :diminish
   :after (ivy)
   :bind ("C-s" . swiper)
+  :custom (swiper-action-recenter t)
   :custom-face
   (swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
   (swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
@@ -469,18 +490,20 @@
   :ensure t
   :diminish
   :after (ivy)
-  :config (prescient-persist-mode 1))
+  :commands (prescient-persist-mod)
+  :custom (prescient-save-file "~/.emacs.d/prescient-save.el")
+  :config (prescient-persist-mode t))
 
 (use-package company-prescient
   :ensure t
   :diminish
-  :config (company-prescient-mode 1))
+  :config (company-prescient-mode t))
 
 (use-package ivy-prescient
   :ensure t
   :diminish
-  :custom (ivy-prescient-sort-commands :sort)
-  :config (ivy-prescient-mode 1)
+  :custom (ivy-prescient-sort-commands '(:not swiper swiper-isearc))
+  :config (ivy-prescient-mode t)
   :after (ivy))
 
 (use-package which-key
@@ -528,13 +551,13 @@
 
 ;; Emojis
 (use-package emojify
+  :disabled t
   :ensure t
   :diminish t
   :hook (after-init . global-emojify-mode)
   :custom
-  (if (display-graphic-p)
-	    (emojify-display-style 'image)
-	  (emojify-display-style 'unicode)))
+  (emojify-emoji-styles . '(unicode github))
+  (emojify-display-style . 'unicode))
 
 ;; Dimm unfocused buffers.
 (use-package dimmer
@@ -549,7 +572,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Replace selected region
-(delete-selection-mode 1)
+(delete-selection-mode t)
 
 ;; Scroll
 (setq scroll-error-top-bottom t
@@ -620,8 +643,7 @@
 (use-package undo-fu
   :ensure t
   :diminish
-  :custom
-  (undo-fu-allow-undo-in-region t)
+  :custom (undo-fu-allow-undo-in-region t)
   :bind (("C-z" . 'undo-fu-only-undo)
 	       ("C-S-z" . 'undo-fu-only-redo)))
 
@@ -645,9 +667,7 @@
 
 (use-package move-text
   :ensure t
-  :defer 0.5
-  :config
-  (move-text-default-bindings))
+  :config (move-text-default-bindings))
 
 (defun duplicate-line()
   "Duplicate the cursor's current line."
@@ -673,6 +693,7 @@
 (use-package persistent-scratch
   :ensure t
   :diminish
+  :custom (persistent-scratch-save-file "~/.emacs.d/persistent-scratch")
   :config
   (persistent-scratch-setup-default)
   (local-set-key (kbd "C-x C-s") 'persistent-scratch-save))
@@ -702,7 +723,7 @@
   :ensure t
   :diminish
   :config
-  (global-company-mode 1)
+  (global-company-mode t)
 
   ;; Trigger auto completion on tab or indent based on context
   (define-key company-mode-map (kbd "TAB") 'company-indent-or-complete-common)
@@ -797,7 +818,7 @@
 (use-package company-statistics
   :ensure t
   :diminish
-  :after company
+  :after (company)
   :hook (global-company-mode . company-statistics-mode))
 
 ;; Flycheck
@@ -805,14 +826,16 @@
   :ensure t
   :diminish
   :custom
-  (flycheck-check-syntax-automatically '(idle-change save))
+  (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch))
+  (flycheck-idle-buffer-switch-delay 0.5)
   (flycheck-javascript-eslint-executable "eslint_d")
-  :config
-  (global-flycheck-mode)
+  :config (global-flycheck-mode)
 
   ;; Error symbol to display in fringe
   (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
     (vector #b00000000
+            #b00000000
+            #b00000000
             #b00000000
             #b00000000
             #b00000000
@@ -866,8 +889,7 @@
   :disabled t
   :hook (prog-mode . yas-minor-mode)
   :commands (yas-reload-all)
-  :config
-  (yas-reload-all))
+  :config (yas-reload-all))
 
 ;; Colors
 (use-package ansi-color
@@ -916,17 +938,17 @@
 	       ("C-S-P" . projectile-switch-project)
 	       ("C-S-r" . projectile-run-project))
   :commands (projectile-register-project-type)
-  :config
-  (projectile-mode)
-  (setq projectile-completion-system 'ivy)
-  (defvar projetile-indexing-method 'alien)
-  (setq projectile-sort-order 'recentf)
-  (setq projectile-enable-caching t))
+  :custom
+  (projectile-completion-system 'ivy)
+  (projetile-indexing-method 'alien)
+  (projectile-sort-order 'recentf)
+  (projectile-enable-caching t)
+  :config (projectile-mode))
 
 (use-package ag
   :ensure t
   :diminish
-  :after projectile
+  :after (projectile)
   :custom
   (ag-highlight-search t)
   (ag-reuse-buffers t)
@@ -937,6 +959,24 @@
 (use-package tide
   :ensure t
   :diminish
+  :preface
+  ;; https://github.com/ananthakumaran/tide/issues/371#issuecomment-610086691
+  (defun tide-which-function ()
+    (defun tide-build-imenu-index (navtree)
+      (let* ((child-items (plist-get navtree :childItems))
+             (high-level-kinds '("class" "method" "function" "interface" "type" "enum"))
+             (kind (plist-get navtree :kind))
+             (text (plist-get navtree :text))
+             (node (cons (concat text " " (propertize (plist-get navtree :kind) 'face 'tide-imenu-type-face))
+                         (tide-span-to-position (plist-get (car (plist-get navtree :spans)) :start)))))
+        (if (member kind high-level-kinds)
+            (if child-items
+                (cons text
+                      (-concat (list node)
+                               (remove nil
+                                       (-map #'tide-build-imenu-index child-items))))
+              node)
+          ()))))
   :custom
   (typescript-indent-level 2)
 	(tide-completion-ignore-case 1)
@@ -946,29 +986,28 @@
   :hook ((typescript-mode . tide-setup)
 	       (typescript-mode . tide-hl-identifier-mode)
 	       (typescript-mode . company-mode)
+	       (typescript-mode . tide-which-function)
 	       (before-save . tide-format-before-save))
   :commands
-  (tide-rename-symbol tide-rename-file tide-references prettier-js)
+  (tide-rename-symbol tide-rename-file tide-references prettier-js tide-span-to-position)
   :bind (("C-c C-t r s" . tide-rename-symbol)
 	       ("C-c C-t r f" . tide-rename-file)
 	       ("C-c C-t f r" . tide-references)
 	       ("C-c C-t i j" . tide-jsdoc-template)
 	       ("C-c C-t e" . tide-project-errors)
-	       ("C-c C-p" . prettier-js))
+	       ("C-c C-t p" . prettier-js))
   :custom-face
-  (tide-hl-identifier-face ((t (:background "gray11" :underline t :weight bold)))))
+  (tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
 
 (use-package npm-mode
   :ensure t
   :diminish
-  :defer t
   :hook ((typescript-mode . npm-mode)
          (javascript-mode . npm-mode))
   :commands (npm-mode-npm-run)
-  :config
-  (local-set-key (kbd "C-c C-c") (lambda()
-				                           (interactive)
-				                           (npm-mode-npm-run "build"))))
+  :config (local-set-key (kbd "C-c C-c") (lambda()
+				                                   (interactive)
+				                                   (npm-mode-npm-run "build"))))
 
 (use-package prettier-js
   :ensure t
@@ -977,8 +1016,7 @@
 
 (use-package add-node-modules-path
   :ensure t
-  :defer t
-  :after tide)
+  :after (tide))
 
 ;; JSON
 (use-package json-mode
@@ -1018,7 +1056,7 @@
 
 (use-package org-superstar
   :ensure t
-  :after org
+  :after (org)
   :hook (org-mode . org-superstar-mode)
   :custom
   (org-superstar-remove-leading-stars t)
@@ -1082,32 +1120,34 @@
   :config (exec-path-from-shell-initialize))
 
 ;; Emacs Start Up Profiler
+;;
+;; # emacs -q
+;; (add-to-list 'load-path "/path/to/esup")
+;; (require 'esup)
+;; C-u M-x esup INIT_FILE
 (use-package esup
   :ensure t
   :diminish
-  :defer t
   :commands (esup)
-  :custom (message-log-max t))
+  :custom (message-log-max t)
+  :pin melpa)
 
 ;; Init file debugger
 (use-package bug-hunter
   :ensure t
-  :diminish
-  :defer t)
-
-(use-package all-the-icons-dired
-  :ensure t
-  :diminish
-  :after (all-the-icons))
+  :diminish)
 
 ;; Icons: M-x all-the-icons-install-fonts
 (use-package all-the-icons
   :ensure t
   :diminish
   :hook (dired-mode . all-the-icons-dired-mode)
-  :init (setq all-the-icons-scale-factor 1)
-  :config (unless (member "all-the-icons" (font-family-list))
-            (all-the-icons-install-fonts t)))
+  :custom (all-the-icons-scale-factor 1))
+
+(use-package all-the-icons-dired
+  :ensure t
+  :diminish
+  :after (all-the-icons))
 
 (use-package recentf
   :ensure t
@@ -1125,7 +1165,7 @@
                      "undo-tree-hist"
                      "url"
                      "COMMIT_EDITMSG\\'"))
-  :config (recentf-mode 1))
+  :config (recentf-mode t))
 
 ;; Dired-subtree
 (use-package dired-subtree
@@ -1137,7 +1177,6 @@
 (use-package writeroom-mode
   :ensure t
   :diminish
-  :defer t
   :commands (writeroom-adjust-width)
   :preface
   (defun writeroom-toggle-on  ()
@@ -1154,9 +1193,7 @@
   (add-hook 'writeroom-mode-disable-hook 'writeroom-toggle-off))
 
 (use-package tramp
-  :defer t
-  :config
-  (put 'temporary-file-directory 'standard-value `(,temporary-file-directory))
+  :config (put 'temporary-file-directory 'standard-value `(,temporary-file-directory))
   :custom
   (tramp-backup-directory-alist backup-directory-alist)
   (tramp-default-method "ssh")
@@ -1169,8 +1206,7 @@
               ("M-s" . sudo-edit)))
 
 (use-package uuidgen
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (defun revert-all-buffers ()
   "Refreshes all open buffers from their respective files."
@@ -1245,8 +1281,7 @@
  '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
  '(objed-cursor-color "#d02b61")
- '(package-selected-packages
-   '(dimmer gcmh highlight-indent-guides vterm company-statistics magit persistent-scratch yasnippet writeroom-mode which-key uuidgen use-package undo-fu tide systemd smex rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions json-mode ivy-prescient ivy-hydra helpful flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree diminish dashboard csv-mode counsel-projectile company-quickhelp company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path))
+ '(package-selected-packages nil)
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
@@ -1312,7 +1347,7 @@
  '(swiper-match-face-2 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-3 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-4 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
- '(tide-hl-identifier-face ((t (:background "gray11" :underline t :weight bold))))
+ '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
  '(trailing-whitespace ((t (:background "#39374E"))))
  '(whitespace-tab ((t (:foreground "#636363")))))
 
