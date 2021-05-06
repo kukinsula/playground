@@ -1,12 +1,26 @@
 # ln -s /path/to/playground/gitconfig ~/.gitconfig
 
 [user]
-  name = TEXIER-ATGER Lucas
-  email = lucas.texier-atger@dametis.com
+	name = TEXIER-ATGER Lucas
+	email = lucas.texier-atger@dametis.com
 
 [color]
-  ui = auto
+	ui = auto
 
 [alias]
-  diff = diff --color-words
-  lg = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
+	# Status
+	stat = status
+
+	# Diff
+	dif = diff --color-words
+
+	# Log
+	l = log --stat
+	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	last = !git --no-pager log -1 --color --stat
+	graph = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
+
+	# Search
+	search = grep --break --heading --line-number
+	search-commit = log --pretty=\"format:%Cgreen%H %Cblue%s\" --name-status --grep

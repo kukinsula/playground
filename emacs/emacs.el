@@ -591,9 +591,11 @@
                 term-mode-hook
                 comint-mode-hook
                 compilation-mode-hook
-                minibuffer-setup-hook))
+                minibuffer-setup-hook
+                vterm-mode-hook))
   (add-hook hook
             (lambda () (setq show-trailing-whitespace nil))))
+
 ;; Remove whitespaces on save.
 (add-hook 'before-save-hook
           (lambda ()
@@ -942,7 +944,6 @@
   (projectile-completion-system 'ivy)
   (projetile-indexing-method 'alien)
   (projectile-sort-order 'recentf)
-  (projectile-enable-caching t)
   :config (projectile-mode))
 
 (use-package ag
@@ -1281,7 +1282,8 @@
  '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
  '(objed-cursor-color "#d02b61")
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd sudo-edit rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
