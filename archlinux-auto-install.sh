@@ -147,7 +147,9 @@ paru -S \
   papirus-icon-theme \
   slack-desktop \
   downgrade \
-  cava
+  cava \
+  hibernator \
+  update-grub
 
 # TLP
 sudo tlp start
