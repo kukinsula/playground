@@ -7,12 +7,12 @@ function create_simlink () {
     then
         echo "Successfully created simlink $2"
     fi
-
 }
 
 create_simlink `pwd`/conkyrc ~/.conkyrc
 create_simlink `pwd`/zshrc ~/.zshrc
 create_simlink `pwd`/emacs/emacs.el ~/.emacs
 create_simlink `pwd`/toprc ~/.toprc
+create_simlink `pwd`/gitconfig ~/.gitconfig
 
 cp `pwd`/terminator ~/.config/terminator/config

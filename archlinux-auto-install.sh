@@ -8,7 +8,7 @@ mkdir $HOME/info/
 rmdir $HOME/Public $HOME/Modèles
 
 # Update mirrorlist
-curl -s "https://archlinux.org/mirrorlist/?country=FR&protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | sudo rankmirrors --fasttrack
+sudo reflector --age 6 --latest 10 --fastest 10 --threads 10 --sort rate --protocol https --save /etc/pacman.d/mirrorlist
 
 # System update
 sudo pacman -Syu
@@ -46,7 +46,6 @@ sudo pacman -S \
   wine \
   texlive-core \
   npm \
-  postfix \
   keepassxc \
   android-tools \
   evince \
@@ -96,6 +95,19 @@ sudo pacman -S \
   fd \
   the_silver_searcher \
   ripgrep \
+  discord \
+  sl \
+  ntp \
+  arandr \
+  cmatrix \
+  sof-firmware \
+  alsa-ucm-conf \
+  peek \
+  hwinfo \
+  cmake
+
+sudo systemctl start ntpd.service
+sudo systemctl enable ntpd.service
 
 ## Firmware
 fwupdmgr get-devices
@@ -104,7 +116,7 @@ fwupdmgr get-updates
 fwupdmgr update
 
 ## RSA keys
-ssh-keygen -b 4096
+ssh-keygen -t ed25519
 
 # YaY
 # git clone https://aur.archlinux.org/yay.git $HOME/info/yay
@@ -128,10 +140,14 @@ paru -S \
   apache-tools \
   pipes.sh \
   screenfetch \
-  nerd-fonts-complete \
+  nerd-fonts-source-code-pro \
   logo-ls \
   arch-silence-grub-theme-git \
-  icdiff
+  icdiff \
+  papirus-icon-theme \
+  slack-desktop \
+  downgrade \
+  cava
 
 # TLP
 sudo tlp start
@@ -155,7 +171,9 @@ npm install -g \
   tern \
   tslint \
   typescript \
-  yarn
+  yarn \
+  pnpm \
+  rush
 
 # Golang1
 go get golang.org/x/tools/cmd/...
@@ -215,11 +233,11 @@ echo "include /usr/share/nano-syntax-highlighting/*.nanorc" >> ~/.nanorc
 # Ricing
 
 sudo pacman -Ss \
- 	gtk-engine-murrine \
-	gtk-engines \
+  gtk-engine-murrine \
+  gtk-engines \
   lightdm-webkit2-greeter \
-	lightdm-webkit-theme-litarvan \
-	ulauncher
+  lightdm-webkit-theme-litarvan \
+  ulauncher
 
 # Theme
 git clone https://github.com/vinceliuice/Qogir-theme.git $HOME/info

@@ -104,7 +104,7 @@
 (set-language-environment "UTF-8")
 (prefer-coding-system 'utf-8-unix)
 ;; (set-locale-environment "fr_FR.UTF-8")
-;; (set-locale-environment "en_EN.UTF-8")
+(set-locale-environment "en_EN.UTF-8")
 (set-default-coding-systems 'utf-8-unix)
 (set-selection-coding-system 'utf-8-unix)
 (set-buffer-file-coding-system 'utf-8-unix)
@@ -117,7 +117,7 @@
 
 ;; Default browser
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "google-chrome-stable")
+      browse-url-generic-program "chromium")
 
 ;; GC Magic Hack
 (use-package gcmh
@@ -336,7 +336,7 @@
   :commands (doom-modeline-def-modeline)
   :custom-face
   '(doom-modeline-bar ((t (:background "#906CFF"))))
-  '(doom-modeline-bar ((t (:background "#906CFF")))))
+  '(doom-modeline-bar-inactive ((t (:background "#191729")))))
 
 (use-package minions
   :ensure t
@@ -882,6 +882,9 @@
 
   :commands (flycheck-add-mode))
 
+(use-package vterm
+  :ensure t)
+
 ;; Which Function
 (which-function-mode)
 (setq which-func-unknown "∅")
@@ -1320,6 +1323,7 @@
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
  '(dashboard-items-face ((t nil)))
  '(doom-modeline-bar ((t (:background "#906CFF"))))
+ '(doom-modeline-bar-inactive ((t (:background "#191729"))))
  '(font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold))))
  '(hl-line ((t (:extend t :background "#24213b"))))
  '(ivy-current-match ((t (:foreground "#CBE3E7" :weight bold :background "#39374E"))))
