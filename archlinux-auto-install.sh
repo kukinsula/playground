@@ -104,7 +104,11 @@ sudo pacman -S \
   alsa-ucm-conf \
   peek \
   hwinfo \
-  cmake
+  cmake \
+  procinfo \
+  virtualbox-host-dkms \
+  remmina \
+  fprintd
 
 sudo systemctl start ntpd.service
 sudo systemctl enable ntpd.service
@@ -149,10 +153,14 @@ paru -S \
   downgrade \
   cava \
   hibernator \
-  update-grub
+  update-grub \
+  virtualbox-ext-oracle
 
 # TLP
 sudo tlp start
+
+# Virtualbox
+sudo modprobe vboxdrv
 
 # Oh-My-ZSH
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
@@ -286,5 +294,5 @@ base16_helios
 # Restore backup
 # rsync -aAXv --delete --exclude="lost+found" /mnt/usb/ /mnt/system/
 
-# Cleanup
+# Remove all orphaned packages (installed packages that are no longer used/needed)
 sudo pacman -Rns $(pacman -Qtdq)

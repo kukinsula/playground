@@ -25,15 +25,17 @@ alias e=$EDITOR
 alias watch='watch -tn 1'
 alias log='tail -f'
 alias diff='diff --color=auto'
+alias icdiff='icdiff --highlight --line-numbers'
 alias pacman='pacman --color=always'
-alias aur='paru'
+alias aur='paru --color=always'
+alias news='aur --show -w -w'
 alias open='xdg-open'
 
 # Golang
 export GOPATH=$HOME/info/go
 export GO111MODULE=on
 
-export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/info/deployer_shell_script_alias:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin
+export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin
 
 # NodeJS/NPM
 npm config set prefix ~/.npm

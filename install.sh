@@ -14,5 +14,4 @@ create_simlink `pwd`/zshrc ~/.zshrc
 create_simlink `pwd`/emacs/emacs.el ~/.emacs
 create_simlink `pwd`/toprc ~/.toprc
 create_simlink `pwd`/gitconfig ~/.gitconfig
-
-cp `pwd`/terminator ~/.config/terminator/config
+create_simlink `pwd`/terminator ~/.config/terminator/config
