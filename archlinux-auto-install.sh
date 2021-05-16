@@ -245,8 +245,6 @@ echo "include /usr/share/nano-syntax-highlighting/*.nanorc" >> ~/.nanorc
 sudo pacman -Ss \
   gtk-engine-murrine \
   gtk-engines \
-  lightdm-webkit2-greeter \
-  lightdm-webkit-theme-litarvan \
   ulauncher
 
 # Theme
@@ -254,11 +252,6 @@ git clone https://github.com/vinceliuice/Qogir-theme.git $HOME/info
 cd $HOME/info/Qogir-theme
 ./install.sh
 # Set theme Qogir-manjaro-win-dark
-
-# Enable lightdm-webkit theme
-#
-# edit /etc/lightdm/lightdm.conf and set greeter-session=lightdm-webkit2-greeter
-# edit /etc/lightdm/lightdm-webkit2-greeter.conf and set theme or webkit-theme to litarvan
 
 # ULauncher
 git clone https://github.com/levonhart/materia-dark-ulauncher ~/.config/ulauncher/user-themes/materia-dark-ulauncher
@@ -271,10 +264,6 @@ git clone https://github.com/levonhart/materia-dark-ulauncher ~/.config/ulaunche
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
 # base16_<TAB>_<TAB
 base16_helios
-
-# GRUB
-# Edit /etc/default/grub: set GRUB_THEME="/boot/grub/themes/arch-silence/theme.txt"
-# sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 # Backup
 #
@@ -296,3 +285,12 @@ base16_helios
 
 # Remove all orphaned packages (installed packages that are no longer used/needed)
 sudo pacman -Rns $(pacman -Qtdq)
+
+# Finger print
+fprintd-list $USER
+fprintd-enroll
+fprintd-verify
+fprintd-list $USER
+
+# Add "auth sufficient pam_fprintd.so" at the top of each file
+# /etc/pam.d/{system-local-login,login,sudo,lightdm-*,polkit-1}
