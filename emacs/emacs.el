@@ -363,15 +363,15 @@
   (dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
   (dashboard-page-separator "\n\n")
   (dashboard-items '((projects . 10)
-		                 (bookmarks . 5)
-		                 (recents . 20)))
+                     (bookmarks . 5)
+                     (recents . 20)))
   (dashboard-set-init-info nil)
   (dashboard-banner-logo-title
    (format "Emacs init time %.3f seconds with %d garbage collections."
            (float-time (time-subtract after-init-time before-init-time)) gcs-done))
   :bind ("C-S-d" . (lambda ()
-		                 (interactive)
-		                 (switch-to-buffer "*dashboard*")))
+                     (interactive)
+                     (switch-to-buffer "*dashboard*")))
   :custom-face
   (dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
   (dashboard-items-face ((t nil))))
@@ -382,9 +382,9 @@
   :bind (("M-b" . ivy-switch-buffer)
          :map ivy-minibuffer-map
          ("RET" . ivy-alt-done)
-	       ("C-r" . ivy-previous-line-or-history)
-	       ("<tab>" . ivy-next-line)
-	       ("<backtab>" . ivy-previous-line))
+         ("C-r" . ivy-previous-line-or-history)
+         ("<tab>" . ivy-next-line)
+         ("<backtab>" . ivy-previous-line))
   :config (ivy-mode)
   :custom
   (ivy-use-virtual-buffers t)
@@ -451,8 +451,8 @@
   :diminish
   :commands (counsel-linux-app-format-function-name-only)
   :bind (("M-x" . counsel-M-x)
-	       ("C-x C-f" . counsel-find-file)
-	       ("C-x 8 RET" . counsel-unicode-char))
+         ("C-x C-f" . counsel-find-file)
+         ("C-x 8 RET" . counsel-unicode-char))
   :custom (ivy-initial-inputs-alist nil))
 
 (use-package counsel-projectile
@@ -516,8 +516,8 @@
 (global-set-key (kbd "<C-tab>") 'other-window)
 ;; Get to the previsou window with C-<TAB>
 (define-key global-map (kbd "<C-iso-lefttab>") (lambda ()
-						                                     (interactive)
-						                                     (other-window -1)))
+                                                 (interactive)
+                                                 (other-window -1)))
 
 ;; Move to directionnal window
 (global-set-key (kbd "<s-up>") 'windmove-up)
@@ -537,8 +537,8 @@
 (global-set-key (kbd "C-S-o") 'split-window-vertically)
 
 (global-set-key (kbd "C-S-w") (lambda ()
-				                        (interactive)
-				                        (kill-buffer (current-buffer))))
+                                (interactive)
+                                (kill-buffer (current-buffer))))
 
 ;; Text sclae increase/decrease
 (defvar text-scale-mode-step 1.1)
@@ -662,10 +662,10 @@
   :ensure t
   :diminish
   :bind (("C-c m c" . mc/edit-lines)
-	       ("C->" . mc/mark-next-like-this)
-	       ("C-<" . mc/mark-previous-like-this)
-	       ("C-c C-<" . mc/mark-all-like-this)
-	       ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
+         ("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("C-c C-<" . mc/mark-all-like-this)
+         ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
 
 (use-package move-text
   :ensure t
@@ -684,8 +684,8 @@
 (global-set-key (kbd "C-d") 'duplicate-line)
 (global-set-key (kbd "M-;") 'comment-line)
 (global-set-key (kbd "C-k") (lambda ()
-			                        (interactive)
-			                        (kill-line 1)))
+                              (interactive)
+                              (kill-line 1)))
 
 ;; *scratch* file
 (setq initial-scratch-message nil)
@@ -746,7 +746,7 @@
   (company-minimum-prefix-length 1)
   (company-selection-wrap-around t)
   (company-transformers '(company-sort-by-occurrence
-			                    company-sort-by-backend-importance))
+                          company-sort-by-backend-importance))
   (completion-ignore-case t)
   (company-dabbrev-downcase nil)
   (company-dabbrev-code-everywhere t)
@@ -921,14 +921,14 @@
          compilation-error-regexp-alist-alist))
   (compilation-error-regexp-alist (cons 'node compilation-error-regexp-alist))
   :bind (("C-c C-c" . compile)
-	       ("C-c C-r" . recompile)))
+         ("C-c C-r" . recompile)))
 
 ;; Colorise some keywords
 (add-hook 'prog-mode-hook
-	        (lambda ()
-	          (font-lock-add-keywords nil
-				                            '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)"
-				                               1 font-lock-warning-face t)))))
+          (lambda ()
+            (font-lock-add-keywords nil
+                                    '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)"
+                                       1 font-lock-warning-face t)))))
 
 ;; Disable Version Control
 (setq vc-handled-backends nil)
@@ -939,9 +939,9 @@
   :diminish
   :bind-keymap ("C-c p" . projectile-command-map)
   :bind (("C-S-f" . projectile-find-file)
-	       ("C-S-s" . projectile-ag)
-	       ("C-S-P" . projectile-switch-project)
-	       ("C-S-r" . projectile-run-project))
+         ("C-S-s" . projectile-ag)
+         ("C-S-P" . projectile-switch-project)
+         ("C-S-r" . projectile-run-project))
   :commands (projectile-register-project-type)
   :custom
   (projectile-completion-system 'ivy)
@@ -983,23 +983,23 @@
           ()))))
   :custom
   (typescript-indent-level 2)
-	(tide-completion-ignore-case 1)
-	(tide-server-max-response-length 1048576)
-	(tide-hl-identifier-idle-time 0.1)
+  (tide-completion-ignore-case 1)
+  (tide-server-max-response-length 1048576)
+  (tide-hl-identifier-idle-time 0.1)
   (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
   :hook ((typescript-mode . tide-setup)
-	       (typescript-mode . tide-hl-identifier-mode)
-	       (typescript-mode . company-mode)
-	       (typescript-mode . tide-which-function)
-	       (before-save . tide-format-before-save))
+         (typescript-mode . tide-hl-identifier-mode)
+         (typescript-mode . company-mode)
+         (typescript-mode . tide-which-function)
+         (before-save . tide-format-before-save))
   :commands
   (tide-rename-symbol tide-rename-file tide-references prettier-js tide-span-to-position)
   :bind (("C-c C-t r s" . tide-rename-symbol)
-	       ("C-c C-t r f" . tide-rename-file)
-	       ("C-c C-t f r" . tide-references)
-	       ("C-c C-t i j" . tide-jsdoc-template)
-	       ("C-c C-t e" . tide-project-errors)
-	       ("C-c C-t p" . prettier-js))
+         ("C-c C-t r f" . tide-rename-file)
+         ("C-c C-t f r" . tide-references)
+         ("C-c C-t i j" . tide-jsdoc-template)
+         ("C-c C-t e" . tide-project-errors)
+         ("C-c C-t p" . prettier-js))
   :custom-face
   (tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
 
@@ -1010,8 +1010,8 @@
          (javascript-mode . npm-mode))
   :commands (npm-mode-npm-run)
   :config (local-set-key (kbd "C-c C-c") (lambda()
-				                                   (interactive)
-				                                   (npm-mode-npm-run "build"))))
+                                           (interactive)
+                                           (npm-mode-npm-run "build"))))
 
 (use-package prettier-js
   :ensure t
@@ -1045,7 +1045,7 @@
   :ensure nil
   :config (define-key org-mode-map (kbd "<C-tab>") 'other-window)
   :hook ((org-mode . org-indent-mode)
-	       (org-mode . visual-line-mode))
+         (org-mode . visual-line-mode))
   :custom (org-hide-emphasis-markers t)
   :custom-face
   (org-document-title ((t :height 2.0)))
@@ -1074,7 +1074,7 @@
   :ensure t
   :mode ("docker-compose\\*.yaml")
   :hook ((docker-compose-mode . company-mode)
-	       (docker-compose-mode . yaml-mode)))
+         (docker-compose-mode . yaml-mode)))
 
 (use-package systemd
   :ensure t)
@@ -1093,7 +1093,7 @@
   :config
   (auto-package-update-maybe)
   (add-hook 'auto-package-update-before-hook
-	          (lambda () (message "I will update packages now")))
+            (lambda () (message "I will update packages now")))
   :custom
   (auto-package-update-delete-old-versions t)
   (auto-package-update-hide-results t)
@@ -1108,13 +1108,13 @@
   (history-delete-duplicates t)
   (savehist-save-minibuffer-history t)
   (savehist-additional-variables '(kill-ring
-				                           search-ring
-				                           regexp-search-ring
-				                           npm-mode-npm-run
-				                           package-install
-				                           package-delete
-				                           projectile-run-project
-				                           compile)))
+                                   search-ring
+                                   regexp-search-ring
+                                   npm-mode-npm-run
+                                   package-install
+                                   package-delete
+                                   projectile-run-project
+                                   compile)))
 
 ;; Environment variables
 (use-package exec-path-from-shell
@@ -1216,12 +1216,12 @@
   "Refreshes all open buffers from their respective files."
   (interactive)
   (let* ((list (buffer-list))
-	       (buffer (car list)))
+         (buffer (car list)))
     (while buffer
       (when (and (buffer-file-name buffer)
-		             (not (buffer-modified-p buffer)))
-	      (set-buffer buffer)
-	      (revert-buffer t t t))
+                 (not (buffer-modified-p buffer)))
+        (set-buffer buffer)
+        (revert-buffer t t t))
       (setq list (cdr list))
       (setq buffer (car list))))
   (message "Refreshed open files"))
@@ -1233,13 +1233,13 @@
   "Kill all buffers except *Messages* *scratch* and *dashboard**."
   (interactive)
   (mapc 'kill-buffer
-	      (remove-if
-	       (lambda (x)
-	         (or
-	          (string-equal "*Messages*" (buffer-name x))
-	          (string-equal "*scratch*" (buffer-name x))
-	          (string-equal "*dashboard*" (buffer-name x))))
-	       (buffer-list)))
+        (remove-if
+         (lambda (x)
+           (or
+            (string-equal "*Messages*" (buffer-name x))
+            (string-equal "*scratch*" (buffer-name x))
+            (string-equal "*dashboard*" (buffer-name x))))
+         (buffer-list)))
   (delete-other-windows nil)
   (delete-other-frames nil))
 
@@ -1248,8 +1248,8 @@
   "Copy the current buffer file name to the clipboard."
   (interactive)
   (let ((filename (if (equal major-mode 'dired-mode)
-		                  default-directory
-		                (buffer-file-name))))
+                      default-directory
+                    (buffer-file-name))))
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))

@@ -16,7 +16,7 @@ export VISUAL=$EDITOR
 # Colors
 export TERM=xterm-256color
 
-# aliases
+# Aliases
 alias ls='logo-ls -lgG --human-readable --git-status --time-style RFC822'
 alias ll='ls -lh'
 alias la='ls -lah'
@@ -49,6 +49,21 @@ alias less='less --long-prompt --LINE-NUMBERS --HILITE-SEARCH --ignore-case -J -
 alias more='less'
 alias cat="src-hilite-lesspipe.sh $1"
 alias nano="nano -l"
+
+# Updates pacman, AUR and NPM packages
+update(){
+    sudo pacman -Syu
+    aur -Syu
+    npm update -g
+}
+
+fuzzy-install(){
+    pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S
+}
+
+fuzzy-remove(){
+    pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns
+}
 
 # Base16 shell theme
 BASE16_SHELL="$HOME/.config/base16-shell/"

@@ -108,7 +108,9 @@ sudo pacman -S \
   procinfo \
   virtualbox-host-dkms \
   remmina \
-  fprintd
+  fprintd \
+  arch-audit \
+  fzf
 
 sudo systemctl start ntpd.service
 sudo systemctl enable ntpd.service
@@ -188,6 +190,8 @@ npm install -g \
 # Golang1
 go get golang.org/x/tools/cmd/...
 go get github.com/rogpeppe/godef
+
+go get -u github.com/isacikgoz/tldr
 
 # /etc/hosts
 sudo curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts --output /etc/hosts
