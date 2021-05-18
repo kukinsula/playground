@@ -185,7 +185,8 @@ npm install -g \
   typescript \
   yarn \
   pnpm \
-  rush
+  rush \
+  ts-node-dev
 
 # Golang1
 go get golang.org/x/tools/cmd/...
@@ -259,10 +260,10 @@ cd $HOME/info/Qogir-theme
 
 # ULauncher
 git clone https://github.com/levonhart/materia-dark-ulauncher ~/.config/ulauncher/user-themes/materia-dark-ulauncher
-# Extensions
+# Extensions:
+# https://github.com/henriqueutsch/exec-terminal
 # https://ext.ulauncher.io/-/github-hippo-o-matic-ulauncher-qalc
 # https://ext.ulauncher.io/-/github-fsevenm-ulauncher-uuid
-# https://github.com/henriqueutsch/exec-terminal
 
 # Terminal base16 theme
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
@@ -295,6 +296,5 @@ fprintd-list $USER
 fprintd-enroll
 fprintd-verify
 fprintd-list $USER
-
 # Add "auth sufficient pam_fprintd.so" at the top of each file
 # /etc/pam.d/{system-local-login,login,sudo,lightdm-*,polkit-1}
