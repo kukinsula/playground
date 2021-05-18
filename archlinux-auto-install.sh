@@ -5,18 +5,6 @@ cd $HOME
 
 # Directories
 mkdir $HOME/info/
-rmdir $HOME/Public $HOME/Modèles
-
-# Update mirrorlist
-sudo reflector --age 6 --latest 10 --fastest 10 --threads 10 --sort rate --protocol https --save /etc/pacman.d/mirrorlist
-
-# System update
-sudo pacman -Syu
-
-# LTS Kernel
-sudo pacman -S linux-lts
-sudo pacman install linux-lts-headers
-sudo pacman -Rs linux
 
 # Uncomment Misc Options in /etc/pacman.conf
 # Color
@@ -24,8 +12,14 @@ sudo pacman -Rs linux
 # CheckSpace
 # ILoveCandy
 
+# System update
+sudo pacman -Syu
+
 # Programs
 sudo pacman -S \
+  linux-hardened \
+  linux-zen \
+  linux-lts \
   git \
   tig \
   tk \
@@ -111,6 +105,9 @@ sudo pacman -S \
   fprintd \
   arch-audit \
   fzf
+
+# Update mirrorlist
+sudo reflector --age 6 --latest 10 --fastest 10 --threads 10 --sort rate --protocol https --save /etc/pacman.d/mirrorlist
 
 sudo systemctl start ntpd.service
 sudo systemctl enable ntpd.service
@@ -247,7 +244,7 @@ echo "include /usr/share/nano-syntax-highlighting/*.nanorc" >> ~/.nanorc
 
 # Ricing
 
-sudo pacman -Ss \
+paru -Ss \
   gtk-engine-murrine \
   gtk-engines \
   ulauncher
