@@ -55,6 +55,7 @@ update(){
     sudo pacman -Syu
     aur -Syu
     npm update -g
+    pnpm update -g
 }
 
 fuzzy-install(){

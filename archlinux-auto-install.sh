@@ -5,6 +5,7 @@ cd $HOME
 
 # Directories
 mkdir $HOME/info/
+export INFO=$HOME/info/
 
 # Uncomment Misc Options in /etc/pacman.conf
 # Color
@@ -14,6 +15,10 @@ mkdir $HOME/info/
 
 # System update
 sudo pacman -Syu
+
+# Update mirrorlist
+sudo pacman -S reflector
+sudo reflector --age 6 --latest 10 --fastest 10 --threads 10 --sort rate --protocol https --save /etc/pacman.d/mirrorlist
 
 # Programs
 sudo pacman -S \
@@ -53,7 +58,6 @@ sudo pacman -S \
   libreoffice-fresh-fr \
   python-pip \
   net-tools \
-  etcher \
   dia \
   transmission-gtk \
   redshift \
@@ -82,10 +86,9 @@ sudo pacman -S \
   gzip \
   file-roller \
   screen \
-  fortune \
+  cowfortune \
   cowsay \
   lolcat \
-  reflector \
   fd \
   the_silver_searcher \
   ripgrep \
@@ -104,10 +107,19 @@ sudo pacman -S \
   remmina \
   fprintd \
   arch-audit \
-  fzf
+  fzf \
+  networkmanager-openvpn \
+  noto-fonts \
+  xdg-utils \
+  feh \
 
-# Update mirrorlist
-sudo reflector --age 6 --latest 10 --fastest 10 --threads 10 --sort rate --protocol https --save /etc/pacman.d/mirrorlist
+# Edit /etc/default/grub and set these
+# GRUB_DISABLE_SUBMENU=y
+# GRUB_DEFAULT=saved
+# GRUB_SAVEDEFAULT=true
+
+# Apply GRUB changes through
+sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 sudo systemctl start ntpd.service
 sudo systemctl enable ntpd.service
@@ -122,14 +134,14 @@ fwupdmgr update
 ssh-keygen -t ed25519
 
 # YaY
-# git clone https://aur.archlinux.org/yay.git $HOME/info/yay
-# cd $HOME/info/yay
+# git clone https://aur.archlinux.org/yay.git $INFO/yay
+# cd $$INFO/yay
 # makepkg -si
 # cd $HOME
 
 # Paru
-git clone https://aur.archlinux.org/paru.git $HOME/info/paru
-cd $HOME/info/paru
+git clone https://aur.archlinux.org/paru.git $$INFO/paru
+cd $INFO/paru
 makepkg -si
 cd $HOME
 
@@ -153,9 +165,17 @@ paru -S \
   cava \
   hibernator \
   update-grub \
-  virtualbox-ext-oracle
+  virtualbox-ext-oracle \
+  mugshot \
+  influxdb-cli \
+  mongodb-shell \
+  etcher-bin \
+  ttf-symbola \
+  mononoki \
+  xarchiver \
 
 # TLP
+sudo systemctl enable tlp.service
 sudo tlp start
 
 # Virtualbox
@@ -182,13 +202,19 @@ npm install -g \
   typescript \
   yarn \
   pnpm \
-  rush \
+  @microsoft/rush \
   ts-node-dev
 
-# Golang1
+# Docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Golang
+export GOPATH=$INFO/go
+export GO111MODULE=on
 go get golang.org/x/tools/cmd/...
 go get github.com/rogpeppe/godef
-
 go get -u github.com/isacikgoz/tldr
 
 # /etc/hosts
@@ -250,8 +276,8 @@ paru -Ss \
   ulauncher
 
 # Theme
-git clone https://github.com/vinceliuice/Qogir-theme.git $HOME/info
-cd $HOME/info/Qogir-theme
+git clone https://github.com/vinceliuice/Qogir-theme.git $INFO
+cd $INFO/Qogir-theme
 ./install.sh
 # Set theme Qogir-manjaro-win-dark
 

@@ -100,19 +100,20 @@
   (require 'cl))
 
 ;; Encoding
+(setenv "LANG" "en_US.UTF-8")
 (set-charset-priority 'unicode)
 (set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8-unix)
+(prefer-coding-system 'utf-8)
 ;; (set-locale-environment "fr_FR.UTF-8")
 (set-locale-environment "en_EN.UTF-8")
-(set-default-coding-systems 'utf-8-unix)
-(set-selection-coding-system 'utf-8-unix)
-(set-buffer-file-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
 (set-clipboard-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (setq buffer-file-coding-system 'utf-8
-      save-buffer-coding-system 'utf-8-unix
+      save-buffer-coding-system 'utf-8
       process-coding-system-alist (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
 
 ;; Default browser
@@ -287,11 +288,13 @@
 ;; Set font
 (use-package font-lock
   :ensure nil
-  :config (set-face-attribute 'default nil
-                              :family "Source Code Pro"
-                              :height 115
-                              :weight 'normal
-                              :width 'normal)
+  :config
+  (set-face-attribute 'default nil
+                      :family "Source Code Pro"
+                      :height 115
+                      :weight 'normal
+                      :width 'normal)
+  (set-fontset-font t 'unicode "DejaVu Sans Mono" nil 'prepend)
   :custom-face (font-lock-warning-face
                 ((t (:inherit warning :foreground "sandy brown" :weight bold)))))
 
@@ -348,6 +351,42 @@
   :ensure t
   :diminish)
 
+(use-package cyphejor
+  :ensure t
+  :custom (cyphejor-rules
+           '(:upcase
+             ("bookmark"    "→")
+             ("buffer"      "β")
+             ("fundamental" "Fundamental")
+             ("diff"        "Δ")
+             ("dired"       "δ")
+             ("emacs"       "ε")
+             ("inferior"    "i" :prefix)
+             ("interaction" "i" :prefix)
+             ("interactive" "i" :prefix)
+             ("lisp"        "λ" :postfix)
+             ("menu"        "▤" :postfix)
+             ("mode"        "")
+             ("package"     "↓")
+             ("python"      "π")
+             ("shell"       "SHELL")
+             ("sh"          "SHELL")
+             ("text"        "ξ")
+             ("wdired"      "↯δ")
+             ("typescript"  "TS")
+             ("org"         "ORG")
+             ("dockerfile"  "Dockerfile")
+             ("yaml"        "YAML")
+             ("json"        "JSON")
+             ("js"          "JS")
+             ("markdown"    "MD")
+             ("systemd"     "Systemd")
+             ("web"         "WEB")
+             ("makefile"    "MAKEFILE")
+             ("css"         "CSS")
+             ("pkgbuild"    "PKGBUILD")))
+  :config (cyphejor-mode t))
+
 ;; Dashboard
 (use-package dashboard
   :ensure t
@@ -389,7 +428,7 @@
   :custom
   (ivy-use-virtual-buffers t)
   (ivy-wrap t)
-  (ivy-count-format "【%d / %d】")
+  (ivy-count-format "【%d / %d】 ")
   (enable-recursive-minibuffers t)
   (ivy-dynamic-exhibit-delay-ms 250)
   :custom-face
@@ -549,6 +588,10 @@
 (global-unset-key (kbd "<C-mouse-5>"))
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
 
+(use-package unicode-fonts
+  :ensure t
+  :config (unicode-fonts-setup))
+
 ;; Emojis
 (use-package emojify
   :disabled t
@@ -690,7 +733,7 @@
 ;; *scratch* file
 (setq initial-scratch-message nil)
 
-(add-to-list 'auto-mode-alist '("*scratch*" . text-mode))
+(add-to-list 'auto-mode-alist '("*scratch*" . org-mode))
 
 (use-package persistent-scratch
   :ensure t
@@ -949,6 +992,98 @@
   (projectile-sort-order 'recentf)
   :config (projectile-mode))
 
+(use-package treemacs
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-directory-name-transformer    #'identity
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 t
+          treemacs-file-event-delay              5000
+          treemacs-file-extension-regex          treemacs-last-period-regex-value
+          treemacs-file-follow-delay             0.2
+          treemacs-file-name-transformer         #'identity
+          treemacs-follow-after-init             t
+          treemacs-expand-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   2
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         nil
+          treemacs-max-git-entries               5000
+          treemacs-missing-project-action        'ask
+          treemacs-move-forward-on-expand        nil
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       t
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                      'left
+          treemacs-read-string-input             'from-child-frame
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-litter-directories            '("/node_modules" "/.venv" "/.cask")
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             t
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-asc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          treemacs-user-mode-line-format         nil
+          treemacs-user-header-line-format       nil
+          treemacs-width                         35
+          treemacs-workspace-switch-cleanup      nil)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :after (treemacs dired)
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
+
+(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  :ensure t
+  :config (treemacs-set-scope-type 'Perspectives))
+
 (use-package ag
   :ensure t
   :diminish
@@ -959,20 +1094,44 @@
   :custom-face
   (ag-match-face ((t (:background nil :foreground "hot pink" :weight bold)))))
 
+(use-package emmet-mode
+  :ensure t)
+
+(use-package web-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . typescript-mode))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-mode))
+  :hook (web-mode . emmet-mode)
+  :custom (
+           web-mode-markup-indent-offset 2
+           web-mode-css-indent-offset 2
+           web-mode-code-indent-offset 2
+           web-mode-enable-auto-closing t
+           web-mode-enable-auto-opening t
+           web-mode-enable-auto-pairing t
+           web-mode-enable-auto-indentation t))
+
 ;; Typescript
 (use-package tide
   :ensure t
   :diminish
   :preface
-  ;; https://github.com/ananthakumaran/tide/issues/371#issuecomment-610086691
+  :preface
+  ;; https://github.com/ananthakumaran/tide/issues/371#issuecomment-61008
   (defun tide-which-function ()
     (defun tide-build-imenu-index (navtree)
       (let* ((child-items (plist-get navtree :childItems))
-             (high-level-kinds '("class" "method" "function" "interface" "type" "enum"))
+             (high-level-kinds '("class" "method" "function" "interface"
+                                 "type" "enum"))
              (kind (plist-get navtree :kind))
              (text (plist-get navtree :text))
-             (node (cons (concat text " " (propertize (plist-get navtree :kind) 'face 'tide-imenu-type-face))
-                         (tide-span-to-position (plist-get (car (plist-get navtree :spans)) :start)))))
+             (node (cons (concat text " " (propertize (plist-get navtree
+                                                                 :kind) 'face 'tide-imenu-type-face))
+                         (tide-span-to-position (plist-get (car (plist-ge
+                                                                 t navtree :spans)) :start)))))
         (if (member kind high-level-kinds)
             (if child-items
                 (cons text
@@ -987,10 +1146,12 @@
   (tide-server-max-response-length 1048576)
   (tide-hl-identifier-idle-time 0.1)
   (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-  :hook ((typescript-mode . tide-setup)
+  :hook (
+         (typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
          (typescript-mode . company-mode)
          (typescript-mode . tide-which-function)
+         (typescript-mode . setup-tide-mode)
          (before-save . tide-format-before-save))
   :commands
   (tide-rename-symbol tide-rename-file tide-references prettier-js tide-span-to-position)
@@ -1078,6 +1239,19 @@
 
 (use-package systemd
   :ensure t)
+
+;; Archlinux PKGBUILD
+(use-package pkgbuild
+  :ensure t)
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :custom (markdown-hide-markup t)
+  :init (setq markdown-command "multimarkdown"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                             ;;
@@ -1184,7 +1358,6 @@
   :commands (writeroom-adjust-width)
   :preface
   (defun writeroom-toggle-on  ()
-    (writeroom-adjust-width 40) ;; Width = 80 + 40
     (text-scale-increase 1)
     (text-scale-increase 1))
   (defun writeroom-toggle-off  ()
@@ -1277,41 +1450,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
  '(custom-safe-themes '(default))
- '(fci-rule-color "#505050")
- '(jdee-db-active-breakpoint-face-colors (cons "#1b1d1e" "#fc20bb"))
- '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
- '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
- '(objed-cursor-color "#d02b61")
  '(package-selected-packages
-   '(vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd sudo-edit rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path))
- '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
- '(rustic-ansi-faces
-   ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
- '(vc-annotate-background "#1b1d1e")
- '(vc-annotate-color-map
-   (list
-    (cons 20 "#60aa00")
-    (cons 40 "#859f0d")
-    (cons 60 "#aa931a")
-    (cons 80 "#d08928")
-    (cons 100 "#d38732")
-    (cons 120 "#d6863d")
-    (cons 140 "#da8548")
-    (cons 160 "#ce8379")
-    (cons 180 "#c281aa")
-    (cons 200 "#b77fdb")
-    (cons 220 "#bf63b2")
-    (cons 240 "#c74789")
-    (cons 260 "#d02b61")
-    (cons 280 "#b0345c")
-    (cons 300 "#903d58")
-    (cons 320 "#704654")
-    (cons 340 "#505050")
-    (cons 360 "#505050")))
- '(vc-annotate-very-old-color nil))
+   '(pkgbuild-mode pkgbuild emmet-mode web-mode web markdown-mode treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd sudo-edit rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1322,8 +1463,6 @@
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
  '(dashboard-items-face ((t nil)))
- '(doom-modeline-bar ((t (:background "#906CFF"))))
- '(doom-modeline-bar-inactive ((t (:background "#191729"))))
  '(font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold))))
  '(hl-line ((t (:extend t :background "#24213b"))))
  '(ivy-current-match ((t (:foreground "#CBE3E7" :weight bold :background "#39374E"))))
@@ -1331,8 +1470,6 @@
  '(ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(mode-line ((t (:background "#161424" :box nil))))
- '(mode-line-inactive ((t (:background "#191729" :foreground "#858FA5" :box nil))))
  '(org-document-title ((t :height 2.0)))
  '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)))
  '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)))
@@ -1343,7 +1480,6 @@
  '(org-level-7 ((t :inherit outline-7 :weight semi-bold)))
  '(org-level-8 ((t :inherit outline-8 :weight semi-bold)))
  '(quote (doom-modeline-bar ((t (:background "#906CFF")))))
- '(region ((t (:extend t :background "#333146"))))
  '(swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(swiper-background-match-face-3 ((t (:background "hot pink" :weight bold :background nil))))
@@ -1353,9 +1489,7 @@
  '(swiper-match-face-2 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-3 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-4 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
- '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
- '(trailing-whitespace ((t (:background "#39374E"))))
- '(whitespace-tab ((t (:foreground "#636363")))))
+ '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
 
 (provide 'emacs)
 ;;; emacs ends here

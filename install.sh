@@ -15,3 +15,5 @@ create_simlink `pwd`/emacs/emacs.el ~/.emacs
 create_simlink `pwd`/toprc ~/.toprc
 create_simlink `pwd`/gitconfig ~/.gitconfig
 create_simlink `pwd`/terminator ~/.config/terminator/config
+create_simlink `pwd`/emacs/emacs.desktop ~/.local/share/applications/emacs.desktop
+create_simlink `pwd`/rush_auto_completion ~/.rush_auto_completion
