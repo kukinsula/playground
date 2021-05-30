@@ -104,7 +104,6 @@
 (set-charset-priority 'unicode)
 (set-language-environment "UTF-8")
 (prefer-coding-system 'utf-8)
-;; (set-locale-environment "fr_FR.UTF-8")
 (set-locale-environment "en_EN.UTF-8")
 (set-default-coding-systems 'utf-8)
 (set-selection-coding-system 'utf-8)
@@ -123,6 +122,7 @@
 ;; GC Magic Hack
 (use-package gcmh
   :ensure t
+  :diminish
   :config (gcmh-mode t))
 
 ;; Automatically revert all buffers
@@ -144,10 +144,12 @@
 
 (use-package saveplace
   :ensure nil
+  :diminish
   :config (save-place-mode)
   :custom
   (save-place-forget-unreadable-files t)
-  (save-place-limit 400))
+  (save-place-limit 1024)
+  :init (save-place-mode))
 
 ;; Transparently open compressed files
 (auto-compression-mode t)
@@ -175,6 +177,7 @@
 
 (use-package uniquify
   :ensure nil
+  :diminish
   :custom
   (uniquify-buffer-name-style 'post-forward-angle-brackets)
   (uniquify-separator "/")
@@ -239,6 +242,7 @@
 
 ;; Highlight
 (use-package hl-line
+  :diminish
   :hook (prog-mode . hl-line-mode)
   :custom (global-hl-line-sticky-flag t)
   :custom-face (hl-line ((t (:extend t :background "#24213b")))))
@@ -288,6 +292,7 @@
 ;; Set font
 (use-package font-lock
   :ensure nil
+  :diminish
   :config
   (set-face-attribute 'default nil
                       :family "Source Code Pro"
@@ -322,6 +327,7 @@
 ;; Modeline
 (use-package doom-modeline
   :ensure t
+  :diminish
   :init (doom-modeline-mode)
   :config (doom-modeline-def-modeline 'main
             '(bar matches buffer-info buffer-position selection-info)
@@ -353,12 +359,14 @@
 
 (use-package cyphejor
   :ensure t
+  :diminish
   :custom (cyphejor-rules
            '(:upcase
              ("bookmark"    "→")
              ("buffer"      "β")
              ("fundamental" "Fundamental")
              ("diff"        "Δ")
+             ("magit"       "Magit")
              ("dired"       "δ")
              ("emacs"       "ε")
              ("inferior"    "i" :prefix)
@@ -366,23 +374,32 @@
              ("interactive" "i" :prefix)
              ("lisp"        "λ" :postfix)
              ("menu"        "▤" :postfix)
+             ("custom"      "Custom")
+             ("helpful"     "Help")
+             ("help"        "Help")
              ("mode"        "")
+             ("dashboard"   "Dashboard")
              ("package"     "↓")
              ("python"      "π")
-             ("shell"       "SHELL")
-             ("sh"          "SHELL")
+             ("shell"       "Shell")
+             ("sh"          "Shell")
+             ("conf"        "Conf")
+             ("unix"        "Unix")
              ("text"        "ξ")
              ("wdired"      "↯δ")
-             ("typescript"  "TS")
-             ("org"         "ORG")
+             ("grep"        "Grep")
+             ("ag"          "Ag")
+             ("ripgrep"     "Rg")
+             ("typescript"  "Ts")
+             ("org"         "Org")
              ("dockerfile"  "Dockerfile")
              ("yaml"        "YAML")
              ("json"        "JSON")
-             ("js"          "JS")
+             ("js"          "Js")
              ("markdown"    "MD")
              ("systemd"     "Systemd")
-             ("web"         "WEB")
-             ("makefile"    "MAKEFILE")
+             ("web"         "Web")
+             ("makefile"    "Makefile")
              ("css"         "CSS")
              ("pkgbuild"    "PKGBUILD")))
   :config (cyphejor-mode t))
@@ -415,6 +432,23 @@
   (dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
   (dashboard-items-face ((t nil))))
 
+;; Projectile
+(use-package projectile
+  :ensure t
+  :diminish
+  :bind-keymap ("C-c p" . projectile-command-map)
+  :bind (("C-S-f" . counsel-projectile-find-file)
+         ("C-S-s" . projectile-ag)
+         ("C-S-h" . projectile-replace)
+         ("C-S-P" . projectile-switch-project)
+         ("C-S-r" . projectile-run-project))
+  :commands (projectile-register-project-type)
+  :custom
+  (projectile-completion-system 'ivy)
+  (projetile-indexing-method 'alien)
+  (projectile-sort-order 'recentf)
+  :config (projectile-mode))
+
 (use-package ivy
   :ensure t
   :diminish
@@ -426,7 +460,8 @@
          ("<backtab>" . ivy-previous-line))
   :config (ivy-mode)
   :custom
-  (ivy-use-virtual-buffers t)
+  (ivy-use-virtual-buffers nil)
+  (ivy-virtual-abbreviate 'abbreviate)
   (ivy-wrap t)
   (ivy-count-format "【%d / %d】 ")
   (enable-recursive-minibuffers t)
@@ -443,63 +478,19 @@
   :diminish
   :after(ivy hydra))
 
-(use-package all-the-icons-ivy-rich
-  :ensure t
-  :after (counsel)
-  :custom (all-the-icons-ivy-file-commands
-           '(counsel-find-file
-             counsel-file-jump
-             counsel-recentf
-             counsel-projectile-find-file
-             counsel-projectile-find-dir) "Prettify more commands.")
-  :config (all-the-icons-ivy-rich-mode t))
-
-(use-package ivy-rich
-  :ensure t
-  :diminish
-  :config
-  (ivy-rich-mode t)
-  (progn
-    (defvar ek/ivy-rich-cache
-      (make-hash-table :test 'equal))
-
-    (defun ek/ivy-rich-cache-lookup (delegate candidate)
-      (let ((result (gethash candidate ek/ivy-rich-cache)))
-        (unless result
-          (setq result (funcall delegate candidate))
-          (puthash candidate result ek/ivy-rich-cache))
-        result))
-
-    (defun ek/ivy-rich-cache-reset ()
-      (clrhash ek/ivy-rich-cache))
-
-    (defun ek/ivy-rich-cache-rebuild ()
-      (mapc (lambda (buffer)
-              (ivy-rich--ivy-switch-buffer-transformer (buffer-name buffer)))
-            (buffer-list)))
-
-    (defun ek/ivy-rich-cache-rebuild-trigger ()
-      (ek/ivy-rich-cache-reset)
-      (run-with-idle-timer 1 nil 'ek/ivy-rich-cache-rebuild))
-
-    (advice-add 'ivy-rich--ivy-switch-buffer-transformer :around 'ek/ivy-rich-cache-lookup)
-    (advice-add 'ivy-switch-buffer :after 'ek/ivy-rich-cache-rebuild-trigger)))
-
 (use-package counsel
   :ensure t
   :diminish
   :commands (counsel-linux-app-format-function-name-only)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
-         ("C-x 8 RET" . counsel-unicode-char))
+         ("C-x 8 RET" . counsel-unicode-char)
+         ("C-S-b" . counsel-bookmark))
   :custom (ivy-initial-inputs-alist nil))
 
 (use-package counsel-projectile
-  :ensure t)
-
-(define-key ivy-minibuffer-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
-(define-key swiper-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
-(global-set-key (kbd "<M-backspace>") 'backward-kill-word)
+  :ensure t
+  :diminish)
 
 (use-package swiper
   :ensure t
@@ -517,6 +508,10 @@
   (swiper-match-face-2 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
   (swiper-match-face-3 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
   (swiper-match-face-4 ((t (:background nil :foreground "#CBE3E7" :weight bold)))))
+
+(define-key ivy-minibuffer-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
+(define-key swiper-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
+(global-set-key (kbd "<M-backspace>") 'backward-kill-word)
 
 ;; Improves sorting for fuzzy-matched results
 (use-package flx
@@ -569,7 +564,7 @@
 (global-set-key (kbd "C-S-n") 'make-frame-command)
 
 ;; Jump to bookmark
-(global-set-key (kbd "C-S-b") 'bookmark-jump)
+;; (global-set-key (kbd "C-S-b") 'counsel-bookmark)
 
 ;; Split windows
 (global-set-key (kbd "C-S-e") 'split-window-horizontally)
@@ -590,13 +585,14 @@
 
 (use-package unicode-fonts
   :ensure t
+  :diminish
   :config (unicode-fonts-setup))
 
 ;; Emojis
 (use-package emojify
-  :disabled t
   :ensure t
-  :diminish t
+  :diminish
+  :disabled t
   :hook (after-init . global-emojify-mode)
   :custom
   (emojify-emoji-styles . '(unicode github))
@@ -690,7 +686,7 @@
   :diminish
   :custom (undo-fu-allow-undo-in-region t)
   :bind (("C-z" . 'undo-fu-only-undo)
-	       ("C-S-z" . 'undo-fu-only-redo)))
+         ("C-S-z" . 'undo-fu-only-redo)))
 
 (setq undo-limit 20000000
       undo-strong-limit 40000000)
@@ -754,6 +750,9 @@
 ;;          PROGRAMMING         ;;
 ;;                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Disable Version Control
+(setq vc-handled-backends nil)
 
 ;; Magit
 (use-package magit
@@ -852,10 +851,48 @@
             (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
             (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
 
+;; Icons: M-x all-the-icons-install-fonts
+(use-package all-the-icons
+  :ensure t
+  :diminish
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :custom (all-the-icons-scale-factor 1))
+
+(use-package all-the-icons-dired
+  :ensure t
+  :diminish
+  :custom (all-the-icons-dired-monochrome nil))
+
+(use-package all-the-icons-ivy
+  :ensure t
+  :custom
+  (all-the-icons-ivy-file-commands '(counsel-find-file
+                                     counsel-file-jump
+                                     counsel-recentf
+                                     counsel-projectile-find-file
+                                     counsel-projectile-find-dir
+                                     projectile-find-file))
+  :init (all-the-icons-ivy-setup))
+
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :diminish
+  :defer t
+  :init (all-the-icons-ivy-setup))
+
+(use-package ivy-rich
+  :ensure t
+  :diminish
+  :defer t
+  :custom (ivy-rich-path-style 'abbrev)
+  :init (ivy-rich-mode))
+
 ;; Show quick tooltip
 (use-package company-quickhelp
-  :after company
-  :defines company-quickhelp-delay
+  :ensure t
+  :diminish
+  :after (company)
+  :defines (company-quickhelp-delay)
   :hook (global-company-mode . company-quickhelp-mode)
   :custom (company-quickhelp-delay 1))
 
@@ -874,7 +911,10 @@
   (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch))
   (flycheck-idle-buffer-switch-delay 0.5)
   (flycheck-javascript-eslint-executable "eslint_d")
-  :config (global-flycheck-mode)
+  :bind (("M-n" . flycheck-next-error)
+         ("M-p" . flycheck-previous-error))
+  :config
+  (global-flycheck-mode)
 
   ;; Error symbol to display in fringe
   (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
@@ -926,7 +966,8 @@
   :commands (flycheck-add-mode))
 
 (use-package vterm
-  :ensure t)
+  :ensure t
+  :diminish)
 
 ;; Which Function
 (which-function-mode)
@@ -934,7 +975,9 @@
 
 ;; YAS code snippets
 (use-package yasnippet
+  :ensure t
   :disabled t
+  :diminish
   :hook (prog-mode . yas-minor-mode)
   :commands (yas-reload-all)
   :config (yas-reload-all))
@@ -942,6 +985,7 @@
 ;; Colors
 (use-package ansi-color
   :ensure t
+  :diminish
   :commands (ansi-color-apply-on-region)
   :config
   (add-hook 'compilation-filter-hook
@@ -951,6 +995,7 @@
 ;; Compilation
 (use-package compile
   :ensure t
+  :diminish
   :custom
   (compilation-scroll-output 'first-error)
   (compilation-always-kill t)
@@ -973,27 +1018,9 @@
                                     '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)"
                                        1 font-lock-warning-face t)))))
 
-;; Disable Version Control
-(setq vc-handled-backends nil)
-
-;; Projectile
-(use-package projectile
-  :ensure t
-  :diminish
-  :bind-keymap ("C-c p" . projectile-command-map)
-  :bind (("C-S-f" . projectile-find-file)
-         ("C-S-s" . projectile-ag)
-         ("C-S-P" . projectile-switch-project)
-         ("C-S-r" . projectile-run-project))
-  :commands (projectile-register-project-type)
-  :custom
-  (projectile-completion-system 'ivy)
-  (projetile-indexing-method 'alien)
-  (projectile-sort-order 'recentf)
-  :config (projectile-mode))
-
 (use-package treemacs
   :ensure t
+  :diminish
   :defer t
   :init
   (with-eval-after-load 'winum
@@ -1063,25 +1090,30 @@
         ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-evil
-  :after (treemacs evil)
-  :ensure t)
+  :ensure t
+  :diminish
+  :after (treemacs evil))
 
 (use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
+  :ensure t
+  :diminish
+  :after (treemacs projectile))
 
 (use-package treemacs-icons-dired
-  :after (treemacs dired)
   :ensure t
+  :diminish
+  :after (treemacs dired)
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
-
-(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
-  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
   :ensure t
+  :diminish
+  :after (treemacs magit))
+
+(use-package treemacs-persp
+  :ensure t
+  :diminish
+  :after (treemacs persp-mode)
   :config (treemacs-set-scope-type 'Perspectives))
 
 (use-package ag
@@ -1094,11 +1126,21 @@
   :custom-face
   (ag-match-face ((t (:background nil :foreground "hot pink" :weight bold)))))
 
+(use-package ripgrep
+  :ensure t
+  :diminish
+  :after (projectile)
+  :custom
+  (rg-show-columns t)
+  (rg-ignore-case 'smart))
+
 (use-package emmet-mode
-  :ensure t)
+  :ensure t
+  :diminish)
 
 (use-package web-mode
   :ensure t
+  :diminish
   :init
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
@@ -1115,10 +1157,10 @@
            web-mode-enable-auto-indentation t))
 
 ;; Typescript
+;; TODO: C-c C-c => rush build
 (use-package tide
   :ensure t
   :diminish
-  :preface
   :preface
   ;; https://github.com/ananthakumaran/tide/issues/371#issuecomment-61008
   (defun tide-which-function ()
@@ -1142,16 +1184,17 @@
           ()))))
   :custom
   (typescript-indent-level 2)
-  (tide-completion-ignore-case 1)
+  (tide-completion-ignore-case t)
   (tide-server-max-response-length 1048576)
   (tide-hl-identifier-idle-time 0.1)
   (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-  :hook (
-         (typescript-mode . tide-setup)
+  ;; (tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
+  ;; (tide-sync-request-timeout 10)
+  ;; (tide-node-flags "--max-old-space-size=2048")
+  :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
          (typescript-mode . company-mode)
          (typescript-mode . tide-which-function)
-         (typescript-mode . setup-tide-mode)
          (before-save . tide-format-before-save))
   :commands
   (tide-rename-symbol tide-rename-file tide-references prettier-js tide-span-to-position)
@@ -1181,11 +1224,13 @@
 
 (use-package add-node-modules-path
   :ensure t
+  :diminish
   :after (tide))
 
 ;; JSON
 (use-package json-mode
   :ensure t
+  :diminish
   :hook (json-mode . prettier-js-mode)
   :custom
   (make-local-variable 'js-indent-level)
@@ -1194,6 +1239,7 @@
 ;; YAML
 (use-package yaml-mode
   :ensure t
+  :diminish
   :mode (".yml" ".yaml")
   :hook ((yaml-mode . prettier-js-mode)))
 
@@ -1204,6 +1250,7 @@
 
 (use-package org
   :ensure nil
+  :diminish
   :config (define-key org-mode-map (kbd "<C-tab>") 'other-window)
   :hook ((org-mode . org-indent-mode)
          (org-mode . visual-line-mode))
@@ -1221,6 +1268,7 @@
 
 (use-package org-superstar
   :ensure t
+  :diminish
   :after (org)
   :hook (org-mode . org-superstar-mode)
   :custom
@@ -1229,23 +1277,28 @@
 
 (use-package dockerfile-mode
   :ensure t
+  :diminish
   :mode ("Dockerfile"))
 
 (use-package docker-compose-mode
   :ensure t
+  :diminish
   :mode ("docker-compose\\*.yaml")
   :hook ((docker-compose-mode . company-mode)
          (docker-compose-mode . yaml-mode)))
 
 (use-package systemd
-  :ensure t)
+  :ensure t
+  :diminish)
 
 ;; Archlinux PKGBUILD
-(use-package pkgbuild
-  :ensure t)
+(autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
+(setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode))
+				                      auto-mode-alist))
 
 (use-package markdown-mode
   :ensure t
+  :diminish
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -1276,6 +1329,7 @@
 ;; Save history
 (use-package savehist
   :ensure nil
+  :diminish
   :config (savehist-mode)
   :custom
   (history-length 128)
@@ -1315,24 +1369,15 @@
   :ensure t
   :diminish)
 
-;; Icons: M-x all-the-icons-install-fonts
-(use-package all-the-icons
-  :ensure t
-  :diminish
-  :hook (dired-mode . all-the-icons-dired-mode)
-  :custom (all-the-icons-scale-factor 1))
-
-(use-package all-the-icons-dired
-  :ensure t
-  :diminish
-  :after (all-the-icons))
-
 (use-package recentf
   :ensure t
   :diminish
   :custom
   (recentf-max-menu-items 100)
+  (recentf-auto-cleanup 'mode)
   (recentf-exclude '((expand-file-name package-user-dir)
+                     (format "%s/\\.emacs\\.d/elpa/.*" (getenv "HOME"))
+                     "/usr/share/emacs"
                      ".cache"
                      ".elfeed"
                      "bookmarks"
@@ -1342,12 +1387,15 @@
                      "recentf"
                      "undo-tree-hist"
                      "url"
-                     "COMMIT_EDITMSG\\'"))
+                     "COMMIT_EDITMSG\\'"
+                     "node_modules"
+                     "dist"))
   :config (recentf-mode t))
 
 ;; Dired-subtree
 (use-package dired-subtree
   :ensure t
+  :diminish
   :custom (dired-listing-switches "-laGh1v --group-directories-first")
   :bind ("<tab>" . dired-subtree-toggle)
   :hook (dired-mode . auto-revert-mode))
@@ -1369,21 +1417,31 @@
   (add-hook 'writeroom-mode-enable-hook 'writeroom-toggle-on)
   (add-hook 'writeroom-mode-disable-hook 'writeroom-toggle-off))
 
-(use-package tramp
-  :config (put 'temporary-file-directory 'standard-value `(,temporary-file-directory))
-  :custom
-  (tramp-backup-directory-alist backup-directory-alist)
-  (tramp-default-method "ssh")
-  (tramp-default-proxies-alist nil))
+;; (use-package tramp
+;;   :diminish
+;;   :config (put 'temporary-file-directory 'standard-value `(,temporary-file-directory))
+;;   :custom
+;;   (tramp-backup-directory-alist backup-directory-alist)
+;;   (tramp-default-method "ssh")
+;;   (tramp-default-proxies-alist nil)
+;;   )
 
-(use-package sudo-edit
-  :ensure t
-  :config (sudo-edit-indicator-mode)
-  :bind (:map ctl-x-map
-              ("M-s" . sudo-edit)))
+;; (use-package sudo-edit
+;;   :ensure t
+;;   :diminish
+;;   :disabled t
+;;   :config (sudo-edit-indicator-mode)
+;;   :bind (:map ctl-x-map
+;;               ("M-s" . sudo-edit)))
+
+;; (use-package auto-sudoedit
+;;   :ensure t
+;;   :diminish
+;;   :config (auto-sudoedit-mode 1))
 
 (use-package uuidgen
-  :ensure t)
+  :ensure t
+  :diminish)
 
 (defun revert-all-buffers ()
   "Refreshes all open buffers from their respective files."
@@ -1415,6 +1473,16 @@
          (buffer-list)))
   (delete-other-windows nil)
   (delete-other-frames nil))
+
+(defun goto-line-show ()
+  "Show line numbers temporarily, while prompting for the line number input."
+  (interactive)
+  (unwind-protect
+      (progn
+        (linum-mode 1)
+        (call-interactively #'goto-line))
+    (linum-mode -1)))
+(global-set-key (kbd "M-g M-g") 'goto-line-show)
 
 ;; Copy filename to clipboard
 (defun copy-filename-to-clipboard ()
@@ -1450,9 +1518,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(all-the-icons-ivy-rich-mode t)
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(pkgbuild-mode pkgbuild emmet-mode web-mode web markdown-mode treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd sudo-edit rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-ivy-rich all-the-icons-dired aggressive-indent ag add-node-modules-path)))
+   '(counsel-tramp all-the-icons-ivy pkgbuild-mode pkgbuild emmet-mode web-mode web markdown-mode treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1463,6 +1532,7 @@
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
  '(dashboard-items-face ((t nil)))
+ '(doom-modeline-bar-inactive ((t (:background "#161424"))))
  '(font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold))))
  '(hl-line ((t (:extend t :background "#24213b"))))
  '(ivy-current-match ((t (:foreground "#CBE3E7" :weight bold :background "#39374E"))))
@@ -1480,6 +1550,7 @@
  '(org-level-7 ((t :inherit outline-7 :weight semi-bold)))
  '(org-level-8 ((t :inherit outline-8 :weight semi-bold)))
  '(quote (doom-modeline-bar ((t (:background "#906CFF")))))
+ '(region ((t (:extend t :background "#332F4E"))))
  '(swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(swiper-background-match-face-3 ((t (:background "hot pink" :weight bold :background nil))))

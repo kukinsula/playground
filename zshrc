@@ -6,7 +6,12 @@ export ZSH=$HOME/.oh-my-zsh
 
 ZSH_THEME="robbyrussell"
 
-plugins=(zsh-autosuggestions zsh-syntax-highlighting colored-man-pages)
+plugins=(
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    colored-man-pages
+    zsh-better-npm-completion
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -17,7 +22,7 @@ export VISUAL=$EDITOR
 export TERM=xterm-256color
 
 # Aliases
-alias ls='logo-ls -lgG --human-readable --git-status --time-style RFC822'
+alias ls='logo-ls -l --human-readable --git-status --time-style RFC822'
 alias ll='ls -lh'
 alias la='ls -lah'
 alias -s pdf='evince'
@@ -31,6 +36,14 @@ alias aur='paru --color=always'
 alias news='aur --show -w -w'
 alias open='xdg-open'
 
+# less
+export LESSOPEN="| src-hilite-lesspipe.sh %s"
+export LESS=" -R "
+alias less='less --long-prompt --LINE-NUMBERS --HILITE-SEARCH --ignore-case -J --underline-special --SILENT'
+alias more='less'
+alias cat="src-hilite-lesspipe.sh $1"
+alias nano="nano -l"
+
 # Golang
 export GOPATH=$HOME/info/go
 export GO111MODULE=on
@@ -40,15 +53,69 @@ export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/.local/bin:/us
 # NodeJS/NPM
 npm config set prefix ~/.npm
 
-unsetopt share_history
+# NPM auto completion
+if type complete &>/dev/null; then
+  _npm_completion () {
+    local words cword
+    if type _get_comp_words_by_ref &>/dev/null; then
+      _get_comp_words_by_ref -n = -n @ -n : -w words -i cword
+    else
+      cword="$COMP_CWORD"
+      words=("${COMP_WORDS[@]}")
+    fi
 
-# less
-export LESSOPEN="| src-hilite-lesspipe.sh %s"
-export LESS=" -R "
-alias less='less --long-prompt --LINE-NUMBERS --HILITE-SEARCH --ignore-case -J --underline-special --SILENT'
-alias more='less'
-alias cat="src-hilite-lesspipe.sh $1"
-alias nano="nano -l"
+    local si="$IFS"
+    if ! IFS=$'\n' COMPREPLY=($(COMP_CWORD="$cword" \
+                           COMP_LINE="$COMP_LINE" \
+                           COMP_POINT="$COMP_POINT" \
+                           npm completion -- "${words[@]}" \
+                           2>/dev/null)); then
+      local ret=$?
+      IFS="$si"
+      return $ret
+    fi
+    IFS="$si"
+    if type __ltrim_colon_completions &>/dev/null; then
+      __ltrim_colon_completions "${words[cword]}"
+    fi
+  }
+  complete -o default -F _npm_completion npm
+elif type compdef &>/dev/null; then
+  _npm_completion() {
+    local si=$IFS
+    compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+                 COMP_LINE=$BUFFER \
+                 COMP_POINT=0 \
+                 npm completion -- "${words[@]}" \
+                 2>/dev/null)
+    IFS=$si
+  }
+  compdef _npm_completion npm
+elif type compctl &>/dev/null; then
+  _npm_completion () {
+    local cword line point words si
+    read -Ac words
+    read -cn cword
+    let cword-=1
+    read -l line
+    read -ln point
+    si="$IFS"
+    if ! IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+                       COMP_LINE="$line" \
+                       COMP_POINT="$point" \
+                       npm completion -- "${words[@]}" \
+                       2>/dev/null)); then
+
+      local ret=$?
+      IFS="$si"
+      return $ret
+    fi
+    IFS="$si"
+  }
+  compctl -K _npm_completion npm
+fi
+
+unsetopt share_history
 
 # Updates pacman, AUR and NPM packages
 update(){
@@ -75,6 +142,7 @@ BASE16_SHELL="$HOME/.config/base16-shell/"
 # Disable paste animation
 zstyle ':bracketed-paste-magic' active-widgets '.self-*'
 
+# Emacs vterm
 vterm_printf(){
     if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
         # Tell tmux to pass the escape sequences through

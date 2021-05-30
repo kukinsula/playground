@@ -112,6 +112,7 @@ sudo pacman -S \
   noto-fonts \
   xdg-utils \
   feh \
+  onefetch \
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
