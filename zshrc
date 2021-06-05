@@ -10,7 +10,6 @@ plugins=(
     zsh-autosuggestions
     zsh-syntax-highlighting
     colored-man-pages
-    zsh-better-npm-completion
 )
 
 source $ZSH/oh-my-zsh.sh

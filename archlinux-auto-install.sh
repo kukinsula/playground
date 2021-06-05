@@ -9,7 +9,7 @@ export INFO=$HOME/info/
 
 # Uncomment Misc Options in /etc/pacman.conf
 # Color
-# TotalDownload
+# TotalDownload # Not anymore, Pacman v6 deprecated it
 # CheckSpace
 # ILoveCandy
 
@@ -113,6 +113,7 @@ sudo pacman -S \
   xdg-utils \
   feh \
   onefetch \
+  iperf \
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
@@ -135,10 +136,10 @@ fwupdmgr update
 ssh-keygen -t ed25519
 
 # YaY
-# git clone https://aur.archlinux.org/yay.git $INFO/yay
-# cd $$INFO/yay
-# makepkg -si
-# cd $HOME
+git clone https://aur.archlinux.org/yay.git $INFO/yay
+cd $INFO/yay
+makepkg -si
+cd $HOME
 
 # Paru
 git clone https://aur.archlinux.org/paru.git $$INFO/paru
@@ -174,6 +175,7 @@ paru -S \
   ttf-symbola \
   mononoki \
   xarchiver \
+  ytop-bin \
 
 # TLP
 sudo systemctl enable tlp.service

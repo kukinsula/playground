@@ -31,8 +31,6 @@
 ;;
 ;; tester https://github.com/felipeochoa/rjsx-mode
 ;;
-;; Tide (tsserver): améliorer temps de chargement d'un gros projet
-;;
 ;; ELisp format on save
 ;;
 ;; vterm
@@ -40,7 +38,7 @@
 ;; Magit: pull --rebase / push / status / commit / diff / log
 ;;
 ;; Tester:
-;;   electrum: https://github.com/raxod502/selectrum
+;;   selectrum: https://github.com/raxod502/selectrum
 ;;   DAP https://github.com/emacs-lsp/dap-mode
 ;;
 ;; ElDoc
@@ -48,8 +46,6 @@
 ;; DAP
 ;;
 ;; flycheck-checker-error-threshold
-;;
-;; Tide: que le serveur démarre dès qu'un fichier TS est ouvert
 ;;
 ;; Désactiver pleins de trucs si on est en mode text
 ;;
@@ -299,7 +295,7 @@
                       :height 115
                       :weight 'normal
                       :width 'normal)
-  (set-fontset-font t 'unicode "DejaVu Sans Mono" nil 'prepend)
+  ;; (set-fontset-font t 'unicode "DejaVu Sans Mono" nil 'prepend)
   :custom-face (font-lock-warning-face
                 ((t (:inherit warning :foreground "sandy brown" :weight bold)))))
 
@@ -377,18 +373,23 @@
              ("custom"      "Custom")
              ("helpful"     "Help")
              ("help"        "Help")
+             ("messages"    "Message")
              ("mode"        "")
              ("dashboard"   "Dashboard")
              ("package"     "↓")
              ("python"      "π")
              ("shell"       "Shell")
              ("sh"          "Shell")
+             ("perl"        "Perl")
+             ("debugger"    "Debugger")
+             ("compilation" "Compilation")
              ("conf"        "Conf")
              ("unix"        "Unix")
              ("text"        "ξ")
              ("wdired"      "↯δ")
              ("grep"        "Grep")
              ("ag"          "Ag")
+             ("pdf"         "PDF")
              ("ripgrep"     "Rg")
              ("typescript"  "Ts")
              ("org"         "Org")
@@ -563,13 +564,17 @@
 (global-unset-key (kbd "C-S-n"))
 (global-set-key (kbd "C-S-n") 'make-frame-command)
 
-;; Jump to bookmark
-;; (global-set-key (kbd "C-S-b") 'counsel-bookmark)
-
 ;; Split windows
-(global-set-key (kbd "C-S-e") 'split-window-horizontally)
-(global-set-key (kbd "C-S-o") 'split-window-vertically)
+(global-set-key (kbd "C-S-e") (lambda ()
+                                (interactive)
+                                (split-window-horizontally)
+                                (other-window 1 nil)))
+(global-set-key (kbd "C-S-o") (lambda ()
+                                (interactive)
+                                (split-window-vertically)
+                                (other-window 1 nil)))
 
+;; Kill current buffer
 (global-set-key (kbd "C-S-w") (lambda ()
                                 (interactive)
                                 (kill-buffer (current-buffer))))
@@ -582,6 +587,9 @@
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-unset-key (kbd "<C-mouse-5>"))
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
+
+;; Disable C-x C-c
+(global-set-key (kbd "C-x C-c") nil)
 
 (use-package unicode-fonts
   :ensure t
@@ -674,6 +682,7 @@
 
 ;; Show pairing parenthesis and brackets
 (show-paren-mode t)
+(defvar show-paren-style 'parenthesis)
 
 (use-package rainbow-delimiters
   :ensure t
@@ -701,6 +710,7 @@
   :ensure t
   :diminish
   :bind (("C-c m c" . mc/edit-lines)
+         ("C-c m e" . mc/edit-ends-of-lines)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C-<" . mc/mark-all-like-this)
@@ -728,7 +738,6 @@
 
 ;; *scratch* file
 (setq initial-scratch-message nil)
-
 (add-to-list 'auto-mode-alist '("*scratch*" . org-mode))
 
 (use-package persistent-scratch
@@ -815,7 +824,7 @@
   :custom
   (company-box-icons-alist 'company-box-icons-all-the-icons)
   (company-box-backends-colors nil)
-  (company-box-show-single-candidate t)
+  (company-box-show-single-candidate 'always)
   :config
   (with-eval-after-load 'all-the-icons
     (declare-function all-the-icons-faicon 'all-the-icons)
@@ -967,24 +976,34 @@
 
 (use-package vterm
   :ensure t
-  :diminish)
+  :diminish
+  :bind (("<f1>" . vterm)))
 
 ;; Which Function
 (which-function-mode)
 (setq which-func-unknown "∅")
 
-;; YAS code snippets
+;; YASnippets
 (use-package yasnippet
   :ensure t
-  :disabled t
   :diminish
   :hook (prog-mode . yas-minor-mode)
   :commands (yas-reload-all)
-  :config (yas-reload-all))
+  :config
+  (add-to-list 'company-backends 'company-yasnippet)
+  (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
+  (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
+  (yas-reload-all))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :diminish
+  :after yasnippet)
 
 ;; Colors
 (use-package ansi-color
   :ensure t
+  :disabled t
   :diminish
   :commands (ansi-color-apply-on-region)
   :config
@@ -996,10 +1015,11 @@
 (use-package compile
   :ensure t
   :diminish
+  ;; :bind (("C-c C-c" . compile)
+  ;;        ("C-c C-r" . recompile))
   :custom
   (compilation-scroll-output 'first-error)
   (compilation-always-kill t)
-
   (compilation-error-regexp-alist-alist
    (cons '(node "^[  ]+at \\(?:[^\(\n]+ \(\\)?\\([a-zA-Z\.0-9_/-]+\\):\\([0-9]+\\):\\([0-9]+\\)\)?$"
                 1 ;; file
@@ -1007,8 +1027,26 @@
                 3 ;; column
                 )
          compilation-error-regexp-alist-alist))
-  (compilation-error-regexp-alist (cons 'node compilation-error-regexp-alist))
-  :bind (("C-c C-c" . compile)
+  (compilation-error-regexp-alist (cons 'node compilation-error-regexp-alist)))
+
+(use-package multi-compile
+  :ensure t
+  :diminish
+  :custom
+  (multi-compile-completion-system 'ivy)
+  (multi-compile-alist '((typescript-mode . (
+                                             ;; NPM
+                                             ("npm-run-build" . "npm run build")
+                                             ("npm-start" . "npm start")
+                                             ("npm-test" . "npm test")
+
+                                             ;; Rush
+                                             ("rush-build" . "rush build")
+                                             ("rush-install" . "rush install")))
+
+                         (go-mode . (("go-build" . "go build")
+                                     ("go-run" . "go run")))))
+  :bind (("C-c C-c" . multi-compile-run)
          ("C-c C-r" . recompile)))
 
 ;; Colorise some keywords
@@ -1018,103 +1056,12 @@
                                     '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)"
                                        1 font-lock-warning-face t)))))
 
-(use-package treemacs
+(use-package neotree
   :ensure t
   :diminish
-  :defer t
-  :init
-  (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :config
-  (progn
-    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
-          treemacs-deferred-git-apply-delay      0.5
-          treemacs-directory-name-transformer    #'identity
-          treemacs-display-in-side-window        t
-          treemacs-eldoc-display                 t
-          treemacs-file-event-delay              5000
-          treemacs-file-extension-regex          treemacs-last-period-regex-value
-          treemacs-file-follow-delay             0.2
-          treemacs-file-name-transformer         #'identity
-          treemacs-follow-after-init             t
-          treemacs-expand-after-init             t
-          treemacs-git-command-pipe              ""
-          treemacs-goto-tag-strategy             'refetch-index
-          treemacs-indentation                   2
-          treemacs-indentation-string            " "
-          treemacs-is-never-other-window         nil
-          treemacs-max-git-entries               5000
-          treemacs-missing-project-action        'ask
-          treemacs-move-forward-on-expand        nil
-          treemacs-no-png-images                 nil
-          treemacs-no-delete-other-windows       t
-          treemacs-project-follow-cleanup        nil
-          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-          treemacs-position                      'left
-          treemacs-read-string-input             'from-child-frame
-          treemacs-recenter-distance             0.1
-          treemacs-recenter-after-file-follow    nil
-          treemacs-recenter-after-tag-follow     nil
-          treemacs-recenter-after-project-jump   'always
-          treemacs-recenter-after-project-expand 'on-distance
-          treemacs-litter-directories            '("/node_modules" "/.venv" "/.cask")
-          treemacs-show-cursor                   nil
-          treemacs-show-hidden-files             t
-          treemacs-silent-filewatch              nil
-          treemacs-silent-refresh                nil
-          treemacs-sorting                       'alphabetic-asc
-          treemacs-space-between-root-nodes      t
-          treemacs-tag-follow-cleanup            t
-          treemacs-tag-follow-delay              1.5
-          treemacs-user-mode-line-format         nil
-          treemacs-user-header-line-format       nil
-          treemacs-width                         35
-          treemacs-workspace-switch-cleanup      nil)
-
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode 'always)
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple))))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-(use-package treemacs-evil
-  :ensure t
-  :diminish
-  :after (treemacs evil))
-
-(use-package treemacs-projectile
-  :ensure t
-  :diminish
-  :after (treemacs projectile))
-
-(use-package treemacs-icons-dired
-  :ensure t
-  :diminish
-  :after (treemacs dired)
-  :config (treemacs-icons-dired-mode))
-
-(use-package treemacs-magit
-  :ensure t
-  :diminish
-  :after (treemacs magit))
-
-(use-package treemacs-persp
-  :ensure t
-  :diminish
-  :after (treemacs persp-mode)
-  :config (treemacs-set-scope-type 'Perspectives))
+  :custom
+  (neo-theme (if (display-graphic-p) 'icons 'arrow))
+  :bind (("<f7>" . neotree-toggle)))
 
 (use-package ag
   :ensure t
@@ -1123,6 +1070,15 @@
   :custom
   (ag-highlight-search t)
   (ag-reuse-buffers t)
+  (ag-ignore-list '("vendor"
+                    "*.map"
+                    "dist"
+                    "build"
+                    "bootstrap"
+                    "*.svg"
+                    "*.build.js"
+                    "*.min.js"
+                    "*-lock.*"))
   :custom-face
   (ag-match-face ((t (:background nil :foreground "hot pink" :weight bold)))))
 
@@ -1134,18 +1090,28 @@
   (rg-show-columns t)
   (rg-ignore-case 'smart))
 
+(use-package css-mode
+  :ensure t
+  :custom
+  (css-indent-offset 2))
+
+(use-package scss-mode
+  :ensure t
+  :custom
+  (scss-compile-at-save nil))
+
 (use-package emmet-mode
   :ensure t
-  :diminish)
+  :diminish
+  :hook ((css-mode . emmet-mode)
+         (scss-mode . emmet-mode)))
 
 (use-package web-mode
   :ensure t
   :diminish
-  :init
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
-  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . typescript-mode))
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-mode))
+  :mode (("\\.html?\\'" . web-mode)
+         ("\\.erb\\'" . web-mode)
+         ("\\.eex\\'" . web-mode))
   :hook (web-mode . emmet-mode)
   :custom (
            web-mode-markup-indent-offset 2
@@ -1154,7 +1120,8 @@
            web-mode-enable-auto-closing t
            web-mode-enable-auto-opening t
            web-mode-enable-auto-pairing t
-           web-mode-enable-auto-indentation t))
+           web-mode-enable-auto-indentation t
+           web-mode-enable-current-element-highlight t))
 
 ;; Typescript
 ;; TODO: C-c C-c => rush build
@@ -1182,15 +1149,18 @@
                                        (-map #'tide-build-imenu-index child-items))))
               node)
           ()))))
+  :mode (("\\.tsx\\'" . typescript-mode)
+         ("\\.jsx\\'" . typescript-mode)
+         ("\\.js\\'" . typescript-mode))
   :custom
+  (tide-sync-request-timeout 10)
+  (tide-tsserver-flags '("--max-old-space-size=2048"))
+  (tide-server-max-response-length 1048576)
+
   (typescript-indent-level 2)
   (tide-completion-ignore-case t)
-  (tide-server-max-response-length 1048576)
   (tide-hl-identifier-idle-time 0.1)
   (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-  ;; (tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
-  ;; (tide-sync-request-timeout 10)
-  ;; (tide-node-flags "--max-old-space-size=2048")
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
          (typescript-mode . company-mode)
@@ -1211,11 +1181,7 @@
   :ensure t
   :diminish
   :hook ((typescript-mode . npm-mode)
-         (javascript-mode . npm-mode))
-  :commands (npm-mode-npm-run)
-  :config (local-set-key (kbd "C-c C-c") (lambda()
-                                           (interactive)
-                                           (npm-mode-npm-run "build"))))
+         (javascript-mode . npm-mode)))
 
 (use-package prettier-js
   :ensure t
@@ -1392,6 +1358,12 @@
                      "dist"))
   :config (recentf-mode t))
 
+(use-package dired
+  :ensure nil
+  :diminish
+  :bind (("<f2>" . dired))
+  :config (add-hook 'dired-mode-hook 'hl-line-mode))
+
 ;; Dired-subtree
 (use-package dired-subtree
   :ensure t
@@ -1417,14 +1389,15 @@
   (add-hook 'writeroom-mode-enable-hook 'writeroom-toggle-on)
   (add-hook 'writeroom-mode-disable-hook 'writeroom-toggle-off))
 
-;; (use-package tramp
-;;   :diminish
-;;   :config (put 'temporary-file-directory 'standard-value `(,temporary-file-directory))
-;;   :custom
-;;   (tramp-backup-directory-alist backup-directory-alist)
-;;   (tramp-default-method "ssh")
-;;   (tramp-default-proxies-alist nil)
-;;   )
+(use-package pdf-tools
+  :ensure t
+  :diminish
+  :config (pdf-tools-install))
+
+(use-package tramp
+  :diminish
+  :custom
+  (tramp-default-method "ssh"))
 
 ;; (use-package sudo-edit
 ;;   :ensure t
@@ -1521,7 +1494,7 @@
  '(all-the-icons-ivy-rich-mode t)
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(counsel-tramp all-the-icons-ivy pkgbuild-mode pkgbuild emmet-mode web-mode web markdown-mode treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path)))
+   '(ts-comint nodejs-repl popper wgrep ack neotree pdf-tools multi-compile scss-mode dash-at-point yasnippet-snippets moody counsel-tramp all-the-icons-ivy pkgbuild-mode pkgbuild emmet-mode web-mode web markdown-mode treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
