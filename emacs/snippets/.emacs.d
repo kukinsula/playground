@@ -1,1 +1,0 @@
-/home/kuk/.emacs.d

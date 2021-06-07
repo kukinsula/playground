@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Console log object
-# key: debug
-# --
-console.log('${message}', JSON.stringify(${object}, undefined, 2));

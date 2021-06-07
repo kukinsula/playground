@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: Mocha test
-# key: test
-# --
-describe('${description}', () => {
-  it('${test}', () => {
-
-  });
-});

@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: JSON object
-# key: obj
-# --
-{
-  ${key}: ${value}
-}

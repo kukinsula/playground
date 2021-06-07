@@ -12,6 +12,8 @@ function create_simlink () {
 create_simlink `pwd`/conkyrc ~/.conkyrc
 create_simlink `pwd`/zshrc ~/.zshrc
 create_simlink `pwd`/emacs/emacs.el ~/.emacs
+create_simlink `pwd`/emacs/early-init.el ~/.emacs.d/early-init.el
+create_simlink `pwd`/emacs/snippets ~/.emacs.d/snippets
 create_simlink `pwd`/toprc ~/.toprc
 create_simlink `pwd`/gitconfig ~/.gitconfig
 create_simlink `pwd`/terminator ~/.config/terminator/config

@@ -206,7 +206,8 @@ npm install -g \
   yarn \
   pnpm \
   @microsoft/rush \
-  ts-node-dev
+  ts-node-dev \
+  tsun
 
 # Docker
 sudo groupadd docker

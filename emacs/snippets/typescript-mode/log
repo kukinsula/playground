@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Console.log
-# key: cons
-# --
-console.log(${data});

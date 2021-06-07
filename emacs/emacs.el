@@ -61,6 +61,8 @@
 ;;                         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(setq byte-compile-warnings '(not obsolete))
+
 ;; Memory
 (setq large-file-warning-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024))
@@ -93,7 +95,7 @@
 
 ;; Common Lisp
 (with-no-warnings
-  (require 'cl))
+  (require 'cl-lib))
 
 ;; Encoding
 (setenv "LANG" "en_US.UTF-8")
@@ -133,10 +135,6 @@
 ;; Disable bell
 (setq ring-bell-function 'ignore
       visible-bell nil)
-
-;; Startup messages.
-(setq inhibit-startup-message t
-      inhibit-startup-echo-area-message t)
 
 (use-package saveplace
   :ensure nil
@@ -384,6 +382,7 @@
              ("debugger"    "Debugger")
              ("compilation" "Compilation")
              ("conf"        "Conf")
+             ("snippet"     "Snippet")
              ("unix"        "Unix")
              ("text"        "ξ")
              ("wdired"      "↯δ")
@@ -411,7 +410,10 @@
   :diminish
   :config (dashboard-setup-startup-hook)
   :custom
-  (initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+  (initial-buffer-choice (lambda ()
+                           (if (get-buffer "*scratch*")
+                               (kill-buffer "*scratch*"))
+                           (get-buffer "*dashboard*")))
   (dashboard-startup-banner 'logo)
   (dashboard-set-footer nil)
   (dashboard-set-heading-icons t)
@@ -474,11 +476,6 @@
   (ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil)))))
 
-(use-package ivy-hydra
-  :ensure t
-  :diminish
-  :after(ivy hydra))
-
 (use-package counsel
   :ensure t
   :diminish
@@ -525,14 +522,9 @@
   :ensure t
   :diminish
   :after (ivy)
-  :commands (prescient-persist-mod)
+  :commands (prescient-persist-mode)
   :custom (prescient-save-file "~/.emacs.d/prescient-save.el")
   :config (prescient-persist-mode t))
-
-(use-package company-prescient
-  :ensure t
-  :diminish
-  :config (company-prescient-mode t))
 
 (use-package ivy-prescient
   :ensure t
@@ -736,17 +728,18 @@
                               (interactive)
                               (kill-line 1)))
 
+;; Remove Server's new frame message)
+(add-hook 'server-after-make-frame-hook
+          (lambda ()
+            (setq inhibit-message t)
+            (run-with-idle-timer 0 nil (lambda () (setq inhibit-message nil)))))
+
+;; Startup messages.
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message "Ready!")
+
 ;; *scratch* file
 (setq initial-scratch-message nil)
-(add-to-list 'auto-mode-alist '("*scratch*" . org-mode))
-
-(use-package persistent-scratch
-  :ensure t
-  :diminish
-  :custom (persistent-scratch-save-file "~/.emacs.d/persistent-scratch")
-  :config
-  (persistent-scratch-setup-default)
-  (local-set-key (kbd "C-x C-s") 'persistent-scratch-save))
 
 ;; Hide/show blocks of code.
 (use-package hs-minor-mode
@@ -775,21 +768,6 @@
 (use-package company
   :ensure t
   :diminish
-  :config
-  (global-company-mode t)
-
-  ;; Trigger auto completion on tab or indent based on context
-  (define-key company-mode-map (kbd "TAB") 'company-indent-or-complete-common)
-  (define-key company-mode-map (kbd "<tab>") 'company-indent-or-complete-common)
-
-  ;; Cycle through completions on hitting tab. No need to use arrows
-  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-
-  ;; Select previous completion on shift + tab
-  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-  (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
-
   :custom
   (company-idle-delay 0)
   (company-echo-delay 0)
@@ -804,8 +782,22 @@
   (company-dabbrev-code-modes t)
   (company-dabbrev-code-ignore-case t)
   (company-eclim-auto-save nil)
+  :config
+  ;; Trigger auto completion on tab or indent based on context
+  (define-key company-mode-map (kbd "TAB") 'company-indent-or-complete-common)
+  (define-key company-mode-map (kbd "<tab>") 'company-indent-or-complete-common)
+
+  ;; Cycle through completions on hitting tab. No need to use arrows
+  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+
+  ;; Select previous completion on shift + tab
+  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+  (global-company-mode t)
   :custom-face
-  (company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro")))))
+  (company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
+  (company-template-field ((t (:inherit company-box-scrollbar)))))
 
 (use-package company-box
   :ensure t
@@ -860,6 +852,11 @@
             (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
             (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
 
+(use-package company-prescient
+  :ensure t
+  :diminish
+  :config (company-prescient-mode t))
+
 ;; Icons: M-x all-the-icons-install-fonts
 (use-package all-the-icons
   :ensure t
@@ -887,7 +884,7 @@
   :ensure t
   :diminish
   :defer t
-  :init (all-the-icons-ivy-setup))
+  :init (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
   :ensure t
@@ -982,23 +979,6 @@
 ;; Which Function
 (which-function-mode)
 (setq which-func-unknown "∅")
-
-;; YASnippets
-(use-package yasnippet
-  :ensure t
-  :diminish
-  :hook (prog-mode . yas-minor-mode)
-  :commands (yas-reload-all)
-  :config
-  (add-to-list 'company-backends 'company-yasnippet)
-  (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
-  (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
-  (yas-reload-all))
-
-(use-package yasnippet-snippets
-  :ensure t
-  :diminish
-  :after yasnippet)
 
 ;; Colors
 (use-package ansi-color
@@ -1128,6 +1108,15 @@
 (use-package tide
   :ensure t
   :diminish
+  :commands (tide-build-imenu-index
+             -concat
+             -map
+             plist-get
+             tide-rename-symbol
+             tide-rename-file
+             tide-references
+             prettier-js
+             tide-span-to-position)
   :preface
   ;; https://github.com/ananthakumaran/tide/issues/371#issuecomment-61008
   (defun tide-which-function ()
@@ -1139,8 +1128,8 @@
              (text (plist-get navtree :text))
              (node (cons (concat text " " (propertize (plist-get navtree
                                                                  :kind) 'face 'tide-imenu-type-face))
-                         (tide-span-to-position (plist-get (car (plist-ge
-                                                                 t navtree :spans)) :start)))))
+                         (tide-span-to-position (plist-get (car (plist-get
+                                                                 t navtree)) :start)))))
         (if (member kind high-level-kinds)
             (if child-items
                 (cons text
@@ -1156,18 +1145,16 @@
   (tide-sync-request-timeout 10)
   (tide-tsserver-flags '("--max-old-space-size=2048"))
   (tide-server-max-response-length 1048576)
-
   (typescript-indent-level 2)
   (tide-completion-ignore-case t)
   (tide-hl-identifier-idle-time 0.1)
   (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+  (tide-completion-setup-company-backend nil)
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
-         (typescript-mode . company-mode)
+         ;; (typescript-mode . company-mode)
          (typescript-mode . tide-which-function)
          (before-save . tide-format-before-save))
-  :commands
-  (tide-rename-symbol tide-rename-file tide-references prettier-js tide-span-to-position)
   :bind (("C-c C-t r s" . tide-rename-symbol)
          ("C-c C-t r f" . tide-rename-file)
          ("C-c C-t f r" . tide-references)
@@ -1271,6 +1258,35 @@
          ("\\.markdown\\'" . markdown-mode))
   :custom (markdown-hide-markup t)
   :init (setq markdown-command "multimarkdown"))
+
+;; YASnippets
+(use-package yasnippet
+  :ensure t
+  :diminish
+  :commands (yas-expand yas-reload-all)
+  :config
+  (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
+  (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
+  (yas-reload-all)
+  :hook (prog-mode . yas-minor-mode)
+  :custom-face (yas-field-highlight-face ((t (:foreground "hot pink")))))
+
+(defvar company-mode/enable-yas t
+  "Enable yasnippet for all backends.")
+
+(defun company-mode/backend-with-yas (backend)
+  "Append ':with company-yasnippet' to all BACKEND."
+  (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+      backend
+    (append (if (consp backend) backend (list backend))
+            '(:with company-yasnippet))))
+
+(setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :diminish
+  :after (yasnippet))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                             ;;
@@ -1434,14 +1450,13 @@
 (global-set-key (kbd "S-<f5>") 'revert-all-buffers)
 
 (defun reset-session ()
-  "Kill all buffers except *Messages* *scratch* and *dashboard**."
+  "Kill all buffers except *Messages* and *dashboard**."
   (interactive)
   (mapc 'kill-buffer
-        (remove-if
+        (cl-remove-if
          (lambda (x)
            (or
             (string-equal "*Messages*" (buffer-name x))
-            (string-equal "*scratch*" (buffer-name x))
             (string-equal "*dashboard*" (buffer-name x))))
          (buffer-list)))
   (delete-other-windows nil)
@@ -1491,10 +1506,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(all-the-icons-ivy-rich-mode t)
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(ts-comint nodejs-repl popper wgrep ack neotree pdf-tools multi-compile scss-mode dash-at-point yasnippet-snippets moody counsel-tramp all-the-icons-ivy pkgbuild-mode pkgbuild emmet-mode web-mode web markdown-mode treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js persistent-scratch org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient ivy-hydra helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path)))
+   '(neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1502,6 +1516,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(company-template-field ((t (:inherit company-box-scrollbar))))
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
  '(dashboard-items-face ((t nil)))
@@ -1533,7 +1548,8 @@
  '(swiper-match-face-2 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-3 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-4 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
- '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
+ '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
+ '(yas-field-highlight-face ((t (:foreground "hot pink")))))
 
 (provide 'emacs)
 ;;; emacs ends here

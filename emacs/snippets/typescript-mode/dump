@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: dump
+# key: dump
+# --
+console.log('$1', JSON.stringify($2, undefined, 2));$0

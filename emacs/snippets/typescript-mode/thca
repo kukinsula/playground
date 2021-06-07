@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: then-catch
-# key: thca
-# --
-  .then((${arg}: ${argType}) => { ${body} })
-  .catch((err: any) => { throw err; });
