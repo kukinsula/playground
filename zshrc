@@ -23,6 +23,7 @@ export TERM=xterm-256color
 # Aliases
 alias ls='logo-ls -l --human-readable --git-status --time-style RFC822'
 alias ll='ls -lh'
+alias l='ll'
 alias la='ls -lah'
 alias -s pdf='evince'
 alias e=$EDITOR
@@ -34,6 +35,10 @@ alias pacman='pacman --color=always'
 alias aur='paru --color=always'
 alias news='aur --show -w -w'
 alias open='xdg-open'
+alias tree='tree -C'
+alias cp='cp --verbose --interactive'
+alias mv='mv --verbose --interactive'
+alias rm='rm --verbose'
 
 # less
 export LESSOPEN="| src-hilite-lesspipe.sh %s"
@@ -122,6 +127,10 @@ update(){
     aur -Syu
     npm update -g
     pnpm update -g
+}
+
+loop(){
+		for i in {1..$1}; do eval $2; done
 }
 
 fuzzy-install(){

@@ -114,6 +114,11 @@ sudo pacman -S \
   feh \
   onefetch \
   iperf \
+  dnsutils \
+  xclip \
+  cups \
+  seahorse \
+  autossh
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
@@ -207,7 +212,8 @@ npm install -g \
   pnpm \
   @microsoft/rush \
   ts-node-dev \
-  tsun
+  tsun \
+  migrate-mongo
 
 # Docker
 sudo groupadd docker

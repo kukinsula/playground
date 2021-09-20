@@ -3,6 +3,7 @@
 [user]
   name = TEXIER-ATGER Lucas
   email = lucas.texier-atger@dametis.com
+	signingkey = 28C12FAAEE89EA22
 
 [color]
   ui = auto
@@ -24,3 +25,5 @@
 # Search
   search = grep --break --heading --line-number
   search-commit = log --pretty=\"format:%Cgreen%H %Cblue%s\" --name-status --grep
+[commit]
+	gpgsign = true

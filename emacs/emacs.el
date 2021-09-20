@@ -35,8 +35,6 @@
 ;;
 ;; vterm
 ;;
-;; Magit: pull --rebase / push / status / commit / diff / log
-;;
 ;; Tester:
 ;;   selectrum: https://github.com/raxod502/selectrum
 ;;   DAP https://github.com/emacs-lsp/dap-mode
@@ -121,6 +119,8 @@
 (use-package gcmh
   :ensure t
   :diminish
+  :custom
+  (gcmh-idle-delay 0.3)
   :config (gcmh-mode t))
 
 ;; Automatically revert all buffers
@@ -173,7 +173,8 @@
   :ensure nil
   :diminish
   :custom
-  (uniquify-buffer-name-style 'post-forward-angle-brackets)
+  ;; (uniquify-buffer-name-style 'post-forward-angle-brackets)
+  (uniquify-buffer-name-style 'forward)
   (uniquify-separator "/")
   (uniquify-after-kill-buffer-p t)
   (uniquify-ignore-buffers-re "^\\*"))
@@ -267,6 +268,8 @@
 (line-number-mode t)
 (column-number-mode t)
 (setq size-indication-mode t)
+(set-fill-column 80)
+(global-so-long-mode t)
 
 ;; Display the size of the buffer
 (size-indication-mode t)
@@ -274,7 +277,7 @@
 ;; Fringe size (LEFT . RIGHT)
 (set-fringe-mode '(10 . 0))
 
-;; Maximize windo
+;; Maximize window
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Set frame title to opened buffer name
@@ -288,11 +291,13 @@
   :ensure nil
   :diminish
   :config
+
   (set-face-attribute 'default nil
                       :family "Source Code Pro"
-                      :height 115
+                      :height 118
                       :weight 'normal
                       :width 'normal)
+
   ;; (set-fontset-font t 'unicode "DejaVu Sans Mono" nil 'prepend)
   :custom-face (font-lock-warning-face
                 ((t (:inherit warning :foreground "sandy brown" :weight bold)))))
@@ -322,10 +327,12 @@
 (use-package doom-modeline
   :ensure t
   :diminish
-  :init (doom-modeline-mode)
-  :config (doom-modeline-def-modeline 'main
-            '(bar matches buffer-info buffer-position selection-info)
-            '(misc-info minor-modes major-mode process checker " "))
+  :init
+  (doom-modeline-mode)
+  :config
+  (doom-modeline-def-modeline 'main
+    '(bar matches buffer-info buffer-position selection-info)
+    '(misc-info minor-modes major-mode process checker " "))
   :custom
   (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-minor-modes t)
@@ -334,7 +341,7 @@
   (doom-modeline-icon t)
   (doom-modeline-major-mode-color-icon t)
   (doom-modeline-checker-simple-format t)
-  (doom-modeline-bar-width 5)
+  (doom-modeline-bar-width 10)
   (doom-modeline-height 25)
   :commands (doom-modeline-def-modeline)
   :custom-face
@@ -361,6 +368,11 @@
              ("fundamental" "Fundamental")
              ("diff"        "Δ")
              ("magit"       "Magit")
+             ("status"      "Status")
+             ("log"         "Log")
+             ("revision"    "Commit")
+             ("stash"       "Stash")
+             ("process"     "Process")
              ("dired"       "δ")
              ("emacs"       "ε")
              ("inferior"    "i" :prefix)
@@ -379,6 +391,7 @@
              ("shell"       "Shell")
              ("sh"          "Shell")
              ("perl"        "Perl")
+             ("so-long"     "So-Long")
              ("debugger"    "Debugger")
              ("compilation" "Compilation")
              ("conf"        "Conf")
@@ -396,7 +409,7 @@
              ("yaml"        "YAML")
              ("json"        "JSON")
              ("js"          "Js")
-             ("markdown"    "MD")
+             ("markdown"    "markdown")
              ("systemd"     "Systemd")
              ("web"         "Web")
              ("makefile"    "Makefile")
@@ -463,8 +476,9 @@
          ("<backtab>" . ivy-previous-line))
   :config (ivy-mode)
   :custom
+  (ivy-height 15)
   (ivy-use-virtual-buffers nil)
-  (ivy-virtual-abbreviate 'abbreviate)
+  (ivy-virtual-abbreviate 'name)
   (ivy-wrap t)
   (ivy-count-format "【%d / %d】 ")
   (enable-recursive-minibuffers t)
@@ -631,7 +645,8 @@
                 comint-mode-hook
                 compilation-mode-hook
                 minibuffer-setup-hook
-                vterm-mode-hook))
+                vterm-mode-hook
+                magit-diff-mode-hook))
   (add-hook hook
             (lambda () (setq show-trailing-whitespace nil))))
 
@@ -664,7 +679,7 @@
 (setq backward-delete-char-untabify-method 'hungry)
 
 ;; Visualize tabs as a pipe character - "|".
-(defvar whitespace-style '(face tabs tab-mark trailing))
+(defvar whitespace-style '(face trailing))
 
 ;; This will also show trailing characters as they are useful to spot.
 (defvar whitespace-display-mappings
@@ -724,9 +739,11 @@
 
 (global-set-key (kbd "C-d") 'duplicate-line)
 (global-set-key (kbd "M-;") 'comment-line)
+
+(setq kill-whole-line nil)
 (global-set-key (kbd "C-k") (lambda ()
                               (interactive)
-                              (kill-line 1)))
+                              (kill-whole-line)))
 
 ;; Remove Server's new frame message)
 (add-hook 'server-after-make-frame-hook
@@ -760,16 +777,85 @@
 (use-package magit
   :ensure t
   :diminish
+  :preface
+
+  (defun auto-display-magit-process-buffer (&rest args)
+    "Automatically display the process buffer when it is updated."
+    (let ((magit-display-buffer-noselect t))
+      (magit-process-buffer)))
+
+  (setq magit-display-buffer-function
+        (lambda (buffer)
+          (display-buffer
+           buffer (if (and (derived-mode-p 'magit-mode)
+                           (memq (with-current-buffer buffer major-mode)
+                                 '(magit-process-mode
+                                   magit-revision-mode
+                                   magit-diff-mode
+                                   magit-stash-mode
+                                   magit-status-mode)))
+                      nil
+                    '(display-buffer-same-window)))))
+
+  :custom
+  (magit-diff-refine-hunk nil)
   :config
   (define-key magit-mode-map (kbd "C-TAB") nil)
-  (define-key magit-mode-map (kbd "C-<tab>") nil))
+  (define-key magit-mode-map (kbd "C-<tab>") nil)
+
+  (advice-add 'magit-process-insert-section :before
+	            #'auto-display-magit-process-buffer)
+
+  (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
+  (define-derived-mode magit-staging-mode magit-status-mode "Magit staging"
+    "Mode for showing staged and unstaged changes."
+    :group 'magit-status)
+
+  (defun magit-staging-refresh-buffer ()
+    (magit-insert-section (status)
+      (magit-insert-unstaged-changes)
+      (magit-insert-staged-changes)))
+
+  (defun magit-staging ()
+    (interactive)
+    (magit-setup-buffer #'magit-staging-mode))
+
+  (define-advice magit-push-current-to-upstream (:before (args) query-yes-or-no)
+    "Prompt for confirmation before permitting a push to upstream."
+    (when-let ((branch (magit-get-current-branch)))
+      (unless (yes-or-no-p (format "Push %s branch upstream to %s? "
+                                   branch
+                                   (or (magit-get-upstream-branch branch)
+                                       (magit-get "branch" branch "remote"))))
+        (user-error "Push to upstream aborted by user"))))
+
+  :custom-face
+  '(magit-blame-heading ((t (:extend t :background nil :foreground "#FFB378" :weight bold))))
+  '(magit-branch-remote ((t (:foreground "#95FFA4"))))
+  '(magit-diff-added ((t (:extend t :background nil :foreground "#95FFA4"))))
+  '(magit-diff-added-highlight ((t (:extend t :background nil :foreground "#95FFA4" :weight bold))))
+  '(magit-diff-context-highlight ((t (:extend t :background nil :foreground "#CBE3E7"))))
+  '(magit-diff-file-heading ((t (:extend t :foreground "#FF8080" :weight bold))))
+  '(magit-diff-file-heading-highlight ((t (:inherit magit-section-highlight :extend t :background "#24213b"))))
+  '(magit-diff-file-heading-selection ((t (:extend t :background "#332F4E" :foreground nil :weight bold))))
+  '(magit-diff-hunk-heading ((t (:extend t :background "#2b2453" :foreground "white"))))
+  '(magit-diff-hunk-heading-highlight ((t (:extend t :background "#2b2453" :foreground "white" :weight bold))))
+  '(magit-diff-hunk-region ((t (:background "#red"))))
+  '(magit-diff-removed ((t (:extend t :foreground "#cc6666" :background nil))))
+  '(magit-diff-removed-highlight ((t (:extend t :foreground "#FF8080" :weight bold :background nil))))
+  '(magit-diff-whitespace-warning ((t (:background nil))))
+  '(magit-hash ((t (:foreground "white" :weight bold))))
+  '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
+  '(magit-reflog-other ((t (:foreground "#95FFA4"))))
+  '(magit-reflog-remote ((t (:foreground "#95FFA4")))))
 
 ;; Company-mode
 (use-package company
   :ensure t
   :diminish
   :custom
-  (company-idle-delay 0)
+  (company-idle-delay 0.2)
   (company-echo-delay 0)
   (company-tooltip-align-annotations t)
   (company-minimum-prefix-length 1)
@@ -890,7 +976,7 @@
   :ensure t
   :diminish
   :defer t
-  :custom (ivy-rich-path-style 'abbrev)
+  :custom (ivy-rich-path-style 'absolute)
   :init (ivy-rich-mode))
 
 ;; Show quick tooltip
@@ -916,7 +1002,7 @@
   :custom
   (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch))
   (flycheck-idle-buffer-switch-delay 0.5)
-  (flycheck-javascript-eslint-executable "eslint_d")
+  ;; (flycheck-javascript-eslint-executable "eslint_d")
   :bind (("M-n" . flycheck-next-error)
          ("M-p" . flycheck-previous-error))
   :config
@@ -977,19 +1063,18 @@
   :bind (("<f1>" . vterm)))
 
 ;; Which Function
-(which-function-mode)
-(setq which-func-unknown "∅")
+;; (which-function-mode)
+;; (setq which-func-unknown "∅")
 
 ;; Colors
 (use-package ansi-color
   :ensure t
-  :disabled t
   :diminish
-  :commands (ansi-color-apply-on-region)
-  :config
-  (add-hook 'compilation-filter-hook
-            (lambda () (ansi-color-apply-on-region (point-min)
-                                                   (point-max)))))
+  :preface
+  (defun colorize-compilation-buffer ()
+    (when (eq major-mode 'compilation-mode)
+      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+  :hook (compilation-filter . colorize-compilation-buffer))
 
 ;; Compilation
 (use-package compile
@@ -997,6 +1082,24 @@
   :diminish
   ;; :bind (("C-c C-c" . compile)
   ;;        ("C-c C-r" . recompile))
+
+  :preface
+  (defun bury-compile-buffer-if-successful (buffer string)
+    "Bury a compilation buffer if succeeded without warnings"
+    (if (and
+         (string-match "compilation" (buffer-name buffer))
+         (string-match "finished" string)
+         (not
+          (with-current-buffer buffer
+            (goto-char 1)
+            (search-forward "warning" nil t))))
+        (run-with-timer 1 nil
+                        (lambda (buf)
+                          (bury-buffer buf)
+                          (switch-to-prev-buffer (get-buffer-window buf) 'kill))
+                        buffer)))
+
+  :hook (compilation-finish-functions . 'bury-compile-buffer-if-successful)
   :custom
   (compilation-scroll-output 'first-error)
   (compilation-always-kill t)
@@ -1016,16 +1119,24 @@
   (multi-compile-completion-system 'ivy)
   (multi-compile-alist '((typescript-mode . (
                                              ;; NPM
-                                             ("npm-run-build" . "npm run build")
-                                             ("npm-start" . "npm start")
-                                             ("npm-test" . "npm test")
+                                             ("npm run build" . "npm run build")
+                                             ("npm run lint" . "npm run lint")
+                                             ("npm run start" . "npm run start")
+                                             ("npm run test" . "npm run test")
 
                                              ;; Rush
-                                             ("rush-build" . "rush build")
-                                             ("rush-install" . "rush install")))
+                                             ("rush build" . "rush build --verbose")
+                                             ("rush rebuild" . "rush rebuild --verbose")
+                                             ("rush install" . "rush install --verbose")
+                                             ("rush update" . "rush update")
+                                             ("rush test" . "rush test --verbose")
+                                             ("rush lint" . "rush lint --verbose")
+                                             ("rush check" . "rush check")
+                                             ("rush scan" . "rush scan")))
 
-                         (go-mode . (("go-build" . "go build")
-                                     ("go-run" . "go run")))))
+                         ;; Golang
+                         (go-mode . (("go build" . "go build")
+                                     ("go run" . "go run")))))
   :bind (("C-c C-c" . multi-compile-run)
          ("C-c C-r" . recompile)))
 
@@ -1041,6 +1152,9 @@
   :diminish
   :custom
   (neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (neo-show-hidden-files t)
+  (neo-window-fixed-size nil)
+  (neo-window-width 30)
   :bind (("<f7>" . neotree-toggle)))
 
 (use-package ag
@@ -1053,6 +1167,7 @@
   (ag-ignore-list '("vendor"
                     "*.map"
                     "dist"
+                    "distTS"
                     "build"
                     "bootstrap"
                     "*.svg"
@@ -1069,6 +1184,25 @@
   :custom
   (rg-show-columns t)
   (rg-ignore-case 'smart))
+
+(global-prettify-symbols-mode t)
+(add-hook 'prog-mode-hook (lambda ()
+                            (setq prettify-symbols-alist '(("lambda" . ?λ)
+                                                           (">=" . ?≥)
+                                                           ("<=" . ?≤)
+                                                           ("=>" . ?🡆)
+                                                           ("===" . ?≡)
+                                                           ("!==" . ?≢)
+                                                           ("&&" . ?∧)
+                                                           ("&" . ?＆)
+                                                           ("||" . ?∨)
+                                                           ("/" . ?÷)
+                                                           ("*" . ?⛌)
+                                                           ("+=" . ?⩲)
+                                                           ("??" . ?⁇)
+                                                           ("°C" ? ?℃)
+                                                           ("°F" ? ?℉)
+                                                           ("..." . ?…)))))
 
 (use-package css-mode
   :ensure t
@@ -1104,62 +1238,51 @@
            web-mode-enable-current-element-highlight t))
 
 ;; Typescript
-;; TODO: C-c C-c => rush build
 (use-package tide
   :ensure t
   :diminish
-  :commands (tide-build-imenu-index
-             -concat
-             -map
-             plist-get
-             tide-rename-symbol
-             tide-rename-file
-             tide-references
-             prettier-js
-             tide-span-to-position)
   :preface
-  ;; https://github.com/ananthakumaran/tide/issues/371#issuecomment-61008
-  (defun tide-which-function ()
-    (defun tide-build-imenu-index (navtree)
-      (let* ((child-items (plist-get navtree :childItems))
-             (high-level-kinds '("class" "method" "function" "interface"
-                                 "type" "enum"))
-             (kind (plist-get navtree :kind))
-             (text (plist-get navtree :text))
-             (node (cons (concat text " " (propertize (plist-get navtree
-                                                                 :kind) 'face 'tide-imenu-type-face))
-                         (tide-span-to-position (plist-get (car (plist-get
-                                                                 t navtree)) :start)))))
-        (if (member kind high-level-kinds)
-            (if child-items
-                (cons text
-                      (-concat (list node)
-                               (remove nil
-                                       (-map #'tide-build-imenu-index child-items))))
-              node)
-          ()))))
+  (defun setup-tide ()
+    "Setup tide environment."
+    (tide-setup)
+    (tide-hl-identifier-mode))
   :mode (("\\.tsx\\'" . typescript-mode)
          ("\\.jsx\\'" . typescript-mode)
          ("\\.js\\'" . typescript-mode))
   :custom
-  (tide-sync-request-timeout 10)
-  (tide-tsserver-flags '("--max-old-space-size=2048"))
+  ;; (tide-sync-request-timeout 10)
+  ;; (tide-tsserver-flags '("--max-old-space-size" "2048"))
   (tide-server-max-response-length 1048576)
   (typescript-indent-level 2)
   (tide-completion-ignore-case t)
-  (tide-hl-identifier-idle-time 0.1)
-  (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-  (tide-completion-setup-company-backend nil)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         ;; (typescript-mode . company-mode)
-         (typescript-mode . tide-which-function)
+  (tide-hl-identifier-idle-time 0.2)
+  (tide-format-options '(
+                         :insertSpaceAfterFunctionKeywordForAnonymousFunctions t
+                         :placeOpenBraceOnNewLineForFunctions nil
+                         :insertSpaceAfterCommaDelimiter t
+                         :insertSpaceAfterSemicolonInForStatements t
+                         :insertSpaceBeforeAndAfterBinaryOperators t
+                         :insertSpaceAfterConstructor nil
+                         :insertSpaceAfterKeywordsInControlFlowStatements t
+                         :insertSpaceAfterFunctionKeywordForAnonymousFunctions t
+                         :insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis nil
+                         :insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets nil
+                         :insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces t
+                         :insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces nil
+                         :insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces t
+                         :insertSpaceBeforeFunctionParenthesis nil
+                         :placeOpenBraceOnNewLineForFunctions nil
+                         :placeOpenBraceOnNewLineForControlBlocks nil
+                         :insertSpaceBeforeTypeAnnotation nil
+                         :insertSpaceAfterTypeAssertion nil))
+  :hook ((typescript-mode . setup-tide)
          (before-save . tide-format-before-save))
   :bind (("C-c C-t r s" . tide-rename-symbol)
          ("C-c C-t r f" . tide-rename-file)
          ("C-c C-t f r" . tide-references)
          ("C-c C-t i j" . tide-jsdoc-template)
          ("C-c C-t e" . tide-project-errors)
+         ("C-c C-t p" . tide-format)
          ("C-c C-t p" . prettier-js))
   :custom-face
   (tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
@@ -1173,7 +1296,7 @@
 (use-package prettier-js
   :ensure t
   :diminish
-  :custom (prettier-js-show-errors nil))
+  :custom (prettier-js-show-errors 'buffer))
 
 (use-package add-node-modules-path
   :ensure t
@@ -1265,23 +1388,10 @@
   :diminish
   :commands (yas-expand yas-reload-all)
   :config
-  (define-key yas-minor-mode-map (kbd "SPC") yas-maybe-expand)
   (define-key yas-minor-mode-map (kbd "C-c y") #'yas-expand)
   (yas-reload-all)
   :hook (prog-mode . yas-minor-mode)
   :custom-face (yas-field-highlight-face ((t (:foreground "hot pink")))))
-
-(defvar company-mode/enable-yas t
-  "Enable yasnippet for all backends.")
-
-(defun company-mode/backend-with-yas (backend)
-  "Append ':with company-yasnippet' to all BACKEND."
-  (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-      backend
-    (append (if (consp backend) backend (list backend))
-            '(:with company-yasnippet))))
-
-(setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
 (use-package yasnippet-snippets
   :ensure t
@@ -1331,7 +1441,7 @@
   :ensure t
   :diminish
   :custom (exec-path-from-shell-check-startup-files nil)
-  :config (exec-path-from-shell-initialize))
+  :init (exec-path-from-shell-initialize))
 
 ;; Emacs Start Up Profiler
 ;;
@@ -1357,8 +1467,7 @@
   :custom
   (recentf-max-menu-items 100)
   (recentf-auto-cleanup 'mode)
-  (recentf-exclude '((expand-file-name package-user-dir)
-                     (format "%s/\\.emacs\\.d/elpa/.*" (getenv "HOME"))
+  (recentf-exclude '("\\elpa"
                      "/usr/share/emacs"
                      ".cache"
                      ".elfeed"
@@ -1412,16 +1521,16 @@
 
 (use-package tramp
   :diminish
+  :disabled t
   :custom
   (tramp-default-method "ssh"))
 
 ;; (use-package sudo-edit
 ;;   :ensure t
 ;;   :diminish
-;;   :disabled t
 ;;   :config (sudo-edit-indicator-mode)
-;;   :bind (:map ctl-x-map
-;;               ("M-s" . sudo-edit)))
+;; :bind (:map ctl-x-map
+;;             ("M-s" . sudo-edit)))
 
 ;; (use-package auto-sudoedit
 ;;   :ensure t
@@ -1432,22 +1541,11 @@
   :ensure t
   :diminish)
 
-(defun revert-all-buffers ()
-  "Refreshes all open buffers from their respective files."
-  (interactive)
-  (let* ((list (buffer-list))
-         (buffer (car list)))
-    (while buffer
-      (when (and (buffer-file-name buffer)
-                 (not (buffer-modified-p buffer)))
-        (set-buffer buffer)
-        (revert-buffer t t t))
-      (setq list (cdr list))
-      (setq buffer (car list))))
-  (message "Refreshed open files"))
+(use-package speed-type
+  :ensure t
+  :diminish)
 
 (global-set-key (kbd "<f5>") 'revert-buffer)
-(global-set-key (kbd "S-<f5>") 'revert-all-buffers)
 
 (defun reset-session ()
   "Kill all buffers except *Messages* and *dashboard**."
@@ -1461,6 +1559,11 @@
          (buffer-list)))
   (delete-other-windows nil)
   (delete-other-frames nil))
+
+(use-package goto-last-change
+  :ensure t
+  :config
+  (global-set-key (kbd "C-x -") #'goto-last-change))
 
 (defun goto-line-show ()
   "Show line numbers temporarily, while prompting for the line number input."
@@ -1508,7 +1611,9 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path)))
+   '(goto-last-change sudo-edit prettify-symbols-mode pretty quelpa-use-package speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+ '(writeroom-global-effects
+   '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1520,14 +1625,34 @@
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
  '(dashboard-items-face ((t nil)))
- '(doom-modeline-bar-inactive ((t (:background "#161424"))))
+ '(doom-modeline-bar ((t (:background "#906CFF"))))
+ '(doom-modeline-bar-inactive ((t (:background "#191729"))))
  '(font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold))))
+ '(fringe ((t (:inherit default :background nil :foreground "#565575"))))
  '(hl-line ((t (:extend t :background "#24213b"))))
  '(ivy-current-match ((t (:foreground "#CBE3E7" :weight bold :background "#39374E"))))
  '(ivy-minibuffer-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(magit-blame-heading ((t (:extend t :background nil :foreground "#FFB378" :weight bold))))
+ '(magit-branch-remote ((t (:foreground "#95FFA4"))))
+ '(magit-diff-added ((t (:extend t :background nil :foreground "#95FFA4"))))
+ '(magit-diff-added-highlight ((t (:extend t :background nil :foreground "#95FFA4" :weight bold))))
+ '(magit-diff-context-highlight ((t (:extend t :background nil :foreground "#CBE3E7"))))
+ '(magit-diff-file-heading ((t (:extend t :foreground "#FF8080" :weight bold))))
+ '(magit-diff-file-heading-highlight ((t (:inherit magit-section-highlight :extend t :background "#24213b"))))
+ '(magit-diff-file-heading-selection ((t (:extend t :background "#332F4E" :foreground nil :weight bold))))
+ '(magit-diff-hunk-heading ((t (:extend t :background "#2b2453" :foreground "white"))))
+ '(magit-diff-hunk-heading-highlight ((t (:extend t :background "#2b2453" :foreground "white" :weight bold))))
+ '(magit-diff-hunk-region ((t (:background "#red"))))
+ '(magit-diff-removed ((t (:extend t :foreground "#cc6666" :background nil))))
+ '(magit-diff-removed-highlight ((t (:extend t :foreground "#FF8080" :weight bold :background nil))))
+ '(magit-diff-whitespace-warning ((t (:background nil))))
+ '(magit-hash ((t (:foreground "white" :weight bold))))
+ '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
+ '(magit-reflog-other ((t (:foreground "#95FFA4"))))
+ '(magit-reflog-remote ((t (:foreground "#95FFA4"))))
  '(org-document-title ((t :height 2.0)))
  '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)))
  '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)))
@@ -1549,6 +1674,7 @@
  '(swiper-match-face-3 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(swiper-match-face-4 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
  '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
+ '(trailing-whitespace ((t (:background nil))))
  '(yas-field-highlight-face ((t (:foreground "hot pink")))))
 
 (provide 'emacs)
