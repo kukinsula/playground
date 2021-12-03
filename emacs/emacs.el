@@ -50,6 +50,8 @@
 ;; Conserver la text scale après un revert-buffer/revert-all-buffers F5
 ;;
 ;; Popper.el
+;;
+;; pixel-scroll-mode
 
 ;;; Code:
 
@@ -268,7 +270,7 @@
 (line-number-mode t)
 (column-number-mode t)
 (setq size-indication-mode t)
-(set-fill-column 80)
+(setq-default fill-column 80)
 (global-so-long-mode t)
 
 ;; Display the size of the buffer
@@ -779,11 +781,6 @@
   :diminish
   :preface
 
-  (defun auto-display-magit-process-buffer (&rest args)
-    "Automatically display the process buffer when it is updated."
-    (let ((magit-display-buffer-noselect t))
-      (magit-process-buffer)))
-
   (setq magit-display-buffer-function
         (lambda (buffer)
           (display-buffer
@@ -799,14 +796,22 @@
 
   :custom
   (magit-diff-refine-hunk nil)
+  (git-commit-summary-max-length 80)
+  (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
+
+  (magit-section-initial-visibility-alist
+   '((untracked . show)
+     (unstaged . show)
+     (staged . show)
+     (stashes . show)
+     (unpushed . show)))
+
   :config
   (define-key magit-mode-map (kbd "C-TAB") nil)
   (define-key magit-mode-map (kbd "C-<tab>") nil)
 
-  (advice-add 'magit-process-insert-section :before
-	            #'auto-display-magit-process-buffer)
-
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+  (add-hook 'git-commit-setup-hook 'turn-off-auto-fill t)
 
   (define-derived-mode magit-staging-mode magit-status-mode "Magit staging"
     "Mode for showing staged and unstaged changes."
@@ -1083,24 +1088,18 @@
   ;; :bind (("C-c C-c" . compile)
   ;;        ("C-c C-r" . recompile))
 
-  :preface
-  (defun bury-compile-buffer-if-successful (buffer string)
-    "Bury a compilation buffer if succeeded without warnings"
-    (if (and
-         (string-match "compilation" (buffer-name buffer))
-         (string-match "finished" string)
-         (not
-          (with-current-buffer buffer
-            (goto-char 1)
-            (search-forward "warning" nil t))))
-        (run-with-timer 1 nil
-                        (lambda (buf)
-                          (bury-buffer buf)
-                          (switch-to-prev-buffer (get-buffer-window buf) 'kill))
-                        buffer)))
-
-  :hook (compilation-finish-functions . 'bury-compile-buffer-if-successful)
   :custom
+  (compilation-finish-functions
+   (lambda (buffer str)
+     (if (null (string-match ".*exited abnormally.*" str))
+         ;;no errors, make the compilation window go away in a few seconds
+         (progn
+           (run-at-time "1 sec" nil
+                        (lambda (buffer)
+                          (kill-buffer buffer))
+                        buffer)
+           (message "Successful Compilation!")))))
+
   (compilation-scroll-output 'first-error)
   (compilation-always-kill t)
   (compilation-error-regexp-alist-alist
@@ -1611,7 +1610,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(goto-last-change sudo-edit prettify-symbols-mode pretty quelpa-use-package speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(goto-last-change sudo-edit prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
