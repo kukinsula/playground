@@ -1142,7 +1142,7 @@
 ;; Colorise some keywords
 (add-hook 'prog-mode-hook
           (lambda ()
-            (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)" 1 '(:foreground "yellow") t)))
+            (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)" 1 '(:foreground "gold1") t)))
 
             (font-lock-add-keywords nil '(("'\\(DEBUG\\|debug\\)'" 1 '(:foreground "deep sky blue") t)))
             (font-lock-add-keywords nil '(("'\\(INFO\\|info\\)'" 1 '(:foreground "medium spring green") t)))
