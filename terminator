@@ -33,12 +33,12 @@
       type = Window
       parent = ""
       order = 0
-      position = 0:34
+      position = 0:29
       maximised = True
       fullscreen = False
-      size = 1920, 1018
-      title = Dametis dev
-      last_active_term = d8178671-7887-4a8f-b9ab-55963d02fb1e
+      size = 1920, 1143
+      title = kuk@x1-carbon:~/info/damapp/apps/api
+      last_active_term = 8a6a2310-3026-49f2-a29e-ea8aa34338eb
       last_active_window = True
     [[[child1]]]
       type = HPaned

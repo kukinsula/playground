@@ -12,7 +12,8 @@
 ;;
 ;;   $ mkdir -p ~/.config/systemd/user
 ;;   $ cp /path/to/playground/emacs/emacs.service ~/.config/systemd/user
-;;   $ systemct --user start emacs.service
+;;   $ systemctl --user enable emacs.service
+;;   $ systemctl --user start emacs.service
 ;;
 ;;   Text mode: emacsclient --create-frame --quiet -nw
 ;;   GUI mode: emacsclient --create-frame --quiet
@@ -60,6 +61,12 @@
 ;;         GENERAL         ;;
 ;;                         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TODO
+;;
+;; * ag search specific directory
+;;
+;; * Compilation: preserve buffer on failures
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -159,6 +166,9 @@
       auto-save-timeout 30
       auto-save-list-file-prefix "~/.emacs.d/auto-saves/saves-"
       auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-saves/" t)))
+
+(defun save-all () (interactive) (save-some-buffers t))
+(global-set-key (kbd "C-x s") 'save-all)
 
 ;; Backup files
 (setq backup-directory-alist `(("." . "~/.emacs.d/backups"))
@@ -1116,7 +1126,8 @@
   :diminish
   :custom
   (multi-compile-completion-system 'ivy)
-  (multi-compile-alist '((typescript-mode . (
+  (multi-compile-alist '(
+                         (typescript-mode . (
                                              ;; NPM
                                              ("npm run build" . "npm run build")
                                              ("npm run lint" . "npm run lint")
@@ -1165,7 +1176,7 @@
   :after (projectile)
   :custom
   (ag-highlight-search t)
-  (ag-reuse-buffers t)
+  (ag-reuse-buffers nil)
   (ag-ignore-list '("vendor"
                     "*.map"
                     "dist"
@@ -1279,14 +1290,14 @@
                          :insertSpaceBeforeTypeAnnotation nil
                          :insertSpaceAfterTypeAssertion nil))
   :hook ((typescript-mode . setup-tide)
-         (before-save . tide-format-before-save))
+         ;; (before-save . tide-format-before-save)
+         (typescript-mode . prettier-mode))
   :bind (("C-c C-t r s" . tide-rename-symbol)
          ("C-c C-t r f" . tide-rename-file)
          ("C-c C-t f r" . tide-references)
          ("C-c C-t i j" . tide-jsdoc-template)
          ("C-c C-t e" . tide-project-errors)
-         ("C-c C-t p" . tide-format)
-         ("C-c C-t p" . prettier-js))
+         ("C-c C-t p" . prettier-prettify-region))
   :custom-face
   (tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
 
@@ -1299,10 +1310,9 @@
   :hook ((typescript-mode . npm-mode)
          (javascript-mode . npm-mode)))
 
-(use-package prettier-js
+(use-package prettier
   :ensure t
-  :diminish
-  :custom (prettier-js-show-errors 'buffer))
+  :diminish)
 
 (use-package add-node-modules-path
   :ensure t
@@ -1313,7 +1323,7 @@
 (use-package json-mode
   :ensure t
   :diminish
-  :hook (json-mode . prettier-js-mode)
+  :hook (json-mode . prettier-mode)
   :custom
   (make-local-variable 'js-indent-level)
   (js-indent-level 2))
@@ -1323,7 +1333,7 @@
   :ensure t
   :diminish
   :mode (".yml" ".yaml")
-  :hook ((yaml-mode . prettier-js-mode)))
+  :hook ((yaml-mode . prettier-mode)))
 
 ;; CSV
 (use-package csv-mode
@@ -1617,7 +1627,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(eglot goto-last-change sudo-edit prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-js org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(eglot goto-last-change sudo-edit prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 

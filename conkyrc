@@ -48,6 +48,12 @@ conky.text = [[
   ${font :BOLD}Uptime${font}${alignr}${uptime_short}
   ${font :BOLD}Load${font}${alignr}${loadavg}
 
+  ${font :BOLD}Processes${font}
+  ${voffset -10}${hr}
+  ${font :BOLD}Total${font}${alignr}$processes
+  ${font :BOLD}Running${font}${alignr}$running_processes
+  ${font :BOLD}Threads${font}${alignr}$running_threads
+
   ${font :BOLD}CPU${alignr}${cpu cpu0}%${font}
   ${voffset -10}${hr}
   ${font :BOLD}${top name 1}${font}${alignr}${top cpu 1}%
@@ -72,6 +78,7 @@ conky.text = [[
   ${font :BOLD}NETWORK${font}
   ${voffset -10}${hr}
   ${font :BOLD}SSID${font}${alignr}${wireless_essid wlp0s20f3}
+  ${font :BOLD}Address${font}${alignr}${addr wlp0s20f3}
   ${font :BOLD}Download${font}${alignr}${downspeed wlp0s20f3}
   ${font :BOLD}Upload${font}${alignr}${upspeed wlp0s20f3}
 

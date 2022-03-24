@@ -39,6 +39,7 @@ alias tree='tree -C'
 alias cp='cp --verbose --interactive'
 alias mv='mv --verbose --interactive'
 alias rm='rm --verbose'
+alias grep='grep --line-number --color=always'
 
 # less
 export LESSOPEN="| src-hilite-lesspipe.sh %s"
@@ -53,9 +54,6 @@ export GOPATH=$HOME/info/go
 export GO111MODULE=on
 
 export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin
-
-# NodeJS/NPM
-npm config set prefix ~/.npm
 
 # NPM auto completion
 if type complete &>/dev/null; then
@@ -126,7 +124,7 @@ update(){
     sudo pacman -Syu
     aur -Syu
     npm update -g
-    pnpm update -g
+    # pnpm update -g
 }
 
 loop(){
@@ -171,3 +169,8 @@ vterm_printf(){
 autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 source ~/.rush_auto_completion
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

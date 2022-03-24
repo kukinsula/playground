@@ -118,7 +118,10 @@ sudo pacman -S \
   xclip \
   cups \
   seahorse \
-  autossh
+  autossh \
+  gnome-calculator \
+  gdb \
+  valgrind
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
@@ -181,6 +184,8 @@ paru -S \
   mononoki \
   xarchiver \
   ytop-bin \
+  lightdm-gtk-greeter-settings \
+  google-chrome
 
 # TLP
 sudo systemctl enable tlp.service
@@ -197,7 +202,9 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
 
-# Node
+# NodeJS/NPM
+npm config set prefix ~/.npm
+
 npm install -g \
   c8 \
   flamebearer \
