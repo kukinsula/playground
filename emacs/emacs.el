@@ -64,8 +64,6 @@
 
 ;; TODO
 ;;
-;; * ag search specific directory
-;;
 ;; * Compilation: preserve buffer on failures
 
 (setq byte-compile-warnings '(not obsolete))
@@ -605,6 +603,7 @@
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-unset-key (kbd "<C-mouse-5>"))
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
+(global-unset-key (kbd "<C-c C-c>"))
 
 ;; Disable C-x C-c
 (global-set-key (kbd "C-x C-c") nil)
@@ -1070,6 +1069,36 @@
     :fringe-face 'flycheck-fringe-info
     :info-list-face 'flycheck-info-list-info)
 
+  ;; ESLint: way too slow
+  ;; ;; disable jshint since we prefer eslint checking
+  ;; (setq-default flycheck-disabled-checkers
+  ;;               (append flycheck-disabled-checkers
+  ;;                       '(javascript-jshint)))
+
+  ;; ;; use eslint with web-mode for jsx files
+  ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
+
+  ;; ;; customize flycheck temp file prefix
+  ;; (setq-default flycheck-temp-prefix ".flycheck")
+
+  ;; ;; disable json-jsonlist checking for json files
+  ;; (setq-default flycheck-disabled-checkers
+  ;;               (append flycheck-disabled-checkers
+  ;;                       '(json-jsonlist)))
+
+  ;; (defun my/use-eslint-from-node-modules ()
+  ;;   (let* ((root (locate-dominating-file
+  ;;                 (or (buffer-file-name) default-directory)
+  ;;                 "node_modules"))
+  ;;          (eslint (and root
+  ;;                       (expand-file-name "node_modules/eslint/bin/eslint.js"
+  ;;                                         root))))
+  ;;     (when (and eslint (file-executable-p eslint))
+  ;;       (setq-local flycheck-javascript-eslint-executable eslint))))
+  ;; (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
+
+  ;;
+
   :commands (flycheck-add-mode))
 
 (use-package vterm
@@ -1095,10 +1124,8 @@
 (use-package compile
   :ensure t
   :diminish
-  ;; :bind (("C-c C-c" . compile)
-  ;;        ("C-c C-r" . recompile))
-
   :custom
+  (compilation-save-buffers-predicate nil)
   (compilation-finish-functions
    (lambda (buffer str)
      (if (null (string-match ".*exited abnormally.*" str))
@@ -1124,6 +1151,8 @@
 (use-package multi-compile
   :ensure t
   :diminish
+  :bind (("C-c C-c" . multi-compile-run)
+         ("C-c C-r" . recompile))
   :custom
   (multi-compile-completion-system 'ivy)
   (multi-compile-alist '(
@@ -1144,21 +1173,61 @@
                                              ("rush check" . "rush check")
                                              ("rush scan" . "rush scan")))
 
+                         ;; JSON
+                         (json-mode . (
+                                       ;; NPM
+                                       ("npm run build" . "npm run build")
+                                       ("npm run lint" . "npm run lint")
+                                       ("npm run start" . "npm run start")
+                                       ("npm run test" . "npm run test")
+
+                                       ;; Rush
+                                       ("rush build" . "rush build --verbose")
+                                       ("rush rebuild" . "rush rebuild --verbose")
+                                       ("rush install" . "rush install --verbose")
+                                       ("rush update" . "rush update")
+                                       ("rush test" . "rush test --verbose")
+                                       ("rush lint" . "rush lint --verbose")
+                                       ("rush check" . "rush check")
+                                       ("rush scan" . "rush scan")))
+
+                         ;; YAML
+                         (yaml-mode . (
+                                       ;; NPM
+                                       ("npm run build" . "npm run build")
+                                       ("npm run lint" . "npm run lint")
+                                       ("npm run start" . "npm run start")
+                                       ("npm run test" . "npm run test")
+
+                                       ;; Rush
+                                       ("rush build" . "rush build --verbose")
+                                       ("rush rebuild" . "rush rebuild --verbose")
+                                       ("rush install" . "rush install --verbose")
+                                       ("rush update" . "rush update")
+                                       ("rush test" . "rush test --verbose")
+                                       ("rush lint" . "rush lint --verbose")
+                                       ("rush check" . "rush check")
+                                       ("rush scan" . "rush scan")))
+
                          ;; Golang
                          (go-mode . (("go build" . "go build")
-                                     ("go run" . "go run")))))
-  :bind (("C-c C-c" . multi-compile-run)
-         ("C-c C-r" . recompile)))
+                                     ("go run" . "go run")))
 
-;; Colorise some keywords
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)" 1 '(:foreground "gold1") t)))
+                         ;;;; C (doesn't work...)
+                         ;; (c-mode . (("make" . "make")
+                         ;;            ("make 2" . "make")))
 
-            (font-lock-add-keywords nil '(("'\\(DEBUG\\|debug\\)'" 1 '(:foreground "deep sky blue") t)))
-            (font-lock-add-keywords nil '(("'\\(INFO\\|info\\)'" 1 '(:foreground "medium spring green") t)))
-            (font-lock-add-keywords nil '(("'\\(WARN\\|warn\\)'" 1 '(:foreground "chocolate1") t)))
-            (font-lock-add-keywords nil '(("'\\(ERROR\\|error\\)'" 1 '(:foreground "firebrick1") t)))))
+                         ))
+
+  ;; Colorise some keywords
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)" 1 '(:foreground "gold1") t)))
+
+              (font-lock-add-keywords nil '(("'\\(DEBUG\\|debug\\)'" 1 '(:foreground "deep sky blue") t)))
+              (font-lock-add-keywords nil '(("'\\(INFO\\|info\\)'" 1 '(:foreground "medium spring green") t)))
+              (font-lock-add-keywords nil '(("'\\(WARN\\|warn\\)'" 1 '(:foreground "chocolate1") t)))
+              (font-lock-add-keywords nil '(("'\\(ERROR\\|error\\)'" 1 '(:foreground "firebrick1") t))))))
 
 (use-package neotree
   :ensure t
@@ -1174,6 +1243,7 @@
   :ensure t
   :diminish
   :after (projectile)
+  :bind ("C-S-M-s" . ag-regexp)
   :custom
   (ag-highlight-search t)
   (ag-reuse-buffers nil)
