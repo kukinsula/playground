@@ -220,7 +220,8 @@ npm install -g \
   @microsoft/rush \
   ts-node-dev \
   tsun \
-  migrate-mongo
+  migrate-mongo \
+  eslint_d
 
 # Docker
 sudo groupadd docker

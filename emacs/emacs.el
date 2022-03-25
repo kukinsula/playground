@@ -22,9 +22,7 @@
 ;;
 ;;   - M-x all-the-icons-install-fonts
 ;;
-;;; TODO:
-;;
-;; Flycheck ESLint
+;;; TOTEST:
 ;;
 ;; LSP: JS/TSX/JSX, Golang, HTML, PHP, LateX, Python, Org
 ;;
@@ -65,6 +63,8 @@
 ;; TODO
 ;;
 ;; * Compilation: preserve buffer on failures
+;;
+;; * edit root/ssh files
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -1016,7 +1016,6 @@
   :custom
   (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch))
   (flycheck-idle-buffer-switch-delay 0.5)
-  ;; (flycheck-javascript-eslint-executable "eslint_d")
   :bind (("M-n" . flycheck-next-error)
          ("M-p" . flycheck-previous-error))
   :config
@@ -1069,35 +1068,15 @@
     :fringe-face 'flycheck-fringe-info
     :info-list-face 'flycheck-info-list-info)
 
-  ;; ESLint: way too slow
-  ;; ;; disable jshint since we prefer eslint checking
-  ;; (setq-default flycheck-disabled-checkers
-  ;;               (append flycheck-disabled-checkers
-  ;;                       '(javascript-jshint)))
-
-  ;; ;; use eslint with web-mode for jsx files
-  ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
-
-  ;; ;; customize flycheck temp file prefix
-  ;; (setq-default flycheck-temp-prefix ".flycheck")
-
-  ;; ;; disable json-jsonlist checking for json files
-  ;; (setq-default flycheck-disabled-checkers
-  ;;               (append flycheck-disabled-checkers
-  ;;                       '(json-jsonlist)))
-
-  ;; (defun my/use-eslint-from-node-modules ()
-  ;;   (let* ((root (locate-dominating-file
-  ;;                 (or (buffer-file-name) default-directory)
-  ;;                 "node_modules"))
-  ;;          (eslint (and root
-  ;;                       (expand-file-name "node_modules/eslint/bin/eslint.js"
-  ;;                                         root))))
-  ;;     (when (and eslint (file-executable-p eslint))
-  ;;       (setq-local flycheck-javascript-eslint-executable eslint))))
-  ;; (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
-
-  ;;
+  ;; ESLint
+  ;; Disable jshint and json-jsonlist
+  (setq-default flycheck-disabled-checkers
+                (append flycheck-disabled-checkers
+                        '(javascript-jshint json-jsonlist)))
+  ;; Customize flycheck temp file prefix
+  (setq-default flycheck-temp-prefix ".flycheck")
+  ;; Set ESLint executable to eslint_d
+  (setq flycheck-javascript-eslint-executable "eslint_d")
 
   :commands (flycheck-add-mode))
 
@@ -1329,7 +1308,12 @@
   (defun setup-tide ()
     "Setup tide environment."
     (tide-setup)
-    (tide-hl-identifier-mode))
+    (tide-hl-identifier-mode)
+
+    ;; Use ESLint with tide-mode
+    (flycheck-add-mode 'javascript-eslint 'tide-mode)
+    (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append))
+
   :mode (("\\.tsx\\'" . typescript-mode)
          ("\\.jsx\\'" . typescript-mode)
          ("\\.js\\'" . typescript-mode))
@@ -1360,7 +1344,6 @@
                          :insertSpaceBeforeTypeAnnotation nil
                          :insertSpaceAfterTypeAssertion nil))
   :hook ((typescript-mode . setup-tide)
-         ;; (before-save . tide-format-before-save)
          (typescript-mode . prettier-mode))
   :bind (("C-c C-t r s" . tide-rename-symbol)
          ("C-c C-t r f" . tide-rename-file)
@@ -1605,18 +1588,19 @@
   :diminish
   :config (pdf-tools-install))
 
-(use-package tramp
-  :diminish
-  :disabled t
-  :custom
-  (tramp-default-method "ssh"))
+;; (use-package tramp
+;;   :diminish
+;;   :disabled t
+;;   :custom
+;;   (tramp-default-method "ssh"))
 
 ;; (use-package sudo-edit
 ;;   :ensure t
 ;;   :diminish
+;;   :disabled t
 ;;   :config (sudo-edit-indicator-mode)
-;; :bind (:map ctl-x-map
-;;             ("M-s" . sudo-edit)))
+;;   :bind (:map ctl-x-map
+;;               ("M-s" . sudo-edit)))
 
 ;; (use-package auto-sudoedit
 ;;   :ensure t
