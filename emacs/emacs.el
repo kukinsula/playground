@@ -62,6 +62,10 @@
 
 ;; TODO
 ;;
+;; * ESLint : multi compilation to use eslint_d
+;;
+;; * Flycheck : list errors of project
+;;
 ;; * Compilation: preserve buffer on failures
 ;;
 ;; * edit root/ssh files
@@ -1118,6 +1122,8 @@
 
   (compilation-scroll-output 'first-error)
   (compilation-always-kill t)
+
+  ;; NodeJS/tsc error compilation error regexp
   (compilation-error-regexp-alist-alist
    (cons '(node "^[  ]+at \\(?:[^\(\n]+ \(\\)?\\([a-zA-Z\.0-9_/-]+\\):\\([0-9]+\\):\\([0-9]+\\)\)?$"
                 1 ;; file
@@ -1139,6 +1145,7 @@
                                              ;; NPM
                                              ("npm run build" . "npm run build")
                                              ("npm run lint" . "npm run lint")
+                                             ("npm run eslint" . "npm run lint:eslint")
                                              ("npm run start" . "npm run start")
                                              ("npm run test" . "npm run test")
 
@@ -1196,17 +1203,17 @@
                          ;; (c-mode . (("make" . "make")
                          ;;            ("make 2" . "make")))
 
-                         ))
+                         )))
 
-  ;; Colorise some keywords
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)" 1 '(:foreground "gold1") t)))
+;; Colorise some keywords
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\|DONE\\|NOTE\\)" 1 '(:foreground "gold1") t)))
 
-              (font-lock-add-keywords nil '(("'\\(DEBUG\\|debug\\)'" 1 '(:foreground "deep sky blue") t)))
-              (font-lock-add-keywords nil '(("'\\(INFO\\|info\\)'" 1 '(:foreground "medium spring green") t)))
-              (font-lock-add-keywords nil '(("'\\(WARN\\|warn\\)'" 1 '(:foreground "chocolate1") t)))
-              (font-lock-add-keywords nil '(("'\\(ERROR\\|error\\)'" 1 '(:foreground "firebrick1") t))))))
+            (font-lock-add-keywords nil '(("'\\(DEBUG\\|debug\\)'" 1 '(:foreground "deep sky blue") t)))
+            (font-lock-add-keywords nil '(("'\\(INFO\\|info\\)'" 1 '(:foreground "medium spring green") t)))
+            (font-lock-add-keywords nil '(("'\\(WARN\\|warn\\)'" 1 '(:foreground "chocolate1") t)))
+            (font-lock-add-keywords nil '(("'\\(ERROR\\|error\\)'" 1 '(:foreground "firebrick1") t)))))
 
 (use-package neotree
   :ensure t
@@ -1366,6 +1373,12 @@
 (use-package prettier
   :ensure t
   :diminish)
+
+;; ESLint errors regexp in compilation buffer
+(use-package compile-eslint
+  :load-path "elpa/compile-eslint"
+  :config
+  (push 'eslint compilation-error-regexp-alist))
 
 (use-package add-node-modules-path
   :ensure t
@@ -1681,7 +1694,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(eglot goto-last-change sudo-edit prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(compile-eslint goto-last-change sudo-edit prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
