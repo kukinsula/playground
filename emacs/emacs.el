@@ -24,33 +24,32 @@
 ;;
 ;;; TOTEST:
 ;;
-;; LSP: JS/TSX/JSX, Golang, HTML, PHP, LateX, Python, Org
+;; * LSP: JS/TSX/JSX, Golang, HTML, PHP, LateX, Python, Org
 ;;
-;; transformer en fichier ORG avec des insert src elisp
+;; * transformer en fichier ORG avec des insert src elisp
 ;;
-;; tester https://github.com/felipeochoa/rjsx-mode
+;; * tester https://github.com/felipeochoa/rjsx-mode
 ;;
-;; ELisp format on save
+;; * ELisp format on save
 ;;
-;; vterm
+;; * vterm
 ;;
-;; Tester:
-;;   selectrum: https://github.com/raxod502/selectrum
-;;   DAP https://github.com/emacs-lsp/dap-mode
+;; * selectrum: https://github.com/raxod502/selectrum
+;; * DAP https://github.com/emacs-lsp/dap-mode
 ;;
-;; ElDoc
-;; Prisme.el
-;; DAP
+;; * ElDoc
+;; * Prisme.el
+;; * DAP
 ;;
-;; flycheck-checker-error-threshold
+;; * flycheck-checker-error-threshold
 ;;
-;; Désactiver pleins de trucs si on est en mode text
+;; * Désactiver pleins de trucs si on est en mode text
 ;;
-;; Conserver la text scale après un revert-buffer/revert-all-buffers F5
+;; * Popper.el
 ;;
-;; Popper.el
+;; * pixel-scroll-mode
 ;;
-;; pixel-scroll-mode
+;; * quelpa
 
 ;;; Code:
 
@@ -68,7 +67,7 @@
 ;;
 ;; * Compilation: preserve buffer on failures
 ;;
-;; * edit root/ssh files
+;; * edit root/ssh files (tramp?)
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -169,8 +168,8 @@
       auto-save-list-file-prefix "~/.emacs.d/auto-saves/saves-"
       auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-saves/" t)))
 
-(defun save-all () (interactive) (save-some-buffers t))
-(global-set-key (kbd "C-x s") 'save-all)
+;; Don't ask confirmation when saving all buffers
+(global-set-key (kbd "C-x s") (lambda () (interactive) (save-some-buffers t)))
 
 ;; Backup files
 (setq backup-directory-alist `(("." . "~/.emacs.d/backups"))
@@ -609,6 +608,15 @@
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
 (global-unset-key (kbd "<C-c C-c>"))
 
+;; Conserve text scale when revert-buffer is invoqued
+(add-hook 'before-revert-hook (lambda ()
+                                (interactive)
+                                (defvar text-scale-previous
+                                  (buffer-local-value 'text-scale-mode-amount (current-buffer)))))
+(add-hook 'after-revert-hook (lambda ()
+                               (interactive)
+                               (text-scale-increase (defvar text-scale-previous))))
+
 ;; Disable C-x C-c
 (global-set-key (kbd "C-x C-c") nil)
 
@@ -867,8 +875,6 @@
   '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
   '(magit-reflog-other ((t (:foreground "#95FFA4"))))
   '(magit-reflog-remote ((t (:foreground "#95FFA4")))))
-
-
 
 ;; Company-mode
 (use-package company
@@ -1148,6 +1154,7 @@
                                              ("npm run build" . "npm run build")
                                              ("npm run lint" . "npm run lint")
                                              ("npm run eslint" . "npm run lint:eslint")
+                                             ("npm run eslint_d" . "eslint_d ./**")
                                              ("npm run start" . "npm run start")
                                              ("npm run test" . "npm run test")
 
