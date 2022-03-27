@@ -868,6 +868,8 @@
   '(magit-reflog-other ((t (:foreground "#95FFA4"))))
   '(magit-reflog-remote ((t (:foreground "#95FFA4")))))
 
+
+
 ;; Company-mode
 (use-package company
   :ensure t
@@ -1357,7 +1359,7 @@
          ("C-c C-t f r" . tide-references)
          ("C-c C-t i j" . tide-jsdoc-template)
          ("C-c C-t e" . tide-project-errors)
-         ("C-c C-t p" . prettier-prettify-region))
+         ("C-c C-t p" . prettier-prettify))
   :custom-face
   (tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
 
