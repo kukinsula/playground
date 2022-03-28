@@ -33,12 +33,12 @@
       type = Window
       parent = ""
       order = 0
-      position = 0:29
+      position = 0:34
       maximised = True
       fullscreen = False
-      size = 1920, 1143
-      title = kuk@x1-carbon:~/info/damapp/apps/api
-      last_active_term = 8a6a2310-3026-49f2-a29e-ea8aa34338eb
+      size = 1920, 1018
+      title = Dametis dev
+      last_active_term = d8178671-7887-4a8f-b9ab-55963d02fb1e
       last_active_window = True
     [[[child1]]]
       type = HPaned
@@ -59,7 +59,7 @@
       order = 1
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
-      command = ssh dev.console.influx && bash
+      command = ssh dev.console.clickhouse && bash
   [[Dametis qualif]]
     [[[child0]]]
       type = Window
