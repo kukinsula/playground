@@ -879,6 +879,34 @@
   '(magit-reflog-other ((t (:foreground "#95FFA4"))))
   '(magit-reflog-remote ((t (:foreground "#95FFA4")))))
 
+(use-package magit-log
+  :preface
+  (defun magit-log--abbreviate-author (&rest args)
+    "The first arg is AUTHOR, abbreviate it.
+First Last  -> F Last
+First.Last  -> F Last
+Last, First -> F Last
+First       -> First (no change).
+
+It is assumed that the author has only one or two names."
+    ;; ARGS               -> '((REV AUTHOR DATE))
+    ;; (car ARGS)         -> '(REV AUTHOR DATE)
+    ;; (nth 1 (car ARGS)) -> AUTHOR
+    (let* ((author (nth 1 (car args)))
+           (author-abbr (if (string-match-p "," author)
+                            ;; Last, First -> F Last
+                            (replace-regexp-in-string "\\(.*?\\), *\\(.\\).*" "\\2 \\1" author)
+                          ;; First Last -> F Last
+                          (replace-regexp-in-string "\\(.\\).*?[. ]+\\(.*\\)" "\\1 \\2" author))))
+      (setf (nth 1 (car args)) author-abbr))
+    (car args))
+
+  :custom
+  (magit-log-margin '(t age-abbreviated magit-log-margin-width :author 8))
+
+  :config
+  (advice-add 'magit-log-format-margin :filter-args #'modi/magit-log--abbreviate-author))
+
 ;; Company-mode
 (use-package company
   :ensure t
