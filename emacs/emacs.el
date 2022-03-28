@@ -50,6 +50,8 @@
 ;; * pixel-scroll-mode
 ;;
 ;; * quelpa
+;;
+;; * desktop sessions
 
 ;;; Code:
 
@@ -229,9 +231,10 @@
 (global-set-key (kbd "<M-S-right>") 'enlarge-window-horizontally)
 
 ;; TODO: save sessions
-;; (use-package desktop
-;;   :config (desktop-save-mode)
-;;   :custom (desktop-path '("~/.emacs.d/desktops/")))
+(use-package desktop
+  ;; :config (desktop-save-mode)
+  :custom
+  (desktop-path '("~/.emacs.d/desktops/")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           ;;
