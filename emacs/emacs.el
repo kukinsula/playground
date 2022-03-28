@@ -1153,7 +1153,7 @@
                                              ;; NPM
                                              ("npm run build" . "npm run build")
                                              ("npm run lint" . "npm run lint")
-                                             ("npm run eslint" . "npm run lint:eslint")
+                                             ("npm run eslint" . "npm run lint:eslint -- --quiet")
                                              ("npm run eslint_d" . "eslint_d ./**")
                                              ("npm run start" . "npm run start")
                                              ("npm run test" . "npm run test")
