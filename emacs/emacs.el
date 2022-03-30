@@ -70,6 +70,8 @@
 ;; * Compilation: preserve buffer on failures
 ;;
 ;; * edit root/ssh files (tramp?)
+;;
+;; * Magit merge diff (left | right) smerge-mode ?
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -513,7 +515,13 @@
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-x 8 RET" . counsel-unicode-char)
-         ("C-S-b" . counsel-bookmark))
+         ("C-S-b" . counsel-bookmark)
+         ("M-y" . counsel-yank-pop)
+
+         ;; Doesn't compile...
+         ;; :map ivy-minibuffer-map
+         ;; ("M-y" . ivy-next-line)
+         )
   :custom (ivy-initial-inputs-alist nil))
 
 (use-package counsel-projectile
@@ -1734,7 +1742,7 @@ It is assumed that the author has only one or two names."
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(compile-eslint goto-last-change sudo-edit prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
