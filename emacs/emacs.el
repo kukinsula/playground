@@ -913,7 +913,7 @@ It is assumed that the author has only one or two names."
   (magit-log-margin '(t age-abbreviated magit-log-margin-width :author 8))
 
   :config
-  (advice-add 'magit-log-format-margin :filter-args #'modi/magit-log--abbreviate-author))
+  (advice-add 'magit-log-format-margin :filter-args #'magit-log--abbreviate-author))
 
 ;; Company-mode
 (use-package company
