@@ -72,6 +72,8 @@
 ;; * edit root/ssh files (tramp?)
 ;;
 ;; * Magit merge diff (left | right) smerge-mode ?
+;;
+;; * list of marks (list all via ivy)
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -349,7 +351,7 @@
   (doom-modeline-mode)
   :config
   (doom-modeline-def-modeline 'main
-    '(bar matches buffer-info buffer-position selection-info)
+    '(bar matches buffer-info buffer-position selection-info vcs)
     '(misc-info minor-modes major-mode process checker " "))
   :custom
   (doom-modeline-buffer-file-name-style 'buffer-name)
@@ -361,6 +363,7 @@
   (doom-modeline-checker-simple-format t)
   (doom-modeline-bar-width 10)
   (doom-modeline-height 25)
+  (doom-modeline-vcs-max-length 20)
   :commands (doom-modeline-def-modeline)
   :custom-face
   '(doom-modeline-bar ((t (:background "#906CFF"))))
@@ -804,8 +807,8 @@
 ;;                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Disable Version Control
-(setq vc-handled-backends nil)
+;; VC auto refresh git branch
+(setq auto-revert-check-vc-info t)
 
 ;; Magit
 (use-package magit
