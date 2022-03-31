@@ -92,6 +92,38 @@
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
       command = ssh qualif.console.influx && bash
+  [[Dametis demo]]
+    [[[child0]]]
+      type = Window
+      parent = ""
+      order = 0
+      position = 0:34
+      maximised = True
+      fullscreen = False
+      size = 1920, 1018
+      title = Dametis demo
+      last_active_term = d8178671-7887-4a8f-b9ab-55963d02fb1e
+      last_active_window = True
+    [[[child1]]]
+      type = HPaned
+      parent = child0
+      order = 0
+      position = 958
+      ratio = 0.5002610966057441
+    [[[terminal2]]]
+      type = Terminal
+      parent = child1
+      order = 0
+      profile = default
+      uuid = d8178671-7887-4a8f-b9ab-55963d02fb1e
+      command = ssh demo.console && bash
+    [[[terminal3]]]
+      type = Terminal
+      parent = child1
+      order = 1
+      profile = default
+      uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
+      command = ssh demo.console.influx && bash
   [[Dametis prod]]
     [[[child0]]]
       type = Window
@@ -124,75 +156,4 @@
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
       command = ssh prod.console.influx && bash
-  [[lol]]
-    [[[child0]]]
-      type = Window
-      parent = ""
-      order = 0
-      position = 0:0
-      maximised = True
-      fullscreen = True
-      size = 1920, 1080
-      title = LOL
-      last_active_term = b500d136-68c5-4f29-b046-96991ac1348e
-      last_active_window = True
-    [[[child1]]]
-      type = HPaned
-      parent = child0
-      order = 0
-      position = 1188
-      ratio = 0.6203655352480417
-    [[[child2]]]
-      type = VPaned
-      parent = child1
-      order = 0
-      position = 655
-      ratio = 0.6093023255813953
-    [[[terminal3]]]
-      type = Terminal
-      parent = child2
-      order = 0
-      profile = default
-      uuid = b500d136-68c5-4f29-b046-96991ac1348e
-      command = cmatrix | lolcat && zsh
-    [[[child4]]]
-      type = HPaned
-      parent = child2
-      order = 1
-      position = 673
-      ratio = 0.5688926458157227
-    [[[terminal5]]]
-      type = Terminal
-      parent = child4
-      order = 0
-      profile = default
-      uuid = db0d0d7b-3f3d-4237-81b6-66c0c4cc34c2
-      command = neofetch | lolcat && zsh
-    [[[terminal6]]]
-      type = Terminal
-      parent = child4
-      order = 1
-      profile = default
-      uuid = 2b0c5a75-f409-4778-ab08-18cc25922f78
-      command = for i in {1..10}; do sl | lolcat; done && zsh
-    [[[child7]]]
-      type = VPaned
-      parent = child1
-      order = 1
-      position = 655
-      ratio = 0.6093023255813953
-    [[[terminal8]]]
-      type = Terminal
-      parent = child7
-      order = 0
-      profile = default
-      uuid = 503aa626-6339-4e6a-9b93-c1a9fb9218f6
-      command = top | lolcat && zsh
-    [[[terminal9]]]
-      type = Terminal
-      parent = child7
-      order = 1
-      profile = default
-      uuid = 3c68cd57-1a84-424b-be67-2311fc9a1b2e
-      command = cava | lolcat && zsh
 [plugins]
