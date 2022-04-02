@@ -74,6 +74,8 @@
 ;; * Magit merge diff (left | right) smerge-mode ?
 ;;
 ;; * list of marks (list all via ivy)
+;;
+;; * Magit is current buffer untracked/modified/deleted/...
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -196,7 +198,8 @@
   (uniquify-buffer-name-style 'forward)
   (uniquify-separator "/")
   (uniquify-after-kill-buffer-p t)
-  (uniquify-ignore-buffers-re "^\\*"))
+  (uniquify-ignore-buffers-re "^\\*")
+  (uniquify-after-kill-buffer-p t))
 
 (global-eldoc-mode t)
 
@@ -364,6 +367,13 @@
   (doom-modeline-bar-width 10)
   (doom-modeline-height 25)
   (doom-modeline-vcs-max-length 20)
+  (doom-modeline-project-detection 'auto)
+  (doom-modeline-buffer-file-name-style 'relative-to-project)
+  (doom-modeline-buffer-modification-icon t)
+  (doom-modeline-buffer-name t)
+  (doom-modeline-enable-word-count nil)
+  (doom-modeline-checker-simple-format nil)
+  (doom-modeline-env-version nil)
   :commands (doom-modeline-def-modeline)
   :custom-face
   '(doom-modeline-bar ((t (:background "#906CFF"))))
