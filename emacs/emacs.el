@@ -35,10 +35,13 @@
 ;; * vterm
 ;;
 ;; * selectrum: https://github.com/raxod502/selectrum
+;;
 ;; * DAP https://github.com/emacs-lsp/dap-mode
 ;;
 ;; * ElDoc
+;;
 ;; * Prisme.el
+;;
 ;; * DAP
 ;;
 ;; * flycheck-checker-error-threshold
@@ -76,6 +79,20 @@
 ;; * list of marks (list all via ivy)
 ;;
 ;; * Magit is current buffer untracked/modified/deleted/...
+;;
+;; * Magit: bindings
+;;     - C-x g s => git status
+;;     - C-x g l => git log
+;;     - C-x g diff => git diff
+;;     - ...
+;;
+;; * tester le package blamer
+;;
+;; * ivy pos-frame center (M-x ET M-b)
+;;
+;; * git merge (smerge ? edfii ?)
+;;
+;; * zoom per window
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -356,8 +373,12 @@
   (doom-modeline-def-modeline 'main
     '(bar vcs buffer-info buffer-position selection-info)
     '(misc-info minor-modes process checker))
+
+  (doom-modeline-def-modeline 'minimal
+    '(buffer-info)
+    '(misc-info process checker))
   :custom
-  (doom-modeline-set-modeline 'main t)
+  (doom-modeline-set-modeline 'main 'default)
   (size-indication-mode nil)
   (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-minor-modes t)
@@ -376,7 +397,6 @@
   (doom-modeline-enable-word-count nil)
   (doom-modeline-checker-simple-format nil)
   (doom-modeline-env-version nil)
-  :commands (doom-modeline-def-modeline)
   :custom-face
   '(doom-modeline-bar ((t (:background "#906CFF"))))
   '(doom-modeline-bar-inactive ((t (:background "#191729")))))
@@ -1649,12 +1669,16 @@ It is assumed that the author has only one or two names."
   :preface
   (defun writeroom-toggle-on  ()
     (text-scale-increase 1)
-    (text-scale-increase 1))
+    (text-scale-increase 1)
+    (doom-modeline-set-modeline 'minimal))
   (defun writeroom-toggle-off  ()
     (text-scale-decrease 1)
-    (text-scale-decrease 1))
+    (text-scale-decrease 1)
+    (doom-modeline-set-modeline 'main))
   :bind ("<f6>" . writeroom-mode)
-  :custom (writeroom-restore-window-config 1)
+  :custom
+  (writeroom-restore-window-config 1)
+  (writeroom-mode-line t)
   :config
   (add-hook 'writeroom-mode-enable-hook 'writeroom-toggle-on)
   (add-hook 'writeroom-mode-disable-hook 'writeroom-toggle-off))
