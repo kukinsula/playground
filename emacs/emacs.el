@@ -86,8 +86,6 @@
 ;;     - C-x g diff => git diff
 ;;     - ...
 ;;
-;; * tester le package blamer
-;;
 ;; * ivy pos-frame center (M-x ET M-b)
 ;;
 ;; * git merge (smerge ? edfii ?)
@@ -922,33 +920,49 @@
   '(magit-reflog-other ((t (:foreground "#95FFA4"))))
   '(magit-reflog-remote ((t (:foreground "#95FFA4")))))
 
-(use-package magit-log
-  :preface
-  (defun magit-log--abbreviate-author (&rest args)
-    "The first arg is AUTHOR, abbreviate it.
+(defun git-log--abbreviate-author (&rest args)
+  "The first ARGS is AUTHOR, abbreviate it.
 First Last  -> F Last
 First.Last  -> F Last
 Last, First -> F Last
 First       -> First (no change).
 
 It is assumed that the author has only one or two names."
-    ;; ARGS               -> '((REV AUTHOR DATE))
-    ;; (car ARGS)         -> '(REV AUTHOR DATE)
-    ;; (nth 1 (car ARGS)) -> AUTHOR
-    (let* ((author (nth 1 (car args)))
-           (author-abbr (if (string-match-p "," author)
-                            ;; Last, First -> F Last
-                            (replace-regexp-in-string "\\(.*?\\), *\\(.\\).*" "\\2 \\1" author)
-                          ;; First Last -> F Last
-                          (replace-regexp-in-string "\\(.\\).*?[. ]+\\(.*\\)" "\\1 \\2" author))))
-      (setf (nth 1 (car args)) author-abbr))
-    (car args))
+  ;; ARGS               -> '((REV AUTHOR DATE))
+  ;; (car ARGS)         -> '(REV AUTHOR DATE)
+  ;; (nth 1 (car ARGS)) -> AUTHOR
+  (let* ((author (nth 1 (car args)))
+         (author-abbr (if (string-match-p "," author)
+                          ;; Last, First -> F Last
+                          (replace-regexp-in-string "\\(.*?\\), *\\(.\\).*" "\\2 \\1" author)
+                        ;; First Last -> F Last
+                        (replace-regexp-in-string "\\(.\\).*?[. ]+\\(.*\\)" "\\1 \\2" author))))
+    (setf (nth 1 (car args)) author-abbr))
+  (car args))
 
+(use-package magit-log
   :custom
   (magit-log-margin '(t age-abbreviated magit-log-margin-width :author 8))
 
   :config
-  (advice-add 'magit-log-format-margin :filter-args #'magit-log--abbreviate-author))
+  (advice-add 'magit-log-format-margin :filter-args #'git-log--abbreviate-author))
+
+(use-package blamer
+  :ensure t
+  :bind (("<C-x g b>" . blamer-show-commit-info))
+  :defer 20
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-min-offset 70)
+  (blamer-prettify-time-p nil)
+  (blamer-max-commit-message-length 80)
+  (blamer-author-formatter "%s ")
+  ;; (blamer-author-formatter git-log--abbreviate-author)
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                   :background nil
+                   :height 100
+                   :italic t))))
 
 ;; Company-mode
 (use-package company
@@ -1781,7 +1795,7 @@ It is assumed that the author has only one or two names."
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
