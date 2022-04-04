@@ -44,8 +44,6 @@
 ;;
 ;; * DAP
 ;;
-;; * flycheck-checker-error-threshold
-;;
 ;; * Désactiver pleins de trucs si on est en mode text
 ;;
 ;; * Popper.el
@@ -89,6 +87,8 @@
 ;; * git merge (smerge ? edfii ?)
 ;;
 ;; * zoom per window
+;;
+;; * custom-faces: les dégager et utiliser que des use-package :custom-face
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -856,7 +856,6 @@
   :ensure t
   :diminish
   :preface
-
   (setq magit-display-buffer-function
         (lambda (buffer)
           (display-buffer
@@ -1128,6 +1127,7 @@ It is assumed that the author has only one or two names."
   :custom
   (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch))
   (flycheck-idle-buffer-switch-delay 0.5)
+  (flycheck-checker-error-threshold 2000)
   :bind (("M-n" . flycheck-next-error)
          ("M-p" . flycheck-previous-error))
   :config
@@ -1800,6 +1800,14 @@ It is assumed that the author has only one or two names."
           (rename-file filename new-name t)
           (set-visited-file-name new-name t t)))))))
 
+(defun sudo-open ()
+  "Like `find-file', but with root rights using TRAMP"
+  (interactive)
+  (let ((file (read-file-name "Open as root: ")))
+    (unless (file-writable-p file)
+      (find-file (concat "/sudo:root@localhost:" file)))))
+(global-set-key (kbd "C-x F") #'sudo-open)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -1817,7 +1825,7 @@ It is assumed that the author has only one or two names."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))))
- '(blamer-face ((t :foreground "#7a88cf" :background nil :height 140 :italic t)))
+ '(blamer-face ((t :foreground "#7a88cf" :background nil :height 100 :italic t)))
  '(company-template-field ((t (:inherit company-box-scrollbar))))
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
