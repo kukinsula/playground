@@ -1761,16 +1761,6 @@ It is assumed that the author has only one or two names."
   :config
   (global-set-key (kbd "C-x -") #'goto-last-change))
 
-(defun goto-line-show ()
-  "Show line numbers temporarily, while prompting for the line number input."
-  (interactive)
-  (unwind-protect
-      (progn
-        (linum-mode 1)
-        (call-interactively #'goto-line))
-    (linum-mode -1)))
-(global-set-key (kbd "M-g M-g") 'goto-line-show)
-
 ;; Copy filename to clipboard
 (defun copy-filename-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
