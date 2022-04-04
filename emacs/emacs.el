@@ -585,6 +585,7 @@
   :diminish
   :after (ivy)
   :custom
+  (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
   (ivy-posframe-parameters '((left-fringe . 1)
                              (right-fringe . 1)
                              (internal-border-width . 4)))
