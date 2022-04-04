@@ -354,9 +354,11 @@
   (doom-modeline-mode)
   :config
   (doom-modeline-def-modeline 'main
-    '(bar matches vcs buffer-info buffer-position selection-info)
-    '(misc-info minor-modes major-mode process checker " "))
+    '(bar vcs buffer-info buffer-position selection-info)
+    '(misc-info minor-modes process checker))
   :custom
+  (doom-modeline-set-modeline 'main t)
+  (size-indication-mode nil)
   (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-minor-modes t)
   (doom-modeline-buffer-encoding nil)
