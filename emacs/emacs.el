@@ -583,16 +583,13 @@
 (use-package ivy-posframe
   :ensure t
   :diminish
-  :after (ivy)
   :custom
   (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
-  (ivy-posframe-parameters '((left-fringe . 1)
-                             (right-fringe . 1)
-                             (internal-border-width . 4)))
-  (ivy-posframe-border-width 4)
   (ivy-posframe-width 150)
   :custom-face
-  (ivy-posframe ((t (:background "#141321" :foreground "#CBE3E7" :weight bold))))
+  (ivy-posframe ((t (:background "#1E1C31" :foreground "#CBE3E7" :weight bold))))
+  (ivy-posframe-border ((t (:background "#CBE3E7"))))
+  ;; (ivy-posframe-cursor ((t (:background "#CBE3E7"))))
   :config
   (ivy-posframe-mode 1))
 
