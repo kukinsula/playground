@@ -533,7 +533,7 @@
   (enable-recursive-minibuffers t)
   (ivy-dynamic-exhibit-delay-ms 250)
   :custom-face
-  (ivy-current-match ((t (:foreground "#CBE3E7" :weight bold :background "#39374E"))))
+  (ivy-current-match ((t (:weight bold :background "#24213b"))))
   (ivy-minibuffer-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
@@ -1103,7 +1103,8 @@ It is assumed that the author has only one or two names."
   :ensure t
   :diminish
   :defer t
-  :custom (ivy-rich-path-style 'absolute)
+  :custom
+  (ivy-rich-path-style 'abbrev)
   :init (ivy-rich-mode))
 
 ;; Show quick tooltip
