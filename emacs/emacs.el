@@ -86,8 +86,6 @@
 ;;     - C-x g diff => git diff
 ;;     - ...
 ;;
-;; * ivy pos-frame center (M-x ET M-b)
-;;
 ;; * git merge (smerge ? edfii ?)
 ;;
 ;; * zoom per window
@@ -581,6 +579,21 @@
 (define-key ivy-minibuffer-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
 (define-key swiper-map (kbd "<ESC>") 'minibuffer-keyboard-quit)
 (global-set-key (kbd "<M-backspace>") 'backward-kill-word)
+
+(use-package ivy-posframe
+  :ensure t
+  :diminish
+  :after (ivy)
+  :custom
+  (ivy-posframe-parameters '((left-fringe . 1)
+                             (right-fringe . 1)
+                             (internal-border-width . 4)))
+  (ivy-posframe-border-width 4)
+  (ivy-posframe-width 150)
+  :custom-face
+  (ivy-posframe ((t (:background "#141321" :foreground "#CBE3E7" :weight bold))))
+  :config
+  (ivy-posframe-mode 1))
 
 ;; Improves sorting for fuzzy-matched results
 (use-package flx
@@ -1795,7 +1808,7 @@ It is assumed that the author has only one or two names."
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes '(default))
  '(package-selected-packages
-   '(blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(ivy-posframe blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
@@ -1805,6 +1818,7 @@ It is assumed that the author has only one or two names."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(blamer-face ((t :foreground "#7a88cf" :background nil :height 140 :italic t)))
  '(company-template-field ((t (:inherit company-box-scrollbar))))
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
