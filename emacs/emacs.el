@@ -89,6 +89,14 @@
 ;; * zoom per window
 ;;
 ;; * custom-faces: les dégager et utiliser que des use-package :custom-face
+;;
+;; * prettierd
+;;
+;; * ivy: minibuffer gets bigger on M-x C-s ...
+;;
+;; * ivy-posframe is one line too tall
+;;
+;; * M-b remove file-size column
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -307,8 +315,8 @@
 (setq-default fill-column 80)
 (global-so-long-mode t)
 
-;; Display the size of the buffer
-(size-indication-mode t)
+;; Don't display the size of the buffer
+(size-indication-mode nil)
 
 ;; Fringe size (LEFT . RIGHT)
 (set-fringe-mode '(10 . 0))
@@ -367,12 +375,12 @@
   (doom-modeline-mode)
   :config
   (doom-modeline-def-modeline 'main
-    '(bar vcs buffer-info buffer-position selection-info)
-    '(misc-info minor-modes process checker))
+    '(bar vcs buffer-info)
+    '(misc-info buffer-position process checker))
 
   (doom-modeline-def-modeline 'minimal
     '(buffer-info)
-    '(misc-info process checker))
+    '(misc-info buffer-position process checker))
   :custom
   (doom-modeline-set-modeline 'main 'default)
   (size-indication-mode nil)
@@ -527,7 +535,7 @@
   :custom
   (ivy-height 15)
   (ivy-use-virtual-buffers nil)
-  (ivy-virtual-abbreviate 'name)
+  (ivy-virtual-abbreviate 'abbreviate)
   (ivy-wrap t)
   (ivy-count-format "【%d / %d】 ")
   (enable-recursive-minibuffers t)
@@ -1094,6 +1102,8 @@ It is assumed that the author has only one or two names."
   :ensure t
   :diminish
   :defer t
+  :custom
+  (all-the-icons-ivy-rich-color-icon t)
   :init (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
