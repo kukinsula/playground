@@ -97,6 +97,8 @@
 ;; * ivy-posframe is one line too tall
 ;;
 ;; * M-b remove file-size column
+;;
+;; * doom-modeline : inactive window adds spaces before buffer name
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -375,7 +377,7 @@
   (doom-modeline-mode)
   :config
   (doom-modeline-def-modeline 'main
-    '(bar vcs buffer-info)
+    '(bar buffer-info)
     '(misc-info buffer-position process checker))
 
   (doom-modeline-def-modeline 'minimal
@@ -857,7 +859,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; VC auto refresh git branch
-(setq auto-revert-check-vc-info t)
+(setq vc-handled-backends nil)
+(setq auto-revert-check-vc-info nil)
 
 ;; Magit
 (use-package magit
@@ -1267,6 +1270,7 @@ It is assumed that the author has only one or two names."
                                              ("npm run eslint_d" . "eslint_d ./**")
                                              ("npm run start" . "npm run start")
                                              ("npm run test" . "npm run test")
+                                             ("npm run clean" . "npm run clean")
 
                                              ;; Rush
                                              ("rush build" . "rush build --verbose")
@@ -1276,7 +1280,8 @@ It is assumed that the author has only one or two names."
                                              ("rush test" . "rush test --verbose")
                                              ("rush lint" . "rush lint --verbose")
                                              ("rush check" . "rush check")
-                                             ("rush scan" . "rush scan")))
+                                             ("rush scan" . "rush scan")
+                                             ("rush clean" . "rush clean")))
 
                          ;; JSON
                          (json-mode . (
@@ -1285,6 +1290,7 @@ It is assumed that the author has only one or two names."
                                        ("npm run lint" . "npm run lint")
                                        ("npm run start" . "npm run start")
                                        ("npm run test" . "npm run test")
+                                       ("npm run clean" . "npm run clean")
 
                                        ;; Rush
                                        ("rush build" . "rush build --verbose")
@@ -1294,7 +1300,8 @@ It is assumed that the author has only one or two names."
                                        ("rush test" . "rush test --verbose")
                                        ("rush lint" . "rush lint --verbose")
                                        ("rush check" . "rush check")
-                                       ("rush scan" . "rush scan")))
+                                       ("rush scan" . "rush scan")
+                                       ("rush clean" . "rush clean")))
 
                          ;; YAML
                          (yaml-mode . (
@@ -1303,6 +1310,7 @@ It is assumed that the author has only one or two names."
                                        ("npm run lint" . "npm run lint")
                                        ("npm run start" . "npm run start")
                                        ("npm run test" . "npm run test")
+                                       ("npm run clean" . "npm run clean")
 
                                        ;; Rush
                                        ("rush build" . "rush build --verbose")
@@ -1312,7 +1320,8 @@ It is assumed that the author has only one or two names."
                                        ("rush test" . "rush test --verbose")
                                        ("rush lint" . "rush lint --verbose")
                                        ("rush check" . "rush check")
-                                       ("rush scan" . "rush scan")))
+                                       ("rush scan" . "rush scan")
+                                       ("rush clean" . "rush clean")))
 
                          ;; Golang
                          (go-mode . (("go build" . "go build")
