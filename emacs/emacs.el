@@ -94,7 +94,9 @@
 ;;
 ;; * ivy: minibuffer gets bigger on M-x C-s ...
 ;;
-;; * ivy-posframe is one line too tall
+;; * ivy-posframe
+;;     - is one line too tall
+;;     - should follow the content height or MAXIMUM height;;
 ;;
 ;; * M-b remove file-size column
 ;;
@@ -832,6 +834,16 @@
 (global-set-key (kbd "C-k") (lambda ()
                               (interactive)
                               (kill-whole-line)))
+
+(defun toggle-maximize-buffer ()
+  "Maximize buffer."
+  (interactive)
+  (if (= 1 (length (window-list)))
+      (jump-to-register '_)
+    (progn
+      (set-register '_ (list (current-window-configuration)))
+      (delete-other-windows))))
+(global-set-key (kbd "C-S-x") 'toggle-maximize-buffer)
 
 ;; Remove Server's new frame message)
 (add-hook 'server-after-make-frame-hook
@@ -1810,7 +1822,7 @@ It is assumed that the author has only one or two names."
           (set-visited-file-name new-name t t)))))))
 
 (defun sudo-open ()
-  "Like `find-file', but with root rights using TRAMP"
+  "Like `find-file', but with root rights using TRAMP."
   (interactive)
   (let ((file (read-file-name "Open as root: ")))
     (unless (file-writable-p file)
