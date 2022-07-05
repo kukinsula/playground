@@ -22,8 +22,8 @@ sudo reflector --age 6 --latest 10 --fastest 10 --threads 10 --sort rate --proto
 
 # Programs
 sudo pacman -S \
-  linux-hardened \
-  linux-zen \
+  # linux-hardened \
+  # linux-zen \
   linux-lts \
   git \
   tig \
@@ -177,7 +177,7 @@ paru -S \
   update-grub \
   virtualbox-ext-oracle \
   mugshot \
-  influxdb-cli \
+  # influxdb-cli \
   mongodb-shell \
   etcher-bin \
   ttf-symbola \
@@ -185,7 +185,8 @@ paru -S \
   xarchiver \
   ytop-bin \
   lightdm-gtk-greeter-settings \
-  google-chrome
+  google-chrome \
+  gitleaks
 
 # TLP
 sudo systemctl enable tlp.service
@@ -223,7 +224,7 @@ npm install -g \
   @microsoft/rush \
   ts-node-dev \
   tsun \
-  migrate-mongo \
+  # migrate-mongo \
   eslint_d
 
 # Docker

@@ -92,6 +92,8 @@
 ;;
 ;; * prettierd
 ;;
+;; * permettre de toggle thème sombre/clair
+;;
 ;; * ivy: minibuffer gets bigger on M-x C-s ...
 ;;
 ;; * ivy-posframe
@@ -101,6 +103,10 @@
 ;; * M-b remove file-size column
 ;;
 ;; * doom-modeline : inactive window adds spaces before buffer name
+;;
+;; * magit :
+;;     - modeline buffer-position is aligned on the left
+;;     - C-c C-k to abort any magit command
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -290,6 +296,8 @@
   :custom (global-hl-line-sticky-flag t)
   :custom-face (hl-line ((t (:extend t :background "#24213b")))))
 
+(setq-default truncate-lines t)
+
 ;; Indentation hightlight
 (use-package highlight-indent-guides
   :ensure t
@@ -381,7 +389,6 @@
   (doom-modeline-def-modeline 'main
     '(bar buffer-info)
     '(misc-info buffer-position process checker))
-
   (doom-modeline-def-modeline 'minimal
     '(buffer-info)
     '(misc-info buffer-position process checker))
@@ -982,10 +989,10 @@ It is assumed that the author has only one or two names."
 
 (use-package blamer
   :ensure t
-  :bind (("<C-x g b>" . blamer-show-commit-info))
   :defer 20
   :custom
-  (blamer-idle-time 0.3)
+  (blamer-idle-time 0)
+  (blamer-type 'both)
   (blamer-min-offset 70)
   (blamer-prettify-time-p nil)
   (blamer-max-commit-message-length 80)
@@ -994,7 +1001,7 @@ It is assumed that the author has only one or two names."
   :custom-face
   (blamer-face ((t :foreground "#7a88cf"
                    :background nil
-                   :height 100
+                   :height 0.8
                    :italic t))))
 
 ;; Company-mode
@@ -1282,6 +1289,7 @@ It is assumed that the author has only one or two names."
                                              ("npm run eslint_d" . "eslint_d ./**")
                                              ("npm run start" . "npm run start")
                                              ("npm run test" . "npm run test")
+                                             ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                              ("npm run clean" . "npm run clean")
 
                                              ;; Rush
@@ -1289,6 +1297,7 @@ It is assumed that the author has only one or two names."
                                              ("rush rebuild" . "rush rebuild --verbose")
                                              ("rush install" . "rush install --verbose")
                                              ("rush update" . "rush update")
+                                             ("rush purge" . "rush purge")
                                              ("rush test" . "rush test --verbose")
                                              ("rush lint" . "rush lint --verbose")
                                              ("rush check" . "rush check")
@@ -1302,6 +1311,7 @@ It is assumed that the author has only one or two names."
                                        ("npm run lint" . "npm run lint")
                                        ("npm run start" . "npm run start")
                                        ("npm run test" . "npm run test")
+                                       ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                        ("npm run clean" . "npm run clean")
 
                                        ;; Rush
@@ -1309,6 +1319,7 @@ It is assumed that the author has only one or two names."
                                        ("rush rebuild" . "rush rebuild --verbose")
                                        ("rush install" . "rush install --verbose")
                                        ("rush update" . "rush update")
+                                       ("rush-update --full" . "rush update --full")
                                        ("rush test" . "rush test --verbose")
                                        ("rush lint" . "rush lint --verbose")
                                        ("rush check" . "rush check")
@@ -1322,6 +1333,7 @@ It is assumed that the author has only one or two names."
                                        ("npm run lint" . "npm run lint")
                                        ("npm run start" . "npm run start")
                                        ("npm run test" . "npm run test")
+                                       ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                        ("npm run clean" . "npm run clean")
 
                                        ;; Rush
@@ -1834,7 +1846,8 @@ It is assumed that the author has only one or two names."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes '(default))
+ '(custom-safe-themes
+   '("cbdf8c2e1b2b5c15b34ddb5063f1b21514c7169ff20e081d39cf57ffee89bc1e" "4f1d2476c290eaa5d9ab9d13b60f2c0f1c8fa7703596fa91b235db7f99a9441b" "d268b67e0935b9ebc427cad88ded41e875abfcc27abd409726a92e55459e0d01" default))
  '(package-selected-packages
    '(ivy-posframe blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
@@ -1846,7 +1859,7 @@ It is assumed that the author has only one or two names."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))))
- '(blamer-face ((t :foreground "#7a88cf" :background nil :height 100 :italic t)))
+ '(blamer-face ((t :foreground "#7a88cf" :background nil :height 140 :italic t)))
  '(company-template-field ((t (:inherit company-box-scrollbar))))
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
  '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
@@ -1856,11 +1869,13 @@ It is assumed that the author has only one or two names."
  '(font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold))))
  '(fringe ((t (:inherit default :background nil :foreground "#565575"))))
  '(hl-line ((t (:extend t :background "#24213b"))))
- '(ivy-current-match ((t (:foreground "#CBE3E7" :weight bold :background "#39374E"))))
+ '(ivy-current-match ((t (:weight bold :background "#24213b"))))
  '(ivy-minibuffer-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(ivy-posframe ((t (:background "#1E1C31" :foreground "#CBE3E7" :weight bold))))
+ '(ivy-posframe-border ((t (:background "#CBE3E7"))))
  '(magit-blame-heading ((t (:extend t :background nil :foreground "#FFB378" :weight bold))))
  '(magit-branch-remote ((t (:foreground "#95FFA4"))))
  '(magit-diff-added ((t (:extend t :background nil :foreground "#95FFA4"))))

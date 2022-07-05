@@ -1,5 +1,6 @@
 [global_config]
   handle_size = 2
+  tab_position = hidden
   enabled_plugins = CustomCommandsMenu, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   suppress_multiple_term_dialog = True
   title_use_system_font = False
@@ -21,13 +22,16 @@
 [layouts]
   [[default]]
     [[[child0]]]
-      fullscreen = False
-      maximised = True
-      order = 0
-      parent = ""
-      position = 0:28
-      size = 1920, 1024
       type = Window
+      parent = ""
+      order = 0
+      position = 0:29
+      maximised = True
+      fullscreen = False
+      size = 1920, 1143
+      title = kuk@x1-carbon:~/info/damapp/apps/api
+      last_active_term = 61a128c5-dea6-4cdd-9190-1f23ce0f3841
+      last_active_window = True
   [[Dametis dev]]
     [[[child0]]]
       type = Window
@@ -123,7 +127,7 @@
       order = 1
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
-      command = ssh prod.console.influx && bash
+      command = ssh prod.console.clickhouse && bash
   [[Dametis demo]]
     [[[child0]]]
       type = Window
@@ -156,4 +160,74 @@
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
       command = ssh demo.console.influx && bash
+  [[damapp]]
+    [[[child0]]]
+      type = Window
+      parent = ""
+      order = 0
+      position = 0:29
+      maximised = True
+      fullscreen = False
+      size = 1920, 1143
+      last_active_term = 61a128c5-dea6-4cdd-9190-1f23ce0f3841
+      last_active_window = True
+    [[[child1]]]
+      type = HPaned
+      parent = child0
+      order = 0
+      position = 1203
+      ratio = 0.6281984334203655
+    [[[child2]]]
+      type = VPaned
+      parent = child1
+      order = 0
+      position = 569
+      ratio = 0.5
+    [[[terminal3]]]
+      type = Terminal
+      parent = child2
+      order = 0
+      profile = default
+      uuid = 61a128c5-dea6-4cdd-9190-1f23ce0f3841
+      command = cd ~/info/damapp/apps/api && zsh
+    [[[terminal4]]]
+      type = Terminal
+      parent = child2
+      order = 1
+      profile = default
+      uuid = fc8ea045-4565-42bd-aa7b-1c8c99ac5e32
+      command = cd ~/info/damapp/apps/api && zsh
+    [[[child5]]]
+      type = VPaned
+      parent = child1
+      order = 1
+      position = 184
+      ratio = 0.1616871704745167
+    [[[terminal6]]]
+      type = Terminal
+      parent = child5
+      order = 0
+      profile = default
+      uuid = 2582e48a-b3cb-4b94-a549-a3d54f88e072
+      command = cd ~/info/damapp/apps/api && zsh
+    [[[child7]]]
+      type = VPaned
+      parent = child5
+      order = 1
+      position = 737
+      ratio = 0.7741596638655462
+    [[[terminal8]]]
+      type = Terminal
+      parent = child7
+      order = 0
+      profile = default
+      uuid = 3c82067f-1e27-47c3-b58c-c4be0437e72b
+      command = cd ~/info/damapp/apps/bull-workers && zsh
+    [[[terminal9]]]
+      type = Terminal
+      parent = child7
+      order = 1
+      profile = default
+      uuid = 5ec645cb-3c28-48e1-8e13-28c754794d5b
+      command = cd ~/info/damapp/apps/www && zsh
 [plugins]
