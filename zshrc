@@ -174,3 +174,10 @@ source ~/.rush_auto_completion
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# bun completions
+[ -s "/home/kuk/.bun/_bun" ] && source "/home/kuk/.bun/_bun"
+
+# Bun
+export BUN_INSTALL="/home/kuk/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

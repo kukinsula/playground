@@ -552,7 +552,7 @@
   (enable-recursive-minibuffers t)
   (ivy-dynamic-exhibit-delay-ms 250)
   :custom-face
-  (ivy-current-match ((t (:weight bold :background "#24213b"))))
+  (ivy-current-match ((t (:background "#39374E" :foreground "#CBE3E7" :weight bold))))
   (ivy-minibuffer-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
@@ -1295,7 +1295,7 @@ It is assumed that the author has only one or two names."
                                              ;; Rush
                                              ("rush build" . "rush build --verbose")
                                              ("rush rebuild" . "rush rebuild --verbose")
-                                             ("rush install" . "rush install --verbose")
+                                             ("rush install" . "rush install")
                                              ("rush update" . "rush update")
                                              ("rush purge" . "rush purge")
                                              ("rush test" . "rush test --verbose")
