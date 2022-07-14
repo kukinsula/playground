@@ -88,8 +88,6 @@
 ;;
 ;; * zoom per window
 ;;
-;; * custom-faces: les dégager et utiliser que des use-package :custom-face
-;;
 ;; * prettierd
 ;;
 ;; * permettre de toggle thème sombre/clair
@@ -163,6 +161,11 @@
 ;; Default browser
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "chromium")
+
+(use-package emacs
+  :config
+  (set-face-background 'region "#332F4E")
+  (set-face-background 'trailing-whitespace nil))
 
 ;; GC Magic Hack
 (use-package gcmh
@@ -413,8 +416,8 @@
   (doom-modeline-checker-simple-format nil)
   (doom-modeline-env-version nil)
   :custom-face
-  '(doom-modeline-bar ((t (:background "#906CFF"))))
-  '(doom-modeline-bar-inactive ((t (:background "#191729")))))
+  (doom-modeline-bar ((t (:background "#906CFF"))))
+  (doom-modeline-bar-inactive ((t (:background "#191729")))))
 
 (use-package minions
   :ensure t
@@ -941,24 +944,24 @@
         (user-error "Push to upstream aborted by user"))))
 
   :custom-face
-  '(magit-blame-heading ((t (:extend t :background nil :foreground "#FFB378" :weight bold))))
-  '(magit-branch-remote ((t (:foreground "#95FFA4"))))
-  '(magit-diff-added ((t (:extend t :background nil :foreground "#95FFA4"))))
-  '(magit-diff-added-highlight ((t (:extend t :background nil :foreground "#95FFA4" :weight bold))))
-  '(magit-diff-context-highlight ((t (:extend t :background nil :foreground "#CBE3E7"))))
-  '(magit-diff-file-heading ((t (:extend t :foreground "#FF8080" :weight bold))))
-  '(magit-diff-file-heading-highlight ((t (:inherit magit-section-highlight :extend t :background "#24213b"))))
-  '(magit-diff-file-heading-selection ((t (:extend t :background "#332F4E" :foreground nil :weight bold))))
-  '(magit-diff-hunk-heading ((t (:extend t :background "#2b2453" :foreground "white"))))
-  '(magit-diff-hunk-heading-highlight ((t (:extend t :background "#2b2453" :foreground "white" :weight bold))))
-  '(magit-diff-hunk-region ((t (:background "#red"))))
-  '(magit-diff-removed ((t (:extend t :foreground "#cc6666" :background nil))))
-  '(magit-diff-removed-highlight ((t (:extend t :foreground "#FF8080" :weight bold :background nil))))
-  '(magit-diff-whitespace-warning ((t (:background nil))))
-  '(magit-hash ((t (:foreground "white" :weight bold))))
-  '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
-  '(magit-reflog-other ((t (:foreground "#95FFA4"))))
-  '(magit-reflog-remote ((t (:foreground "#95FFA4")))))
+  (magit-blame-heading ((t (:extend t :background nil :foreground "#FFB378" :weight bold))))
+  (magit-branch-remote ((t (:foreground "#95FFA4"))))
+  (magit-diff-added ((t (:extend t :background nil :foreground "#95FFA4"))))
+  (magit-diff-added-highlight ((t (:extend t :background nil :foreground "#95FFA4" :weight bold))))
+  (magit-diff-context-highlight ((t (:extend t :background nil :foreground "#CBE3E7"))))
+  (magit-diff-file-heading ((t (:extend t :foreground "#FF8080" :weight bold))))
+  (magit-diff-file-heading-highlight ((t (:inherit magit-section-highlight :extend t :background "#24213b"))))
+  (magit-diff-file-heading-selection ((t (:extend t :background "#332F4E" :foreground nil :weight bold))))
+  (magit-diff-hunk-heading ((t (:extend t :background "#2b2453" :foreground "white"))))
+  (magit-diff-hunk-heading-highlight ((t (:extend t :background "#2b2453" :foreground "white" :weight bold))))
+  (magit-diff-hunk-region ((t (:background "#red"))))
+  (magit-diff-removed ((t (:extend t :foreground "#cc6666" :background nil))))
+  (magit-diff-removed-highlight ((t (:extend t :foreground "#FF8080" :weight bold :background nil))))
+  (magit-diff-whitespace-warning ((t (:background nil))))
+  (magit-hash ((t (:foreground "white" :weight bold))))
+  (magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
+  (magit-reflog-other ((t (:foreground "#95FFA4"))))
+  (magit-reflog-remote ((t (:foreground "#95FFA4")))))
 
 (defun git-log--abbreviate-author (&rest args)
   "The first ARGS is AUTHOR, abbreviate it.
@@ -1875,65 +1878,7 @@ It is assumed that the author has only one or two names."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))))
- '(blamer-face ((t :foreground "#7a88cf" :background nil :height 140 :italic t)))
- '(company-template-field ((t (:inherit company-box-scrollbar))))
- '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
- '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
- '(dashboard-items-face ((t nil)))
- '(doom-modeline-bar ((t (:background "#906CFF"))))
- '(doom-modeline-bar-inactive ((t (:background "#191729"))))
- '(font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold))))
- '(fringe ((t (:inherit default :background nil :foreground "#565575"))))
- '(hl-line ((t (:extend t :background "#24213b"))))
- '(ivy-current-match ((t (:weight bold :background "#24213b"))))
- '(ivy-minibuffer-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(ivy-posframe ((t (:background "#1E1C31" :foreground "#CBE3E7" :weight bold))))
- '(ivy-posframe-border ((t (:background "#CBE3E7"))))
- '(magit-blame-heading ((t (:extend t :background nil :foreground "#FFB378" :weight bold))))
- '(magit-branch-remote ((t (:foreground "#95FFA4"))))
- '(magit-diff-added ((t (:extend t :background nil :foreground "#95FFA4"))))
- '(magit-diff-added-highlight ((t (:extend t :background nil :foreground "#95FFA4" :weight bold))))
- '(magit-diff-context-highlight ((t (:extend t :background nil :foreground "#CBE3E7"))))
- '(magit-diff-file-heading ((t (:extend t :foreground "#FF8080" :weight bold))))
- '(magit-diff-file-heading-highlight ((t (:inherit magit-section-highlight :extend t :background "#24213b"))))
- '(magit-diff-file-heading-selection ((t (:extend t :background "#332F4E" :foreground nil :weight bold))))
- '(magit-diff-hunk-heading ((t (:extend t :background "#2b2453" :foreground "white"))))
- '(magit-diff-hunk-heading-highlight ((t (:extend t :background "#2b2453" :foreground "white" :weight bold))))
- '(magit-diff-hunk-region ((t (:background "#red"))))
- '(magit-diff-removed ((t (:extend t :foreground "#cc6666" :background nil))))
- '(magit-diff-removed-highlight ((t (:extend t :foreground "#FF8080" :weight bold :background nil))))
- '(magit-diff-whitespace-warning ((t (:background nil))))
- '(magit-hash ((t (:foreground "white" :weight bold))))
- '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
- '(magit-reflog-other ((t (:foreground "#95FFA4"))))
- '(magit-reflog-remote ((t (:foreground "#95FFA4"))))
- '(org-document-title ((t :height 2.0)))
- '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)))
- '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)))
- '(org-level-3 ((t :inherit outline-3 :weight bold :height 1.1)))
- '(org-level-4 ((t :inherit outline-4 :weight bold :height 1.0)))
- '(org-level-5 ((t :inherit outline-5 :weight semi-bold :height 1.0)))
- '(org-level-6 ((t :inherit outline-6 :weight semi-bold :height 1.0)))
- '(org-level-7 ((t :inherit outline-7 :weight semi-bold)))
- '(org-level-8 ((t :inherit outline-8 :weight semi-bold)))
- '(quote (doom-modeline-bar ((t (:background "#906CFF")))))
- '(region ((t (:extend t :background "#332F4E"))))
- '(swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(swiper-background-match-face-3 ((t (:background "hot pink" :weight bold :background nil))))
- '(swiper-background-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil))))
- '(swiper-line-face ((t (:background "#39374E" :foreground "#CBE3E7" :weight bold))))
- '(swiper-match-face-1 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
- '(swiper-match-face-2 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
- '(swiper-match-face-3 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
- '(swiper-match-face-4 ((t (:background nil :foreground "#CBE3E7" :weight bold))))
- '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
- '(trailing-whitespace ((t (:background nil))))
- '(yas-field-highlight-face ((t (:foreground "hot pink")))))
+ )
 
 (provide 'emacs)
 ;;; emacs ends here
