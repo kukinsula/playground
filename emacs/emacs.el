@@ -78,15 +78,9 @@
 ;;
 ;; * Magit is current buffer untracked/modified/deleted/...
 ;;
-;; * Magit: bindings
-;;     - C-x g s => git status
-;;     - C-x g l => git log
-;;     - C-x g diff => git diff
-;;     - ...
-;;
 ;; * git merge (smerge ? edfii ?)
 ;;
-;; * zoom per window
+;; * zoom per window and not only per buffer
 ;;
 ;; * prettierd
 ;;
@@ -94,13 +88,7 @@
 ;;
 ;; * ivy: minibuffer gets bigger on M-x C-s ...
 ;;
-;; * ivy-posframe
-;;     - is one line too tall
-;;     - should follow the content height or MAXIMUM height;;
-;;
-;; * M-b remove file-size column
-;;
-;; * doom-modeline : inactive window adds spaces before buffer name
+;; * doom-modeline: inactive window adds spaces before buffer name
 ;;
 ;; * magit :
 ;;     - modeline buffer-position is aligned on the left
@@ -404,13 +392,13 @@
   (inhibit-compacting-font-caches t)
   (doom-modeline-icon t)
   (doom-modeline-major-mode-color-icon t)
+  (doom-modeline-buffer-modification-icon t)
   (doom-modeline-checker-simple-format t)
   (doom-modeline-bar-width 10)
   (doom-modeline-height 25)
   (doom-modeline-vcs-max-length 20)
   (doom-modeline-project-detection 'auto)
   (doom-modeline-buffer-file-name-style 'relative-to-project)
-  (doom-modeline-buffer-modification-icon t)
   (doom-modeline-buffer-name t)
   (doom-modeline-enable-word-count nil)
   (doom-modeline-checker-simple-format nil)
@@ -606,12 +594,12 @@
   :ensure t
   :diminish
   :custom
+  (ivy-posframe-height 15)
   (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
   (ivy-posframe-width 150)
   :custom-face
   (ivy-posframe ((t (:background "#1E1C31" :foreground "#CBE3E7" :weight bold))))
   (ivy-posframe-border ((t (:background "#CBE3E7"))))
-  ;; (ivy-posframe-cursor ((t (:background "#CBE3E7"))))
   :config
   (ivy-posframe-mode 1))
 
