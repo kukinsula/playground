@@ -1123,7 +1123,7 @@ It is assumed that the author has only one or two names."
 (use-package all-the-icons-ivy-rich
   :ensure t
   :diminish
-  :defer t
+  ;; :defer t
   :custom
   (all-the-icons-ivy-rich-color-icon t)
   :init (all-the-icons-ivy-rich-mode 1))
@@ -1133,8 +1133,25 @@ It is assumed that the author has only one or two names."
   :diminish
   :defer t
   :custom
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
   (ivy-rich-path-style 'abbrev)
-  :init (ivy-rich-mode))
+  :config
+  (setq ivy-format-function #'ivy-format-function-line)
+  (setq ivy-rich-display-transformers-list
+        (plist-put ivy-rich-display-transformers-list
+                   'ivy-switch-buffer
+                   '(:columns
+                     ((all-the-icons-ivy-rich-buffer-icon)
+                      (ivy-rich-candidate (:width 50))
+                      ;; (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+                      (ivy-rich-switch-buffer-major-mode
+                       (:face all-the-icons-ivy-rich-major-mode-face :width 15))
+                      (ivy-rich-switch-buffer-project
+                       (:face all-the-icons-ivy-rich-project-face :width 15))
+                      (ivy-rich-switch-buffer-path
+                       (:face all-the-icons-ivy-rich-path-face
+                              :width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.8)))))))))
+  (ivy-rich-mode))
 
 ;; Show quick tooltip
 (use-package company-quickhelp
