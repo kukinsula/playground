@@ -92,7 +92,6 @@
 ;;
 ;; * magit :
 ;;     - modeline buffer-position is aligned on the left
-;;     - C-c C-k to abort any magit command
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -950,6 +949,9 @@
   (magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
   (magit-reflog-other ((t (:foreground "#95FFA4"))))
   (magit-reflog-remote ((t (:foreground "#95FFA4")))))
+
+(use-package magit-process
+  :bind ("C-c C-k" . magit-process-kill))
 
 (defun git-log--abbreviate-author (&rest args)
   "The first ARGS is AUTHOR, abbreviate it.
