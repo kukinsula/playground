@@ -18,8 +18,8 @@
 ;;   Text mode: emacsclient --create-frame --quiet -nw
 ;;   GUI mode: emacsclient --create-frame --quiet
 ;;
-;; * all-the-icons-install
-;;
+;; * First run after installation
+;;   - M-x pdf-tools-install
 ;;   - M-x all-the-icons-install-fonts
 ;;
 ;;; TOTEST:
@@ -86,12 +86,16 @@
 ;;
 ;; * permettre de toggle thème sombre/clair
 ;;
-;; * ivy: minibuffer gets bigger on M-x C-s ...
+;; * ivy:
+;;     - minibuffer gets bigger on M-x C-s ...
+;;     - foreground current match line in hot pink
 ;;
 ;; * doom-modeline: inactive window adds spaces before buffer name
 ;;
 ;; * magit :
 ;;     - modeline buffer-position is aligned on the left
+;;
+;; * emacs daemon
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -1534,6 +1538,7 @@ It is assumed that the author has only one or two names."
 ;; YASnippets
 (use-package yasnippet
   :ensure t
+  :defer t
   :diminish
   :commands (yas-expand yas-reload-all)
   :config
@@ -1544,6 +1549,7 @@ It is assumed that the author has only one or two names."
 
 (use-package yasnippet-snippets
   :ensure t
+  :defer t
   :diminish
   :after (yasnippet))
 
@@ -1589,6 +1595,7 @@ It is assumed that the author has only one or two names."
 (use-package exec-path-from-shell
   :ensure t
   :diminish
+  :defer t
   :custom (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
 
@@ -1670,7 +1677,10 @@ It is assumed that the author has only one or two names."
 (use-package pdf-tools
   :ensure t
   :diminish
-  :config (pdf-tools-install))
+  :config
+  ;; Needs to be done only on first install
+  ;; (pdf-tools-install)
+  )
 
 ;; (use-package tramp
 ;;   :diminish
