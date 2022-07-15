@@ -238,20 +238,6 @@
 
 (setq find-file-visit-truename t)
 
-;; TODO
-;;
-;; (use-package flyspell
-;;   :ensure t
-;;   :config
-;;   (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-;;   (flyspell-mode)
-;;   :custom
-;;   (ispell-program-name "aspell")
-;;   (ispell-list-command "--list"))
-
-;; (dolist (hook '(text-mode-hook))
-;;   (add-hook hook (lambda () (flyspell-mode t))))
-
 ;; Resize windows
 (global-set-key (kbd "<M-S-up>") 'shrink-window)
 (global-set-key (kbd "<M-S-down>") 'enlarge-window)
@@ -261,6 +247,7 @@
 ;; TODO: save sessions
 (use-package desktop
   ;; :config (desktop-save-mode)
+  :disabled t
   :custom
   (desktop-path '("~/.emacs.d/desktops/")))
 
@@ -287,22 +274,6 @@
   :custom-face (hl-line ((t (:extend t :background "#24213b")))))
 
 (setq-default truncate-lines t)
-
-;; Indentation hightlight
-(use-package highlight-indent-guides
-  :ensure t
-  :disabled t
-  :diminish
-  :hook (prog-mode . highlight-indent-guides-mode)
-  :config
-  (set-face-background 'highlight-indent-guides-odd-face "#474747")
-  (set-face-background 'highlight-indent-guides-even-face "#474747")
-  (set-face-foreground 'highlight-indent-guides-character-face "#474747")
-  :custom
-  (highlight-indent-guides-method 'character)
-  (highlight-indent-guides-auto-enabled nil)
-  (highlight-indent-guides-responsive t)
-  (highlight-indent-guides--guide-region nil))
 
 ;; Sets background color to strings that match color names, e.g. #0000ff
 (use-package rainbow-mode
@@ -373,8 +344,7 @@
 (use-package doom-modeline
   :ensure t
   :diminish
-  :init
-  (doom-modeline-mode)
+  :init (doom-modeline-mode 1)
   :config
   (doom-modeline-def-modeline 'main
     '(bar buffer-info)
@@ -415,65 +385,6 @@
 (use-package diminish
   :ensure t
   :diminish)
-
-(use-package cyphejor
-  :ensure t
-  :diminish
-  :custom (cyphejor-rules
-           '(:upcase
-             ("bookmark"    "→")
-             ("buffer"      "β")
-             ("fundamental" "Fundamental")
-             ("diff"        "Δ")
-             ("magit"       "Magit")
-             ("status"      "Status")
-             ("log"         "Log")
-             ("revision"    "Commit")
-             ("stash"       "Stash")
-             ("process"     "Process")
-             ("dired"       "δ")
-             ("emacs"       "ε")
-             ("inferior"    "i" :prefix)
-             ("interaction" "i" :prefix)
-             ("interactive" "i" :prefix)
-             ("lisp"        "λ" :postfix)
-             ("menu"        "▤" :postfix)
-             ("custom"      "Custom")
-             ("helpful"     "Help")
-             ("help"        "Help")
-             ("messages"    "Message")
-             ("mode"        "")
-             ("dashboard"   "Dashboard")
-             ("package"     "↓")
-             ("python"      "π")
-             ("shell"       "Shell")
-             ("sh"          "Shell")
-             ("perl"        "Perl")
-             ("so-long"     "So-Long")
-             ("debugger"    "Debugger")
-             ("compilation" "Compilation")
-             ("conf"        "Conf")
-             ("snippet"     "Snippet")
-             ("unix"        "Unix")
-             ("text"        "ξ")
-             ("wdired"      "↯δ")
-             ("grep"        "Grep")
-             ("ag"          "Ag")
-             ("pdf"         "PDF")
-             ("ripgrep"     "Rg")
-             ("typescript"  "Ts")
-             ("org"         "Org")
-             ("dockerfile"  "Dockerfile")
-             ("yaml"        "YAML")
-             ("json"        "JSON")
-             ("js"          "Js")
-             ("markdown"    "markdown")
-             ("systemd"     "Systemd")
-             ("web"         "Web")
-             ("makefile"    "Makefile")
-             ("css"         "CSS")
-             ("pkgbuild"    "PKGBUILD")))
-  :config (cyphejor-mode t))
 
 ;; Dashboard
 (use-package dashboard
@@ -702,6 +613,7 @@
 ;; Dimm unfocused buffers.
 (use-package dimmer
   :ensure t
+  :disabled t
   :custom (dimmer-fraction 0.1)
   :config (dimmer-mode))
 
@@ -772,7 +684,10 @@
 (defvar whitespace-display-mappings
   '((tab-mark 9 [124 9] [92 9])))
 
-(global-whitespace-mode)
+(use-package whitespace
+  :ensure t
+  :diminish
+  :init (global-whitespace-mode t))
 
 ;; Show pairing parenthesis and brackets
 (show-paren-mode t)
@@ -787,12 +702,12 @@
 (use-package undo-fu
   :ensure t
   :diminish
-  :custom (undo-fu-allow-undo-in-region t)
+  :custom
+  (undo-fu-allow-undo-in-region t)
+  (undo-limit 20000000)
+  (undo-strong-limit 40000000)
   :bind (("C-z" . 'undo-fu-only-undo)
          ("C-S-z" . 'undo-fu-only-redo)))
-
-(setq undo-limit 20000000
-      undo-strong-limit 40000000)
 
 (use-package aggressive-indent
   :ensure t
@@ -1116,7 +1031,6 @@ It is assumed that the author has only one or two names."
 (use-package all-the-icons-ivy-rich
   :ensure t
   :diminish
-  ;; :defer t
   :custom
   (all-the-icons-ivy-rich-color-icon t)
   :init (all-the-icons-ivy-rich-mode 1))
@@ -1136,7 +1050,6 @@ It is assumed that the author has only one or two names."
                    '(:columns
                      ((all-the-icons-ivy-rich-buffer-icon)
                       (ivy-rich-candidate (:width 50))
-                      ;; (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
                       (ivy-rich-switch-buffer-major-mode
                        (:face all-the-icons-ivy-rich-major-mode-face :width 15))
                       (ivy-rich-switch-buffer-project
@@ -1407,14 +1320,6 @@ It is assumed that the author has only one or two names."
                     "*-lock.*"))
   :custom-face
   (ag-match-face ((t (:background nil :foreground "hot pink" :weight bold)))))
-
-(use-package ripgrep
-  :ensure t
-  :diminish
-  :after (projectile)
-  :custom
-  (rg-show-columns t)
-  (rg-ignore-case 'smart))
 
 (global-prettify-symbols-mode t)
 (add-hook 'prog-mode-hook (lambda ()
@@ -1812,7 +1717,8 @@ It is assumed that the author has only one or two names."
 (use-package goto-last-change
   :ensure t
   :config
-  (global-set-key (kbd "C-x -") #'goto-last-change))
+  (global-unset-key (kbd "C-x -"))
+  (global-set-key (kbd "C-x -") 'goto-last-change))
 
 ;; Copy filename to clipboard
 (defun copy-filename-to-clipboard ()
