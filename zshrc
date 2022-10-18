@@ -2,17 +2,50 @@
 
 # ln -s /path/to/playground/zshrc ~/.zshrc
 
-export ZSH=$HOME/.oh-my-zsh
+# Turnon zsh profiler
+# zmodload zsh/zprof
 
-ZSH_THEME="robbyrussell"
+ZSH_COMPDUMP="$ZSH_CACHE_DIR/.zcompdump"
+
+# ZSH_THEME="robbyrussell"
+
+autoload -Uz vcs_info
+precmd() { vcs_info }
+
+zstyle ':vcs_info:git:*' formats '%b '
+PROMPT='%B%F{157}[%2d]%f %F{159}${vcs_info_msg_0_}%f%(?.%F{256}▶%f.%F{203}%B▶%b%f) '
+
+setopt NO_CASE_GLOB
+
+#
 
 plugins=(
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    colored-man-pages
+  zsh-autosuggestions
+  # zsh-syntax-highlighting
+  F-Sy-H
+  colored-man-pages
 )
 
+export ZSH=$HOME/.oh-my-zsh
+zstyle ':omz:update' frequency 16
 source $ZSH/oh-my-zsh.sh
+
+# tabtab source for packages
+# uninstall by removing these lines
+[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+
+# unsetopt share_history
+setopt extendedglob
+
+# Disable paste animation
+zstyle ':bracketed-paste-magic' active-widgets '.self-*'
+
+# ???
+# autoload -Uz compinit
+# for dump in ~/.zcompdump(N.mh+24); do
+#   compinit
+# done
+# compinit -C
 
 export EDITOR='emacsclient --quiet -nw'
 export VISUAL=$EDITOR
@@ -21,103 +54,49 @@ export VISUAL=$EDITOR
 export TERM=xterm-256color
 
 # Aliases
-alias ls='logo-ls -l --human-readable --git-status --time-style RFC822'
-alias ll='ls -lh'
-alias l='ll'
-alias la='ls -lah'
+
+## ls
+# alias ls='logo-ls -l --human-readable --git-status --time-style RFC822'
+# alias ll='ls -lh'
+# alias l='ll'
+# alias la='ls -lah'
+alias ls='exa --color always --binary --icons --modified --git'
+alias ll='ls --long'
+alias la='ll --all'
+
 alias -s pdf='evince'
 alias e=$EDITOR
 alias watch='watch -tn 1'
 alias log='tail -f'
 alias diff='diff --color=auto'
 alias icdiff='icdiff --highlight --line-numbers'
-alias pacman='pacman --color=always'
-alias aur='paru --color=always'
-alias news='aur --show -w -w'
 alias open='xdg-open'
 alias tree='tree -C'
 alias cp='cp --verbose --interactive'
 alias mv='mv --verbose --interactive'
 alias rm='rm --verbose'
 alias grep='grep --line-number --color=always'
+alias df='duf'
 
-# less
-export LESSOPEN="| src-hilite-lesspipe.sh %s"
-export LESS=" -R "
-alias less='less --long-prompt --LINE-NUMBERS --HILITE-SEARCH --ignore-case -J --underline-special --SILENT'
-alias more='less'
-alias cat="src-hilite-lesspipe.sh $1"
-alias nano="nano -l"
+# Arch
+alias pacman='pacman --color=always'
+alias aur='paru --color=always'
+alias news='aur --show -w -w'
+
+# export LESSOPEN="| src-hilite-lesspipe.sh %s"
+# export LESS=" -R "
+# alias less='less --long-prompt --LINE-NUMBERS --HILITE-SEARCH --ignore-case -J --underline-special --SILENT'
+# alias more='less'
+# alias nano="nano -l"
+# alias cat="src-hilite-lesspipe.sh $1"
+alias cat='bat'
+alias less='bat'
 
 # Golang
 export GOPATH=$HOME/info/go
 export GO111MODULE=on
 
 export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin
-
-# NPM auto completion
-if type complete &>/dev/null; then
-  _npm_completion () {
-    local words cword
-    if type _get_comp_words_by_ref &>/dev/null; then
-      _get_comp_words_by_ref -n = -n @ -n : -w words -i cword
-    else
-      cword="$COMP_CWORD"
-      words=("${COMP_WORDS[@]}")
-    fi
-
-    local si="$IFS"
-    if ! IFS=$'\n' COMPREPLY=($(COMP_CWORD="$cword" \
-                           COMP_LINE="$COMP_LINE" \
-                           COMP_POINT="$COMP_POINT" \
-                           npm completion -- "${words[@]}" \
-                           2>/dev/null)); then
-      local ret=$?
-      IFS="$si"
-      return $ret
-    fi
-    IFS="$si"
-    if type __ltrim_colon_completions &>/dev/null; then
-      __ltrim_colon_completions "${words[cword]}"
-    fi
-  }
-  complete -o default -F _npm_completion npm
-elif type compdef &>/dev/null; then
-  _npm_completion() {
-    local si=$IFS
-    compadd -- $(COMP_CWORD=$((CURRENT-1)) \
-                 COMP_LINE=$BUFFER \
-                 COMP_POINT=0 \
-                 npm completion -- "${words[@]}" \
-                 2>/dev/null)
-    IFS=$si
-  }
-  compdef _npm_completion npm
-elif type compctl &>/dev/null; then
-  _npm_completion () {
-    local cword line point words si
-    read -Ac words
-    read -cn cword
-    let cword-=1
-    read -l line
-    read -ln point
-    si="$IFS"
-    if ! IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                       COMP_LINE="$line" \
-                       COMP_POINT="$point" \
-                       npm completion -- "${words[@]}" \
-                       2>/dev/null)); then
-
-      local ret=$?
-      IFS="$si"
-      return $ret
-    fi
-    IFS="$si"
-  }
-  compctl -K _npm_completion npm
-fi
-
-unsetopt share_history
 
 # Updates pacman, AUR and NPM packages
 update(){
@@ -131,6 +110,7 @@ loop(){
 		for i in {1..$1}; do eval $2; done
 }
 
+# Pacman helpers
 fuzzy-install(){
     pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S
 }
@@ -145,9 +125,6 @@ BASE16_SHELL="$HOME/.config/base16-shell/"
     [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
     eval "$("$BASE16_SHELL/profile_helper.sh")"
 
-# Disable paste animation
-zstyle ':bracketed-paste-magic' active-widgets '.self-*'
-
 # Emacs vterm
 vterm_printf(){
     if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
@@ -161,19 +138,10 @@ vterm_printf(){
     fi
 }
 
-# tabtab source for packages
-# uninstall by removing these lines
-[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
-
 # Rush auto completion
 autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 source ~/.rush_auto_completion
-
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # bun completions
 [ -s "/home/kuk/.bun/_bun" ] && source "/home/kuk/.bun/_bun"
@@ -181,3 +149,56 @@ export NVM_DIR="$HOME/.nvm"
 # Bun
 export BUN_INSTALL="/home/kuk/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# McFly
+eval "$(mcfly init zsh)"
+export MCFLY_FUZZY=2
+export MCFLY_RESULTS=50
+export MCFLY_RESULTS_SORT=LAST_RUN
+
+# NPM autocompletion for ZSH
+if type compdef &>/dev/null; then
+    _npm_completion() {
+        local si=$IFS
+
+        # if your npm command includes `install`
+        if [[ ${words} =~ 'install' ]] || [[ ${words} =~ 'i ' ]]; then
+            compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+                COMP_LINE=$BUFFER \
+                COMP_POINT=0 \
+                ls ~/.npm -- "${words[@]}" \
+                2>/dev/null)
+
+        else
+            compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+                COMP_LINE=$BUFFER \
+                COMP_POINT=0 \
+                npm completion -- "${words[@]}" \
+                2>/dev/null)
+        fi
+
+        IFS=$si
+    }
+    compdef _npm_completion npm
+elif type compctl &>/dev/null; then
+
+    _npm_completion () {
+        local cword line point words si
+        read -Ac words
+        read -cn cword
+        let cword-=1
+        read -l line
+        read -ln point
+        si="$IFS"
+        IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+            COMP_LINE="$line" \
+            COMP_POINT="$point" \
+            npm completion -- "${words[@]}" \
+            2>/dev/null)) || return $?
+        IFS="$si"
+    }
+    compctl -K _npm_completion npm
+fi
+
+# Turnoff zsh profiler
+# zprof

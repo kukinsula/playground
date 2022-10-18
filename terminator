@@ -1,10 +1,11 @@
 [global_config]
-  handle_size = 2
+  handle_size = 4
   tab_position = hidden
-  enabled_plugins = CustomCommandsMenu, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
+  enabled_plugins = CustomCommandsMenu, LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, EditorPlugin
   suppress_multiple_term_dialog = True
   title_use_system_font = False
   title_font = Source Code Pro 18
+  line_height = 1.1
 [keybindings]
 [profiles]
   [[default]]
@@ -15,6 +16,7 @@
     foreground_color = "#d3d7cf"
     show_titlebar = False
     scrollbar_position = hidden
+    scrollback_lines = 8192
     scrollback_infinite = True
     exit_action = hold
     login_shell = True
@@ -64,6 +66,38 @@
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
       command = ssh dev.console.clickhouse && bash
+  [[Dametis devalt]]
+    [[[child0]]]
+      type = Window
+      parent = ""
+      order = 0
+      position = 0:34
+      maximised = True
+      fullscreen = False
+      size = 1920, 1018
+      title = Dametis devalt
+      last_active_term = d8178671-7887-4a8f-b9ab-55963d02fb1e
+      last_active_window = True
+    [[[child1]]]
+      type = HPaned
+      parent = child0
+      order = 0
+      position = 958
+      ratio = 0.5002610966057441
+    [[[terminal2]]]
+      type = Terminal
+      parent = child1
+      order = 0
+      profile = default
+      uuid = d8178671-7887-4a8f-b9ab-55963d02fb1e
+      command = ssh devalt.console && bash
+    [[[terminal3]]]
+      type = Terminal
+      parent = child1
+      order = 1
+      profile = default
+      uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
+      command = ssh devalt.console.clickhouse && bash
   [[Dametis qualif]]
     [[[child0]]]
       type = Window
@@ -95,7 +129,7 @@
       order = 1
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
-      command = ssh qualif.console.influx && bash
+      command = ssh qualif.console.clickhouse && bash
   [[Dametis prod]]
     [[[child0]]]
       type = Window
@@ -159,7 +193,7 @@
       order = 1
       profile = default
       uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
-      command = ssh demo.console.influx && bash
+      command = ssh demo.console.clickhouse && bash
   [[damapp]]
     [[[child0]]]
       type = Window
@@ -231,3 +265,8 @@
       uuid = 5ec645cb-3c28-48e1-8e13-28c754794d5b
       command = cd ~/info/damapp/apps/www && zsh
 [plugins]
+  [[EditorPlugin]]
+    command = emacsclient -n +{line} {filepath}
+    match = \(?([^ \t\n\r\f\v:]+?):([0-9]+):?([0-9]+)?\)?
+    groups = file line column
+    open_in_current_term = False

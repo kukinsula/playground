@@ -121,7 +121,12 @@ sudo pacman -S \
   autossh \
   gnome-calculator \
   gdb \
-  valgrind
+  valgrind \
+  firefox \
+  bat \
+  exa \
+  duf \
+  hblock \
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
@@ -200,7 +205,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 sudo chsh -s /bin/zsh
 
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+# git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone https://github.com/z-shell/F-Sy-H.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/F-Sy-H
 git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
 
 # Emacs
@@ -240,7 +246,8 @@ go get github.com/rogpeppe/godef
 go get -u github.com/isacikgoz/tldr
 
 # /etc/hosts
-sudo curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts --output /etc/hosts
+# sudo curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts --output /etc/hosts
+hblock
 
 # Python
 sudo pip install \
@@ -313,7 +320,14 @@ git clone https://github.com/levonhart/materia-dark-ulauncher ~/.config/ulaunche
 # Terminal base16 theme
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
 # base16_<TAB>_<TAB
-base16_helios
+# base16_helios
+base16_gruvbox-dark-hard
+
+# Terminator Plugin
+mkdir -p ~/.config/terminator/plugins/
+curl https://raw.githubusercontent.com/mchelem/terminator-editor-plugin/master/editor_plugin.py --output ~/.config/terminator/plugins/
+# Restart Terminator, goto Preferences/Plugins => enable 'EditorPlugin'
+# Restart Terminator again
 
 # Backup
 #

@@ -96,6 +96,8 @@
 ;;     - modeline buffer-position is aligned on the left
 ;;
 ;; * emacs daemon
+;;
+;; * emacs open file at line
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -137,7 +139,6 @@
 (setenv "LANG" "en_US.UTF-8")
 (set-charset-priority 'unicode)
 (set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8)
 (set-locale-environment "en_EN.UTF-8")
 (set-default-coding-systems 'utf-8)
 (set-selection-coding-system 'utf-8)
@@ -148,6 +149,7 @@
 (setq buffer-file-coding-system 'utf-8
       save-buffer-coding-system 'utf-8
       process-coding-system-alist (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
+(prefer-coding-system 'utf-8)
 
 ;; Default browser
 (setq browse-url-browser-function 'browse-url-generic
@@ -284,6 +286,11 @@
   :ensure t
   :diminish
   :hook (prog-mode))
+
+(use-package eww
+  :config
+  (toggle-truncate-lines nil)
+  )
 
 ;; line:column in modeline
 (line-number-mode t)
@@ -458,6 +465,8 @@
   (ivy-dynamic-exhibit-delay-ms 250)
   :custom-face
   (ivy-current-match ((t (:background "#39374E" :weight bold))))
+
+  ;; TODO: jouer sur les différentes couleurs de minibuffer match
   (ivy-minibuffer-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
   (ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
@@ -491,6 +500,8 @@
   :custom (swiper-action-recenter t)
   :custom-face
   (swiper-line-face ((t (:background "#39374E" :weight bold :foreground nil))))
+
+  ;; TODO: jouer sur les différentes couleurs de match
   (swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
   (swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
   (swiper-background-match-face-3 ((t (:background "hot pink" :weight bold :background nil))))
@@ -905,9 +916,9 @@ It is assumed that the author has only one or two names."
   :custom
   (blamer-idle-time 0)
   (blamer-type 'both)
-  (blamer-min-offset 70)
+  (blamer-min-offset 50)
   (blamer-prettify-time-p nil)
-  (blamer-max-commit-message-length 80)
+  (blamer-max-commit-message-length 200)
   (blamer-author-formatter "%s ")
   ;; (blamer-author-formatter git-log--abbreviate-author)
   :custom-face
@@ -1229,7 +1240,8 @@ It is assumed that the author has only one or two names."
                                              ("rush lint" . "rush lint --verbose")
                                              ("rush check" . "rush check")
                                              ("rush scan" . "rush scan")
-                                             ("rush clean" . "rush clean")))
+                                             ("rush clean" . "rush clean")
+                                             ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")))
 
                          ;; JSON
                          (json-mode . (
@@ -1251,7 +1263,8 @@ It is assumed that the author has only one or two names."
                                        ("rush lint" . "rush lint --verbose")
                                        ("rush check" . "rush check")
                                        ("rush scan" . "rush scan")
-                                       ("rush clean" . "rush clean")))
+                                       ("rush clean" . "rush clean")
+                                       ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")))
 
                          ;; YAML
                          (yaml-mode . (
@@ -1272,7 +1285,8 @@ It is assumed that the author has only one or two names."
                                        ("rush lint" . "rush lint --verbose")
                                        ("rush check" . "rush check")
                                        ("rush scan" . "rush scan")
-                                       ("rush clean" . "rush clean")))
+                                       ("rush clean" . "rush clean")
+                                       ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")))
 
                          ;; Golang
                          (go-mode . (("go build" . "go build")
@@ -1480,7 +1494,9 @@ It is assumed that the author has only one or two names."
 (use-package org
   :ensure nil
   :diminish
-  :config (define-key org-mode-map (kbd "<C-tab>") 'other-window)
+  :config
+  (define-key org-mode-map (kbd "<C-tab>") 'other-window)
+  (org-support-shift-select t)
   :hook ((org-mode . org-indent-mode)
          (org-mode . visual-line-mode))
   :custom (org-hide-emphasis-markers t)
@@ -1502,7 +1518,7 @@ It is assumed that the author has only one or two names."
   :hook (org-mode . org-superstar-mode)
   :custom
   (org-superstar-remove-leading-stars t)
-  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+  (org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "◉" "🞛" "○" "▷")))
 
 (use-package dockerfile-mode
   :ensure t
@@ -1775,7 +1791,7 @@ It is assumed that the author has only one or two names."
  '(custom-safe-themes
    '("cbdf8c2e1b2b5c15b34ddb5063f1b21514c7169ff20e081d39cf57ffee89bc1e" "4f1d2476c290eaa5d9ab9d13b60f2c0f1c8fa7703596fa91b235db7f99a9441b" "d268b67e0935b9ebc427cad88ded41e875abfcc27abd409726a92e55459e0d01" default))
  '(package-selected-packages
-   '(ivy-posframe blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(pacmacs ivy-posframe blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
@@ -1784,7 +1800,61 @@ It is assumed that the author has only one or two names."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(blamer-face ((t :foreground "#7a88cf" :background nil :height 0.8 :italic t)))
+ '(company-template-field ((t (:inherit company-box-scrollbar))))
+ '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
+ '(dashboard-banner-logo-title ((t (:inherit default :foreground "slate gray" :slant italic :weight light))))
+ '(dashboard-items-face ((t nil)))
+ '(doom-modeline-bar ((t (:background "#906CFF"))))
+ '(doom-modeline-bar-inactive ((t (:background "#191729"))))
+ '(font-lock-warning-face ((t (:inherit warning :foreground "sandy brown" :weight bold))))
+ '(hl-line ((t (:extend t :background "#24213b"))))
+ '(ivy-current-match ((t (:background "#39374E" :weight bold))))
+ '(ivy-minibuffer-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(ivy-minibuffer-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(ivy-minibuffer-match-face-3 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(ivy-minibuffer-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(ivy-posframe ((t (:background "#1E1C31" :foreground "#CBE3E7" :weight bold))))
+ '(ivy-posframe-border ((t (:background "#CBE3E7"))))
+ '(magit-blame-heading ((t (:extend t :background nil :foreground "#FFB378" :weight bold))))
+ '(magit-branch-remote ((t (:foreground "#95FFA4"))))
+ '(magit-diff-added ((t (:extend t :background nil :foreground "#95FFA4"))))
+ '(magit-diff-added-highlight ((t (:extend t :background nil :foreground "#95FFA4" :weight bold))))
+ '(magit-diff-context-highlight ((t (:extend t :background nil :foreground "#CBE3E7"))))
+ '(magit-diff-file-heading ((t (:extend t :foreground "#FF8080" :weight bold))))
+ '(magit-diff-file-heading-highlight ((t (:inherit magit-section-highlight :extend t :background "#24213b"))))
+ '(magit-diff-file-heading-selection ((t (:extend t :background "#332F4E" :foreground nil :weight bold))))
+ '(magit-diff-hunk-heading ((t (:extend t :background "#2b2453" :foreground "white"))))
+ '(magit-diff-hunk-heading-highlight ((t (:extend t :background "#2b2453" :foreground "white" :weight bold))))
+ '(magit-diff-hunk-region ((t (:background "#red"))))
+ '(magit-diff-removed ((t (:extend t :foreground "#cc6666" :background nil))))
+ '(magit-diff-removed-highlight ((t (:extend t :foreground "#FF8080" :weight bold :background nil))))
+ '(magit-diff-whitespace-warning ((t (:background nil))))
+ '(magit-hash ((t (:foreground "white" :weight bold))))
+ '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
+ '(magit-reflog-other ((t (:foreground "#95FFA4"))))
+ '(magit-reflog-remote ((t (:foreground "#95FFA4"))))
+ '(org-document-title ((t :height 2.0)))
+ '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)))
+ '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)))
+ '(org-level-3 ((t :inherit outline-3 :weight bold :height 1.1)))
+ '(org-level-4 ((t :inherit outline-4 :weight bold :height 1.0)))
+ '(org-level-5 ((t :inherit outline-5 :weight semi-bold :height 1.0)))
+ '(org-level-6 ((t :inherit outline-6 :weight semi-bold :height 1.0)))
+ '(org-level-7 ((t :inherit outline-7 :weight semi-bold)))
+ '(org-level-8 ((t :inherit outline-8 :weight semi-bold)))
+ '(swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(swiper-background-match-face-3 ((t (:background "hot pink" :weight bold :background nil))))
+ '(swiper-background-match-face-4 ((t (:foreground "hot pink" :weight bold :background nil))))
+ '(swiper-line-face ((t (:background "#39374E" :weight bold :foreground nil))))
+ '(swiper-match-face-1 ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(swiper-match-face-2 ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(swiper-match-face-3 ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(swiper-match-face-4 ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
+ '(yas-field-highlight-face ((t (:foreground "hot pink")))))
 
 (provide 'emacs)
 ;;; emacs ends here

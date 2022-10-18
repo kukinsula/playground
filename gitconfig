@@ -25,5 +25,6 @@
 # Search
   search = grep --break --heading --line-number
   search-commit = log --pretty=\"format:%Cgreen%H %Cblue%s\" --name-status --grep
+
 [commit]
-	gpgsign = true
+  gpgsign = true
