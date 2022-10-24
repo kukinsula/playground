@@ -11,9 +11,9 @@ ZSH_COMPDUMP="$ZSH_CACHE_DIR/.zcompdump"
 
 autoload -Uz vcs_info
 precmd() { vcs_info }
-
 zstyle ':vcs_info:git:*' formats '%b '
-PROMPT='%B%F{157}[%2d]%f %F{159}${vcs_info_msg_0_}%f%(?.%F{256}▶%f.%F{203}%B▶%b%f) '
+
+PROMPT='%B%F{3}[%2d]%f %F{9}${vcs_info_msg_0_}%f%(?.%F{2}❯%f.%F{203}❯%f) '
 
 setopt NO_CASE_GLOB
 
