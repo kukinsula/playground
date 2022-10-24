@@ -266,7 +266,7 @@
       command = cd ~/info/damapp/apps/www && zsh
 [plugins]
   [[EditorPlugin]]
-    command = emacsclient -n +{line} {filepath}
+    command = '''emacsclient --eval '(progn (find-file "{filepath}") (goto-line {line}) (forward-char {column}) (recenter) (raise-frame))' --no-wait --alternate-editor="emacs --eval"'''
     match = \(?([^ \t\n\r\f\v:]+?):([0-9]+):?([0-9]+)?\)?
     groups = file line column
     open_in_current_term = False
