@@ -26,8 +26,8 @@ plugins=(
   colored-man-pages
 )
 
-export ZSH=$HOME/.oh-my-zsh
 zstyle ':omz:update' frequency 16
+export ZSH=$HOME/.oh-my-zsh
 source $ZSH/oh-my-zsh.sh
 
 # tabtab source for packages
@@ -99,23 +99,23 @@ export GO111MODULE=on
 export PATH=$HOME/.npm/bin:$GOPATH/bin:/usr/bin/vendor_perl:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin
 
 # Updates pacman, AUR and NPM packages
-update(){
+update() {
     sudo pacman -Syu
     aur -Syu
     npm update -g
     # pnpm update -g
 }
 
-loop(){
+loop() {
 		for i in {1..$1}; do eval $2; done
 }
 
 # Pacman helpers
-fuzzy-install(){
+fuzzy-install() {
     pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S
 }
 
-fuzzy-remove(){
+fuzzy-remove() {
     pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns
 }
 
@@ -126,25 +126,25 @@ BASE16_SHELL="$HOME/.config/base16-shell/"
     eval "$("$BASE16_SHELL/profile_helper.sh")"
 
 # Emacs vterm
-vterm_printf(){
-    if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
-        # Tell tmux to pass the escape sequences through
-        printf "\ePtmux;\e\e]%s\007\e\\" "$1"
-    elif [ "${TERM%%-*}" = "screen" ]; then
-        # GNU screen (screen, screen-256color, screen-256color-bce)
-        printf "\eP\e]%s\007\e\\" "$1"
-    else
-        printf "\e]%s\e\\" "$1"
-    fi
-}
+# vterm_printf(){
+#     if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ] ); then
+#         # Tell tmux to pass the escape sequences through
+#         printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+#     elif [ "${TERM%%-*}" = "screen" ]; then
+#         # GNU screen (screen, screen-256color, screen-256color-bce)
+#         printf "\eP\e]%s\007\e\\" "$1"
+#     else
+#         printf "\e]%s\e\\" "$1"
+#     fi
+# }
 
 # Rush auto completion
-autoload -U +X compinit && compinit
-autoload -U +X bashcompinit && bashcompinit
-source ~/.rush_auto_completion
+# autoload -U +X compinit && compinit
+# autoload -U +X bashcompinit && bashcompinit
+# source ~/.rush_auto_completion
 
 # bun completions
-[ -s "/home/kuk/.bun/_bun" ] && source "/home/kuk/.bun/_bun"
+# [ -s "/home/kuk/.bun/_bun" ] && source "/home/kuk/.bun/_bun"
 
 # Bun
 export BUN_INSTALL="/home/kuk/.bun"
@@ -157,48 +157,48 @@ export MCFLY_RESULTS=50
 export MCFLY_RESULTS_SORT=LAST_RUN
 
 # NPM autocompletion for ZSH
-if type compdef &>/dev/null; then
-    _npm_completion() {
-        local si=$IFS
+# if type compdef &>/dev/null; then
+#     _npm_completion() {
+#         local si=$IFS
 
-        # if your npm command includes `install`
-        if [[ ${words} =~ 'install' ]] || [[ ${words} =~ 'i ' ]]; then
-            compadd -- $(COMP_CWORD=$((CURRENT-1)) \
-                COMP_LINE=$BUFFER \
-                COMP_POINT=0 \
-                ls ~/.npm -- "${words[@]}" \
-                2>/dev/null)
+#         # if your npm command includes `install`
+#         if [[ ${words} =~ 'install' ]] || [[ ${words} =~ 'i ' ]]; then
+#             compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+#                 COMP_LINE=$BUFFER \
+#                 COMP_POINT=0 \
+#                 ls ~/.npm -- "${words[@]}" \
+#                 2>/dev/null)
 
-        else
-            compadd -- $(COMP_CWORD=$((CURRENT-1)) \
-                COMP_LINE=$BUFFER \
-                COMP_POINT=0 \
-                npm completion -- "${words[@]}" \
-                2>/dev/null)
-        fi
+#         else
+#             compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+#                 COMP_LINE=$BUFFER \
+#                 COMP_POINT=0 \
+#                 npm completion -- "${words[@]}" \
+#                 2>/dev/null)
+#         fi
 
-        IFS=$si
-    }
-    compdef _npm_completion npm
-elif type compctl &>/dev/null; then
+#         IFS=$si
+#     }
+#     compdef _npm_completion npm
+# elif type compctl &>/dev/null; then
 
-    _npm_completion () {
-        local cword line point words si
-        read -Ac words
-        read -cn cword
-        let cword-=1
-        read -l line
-        read -ln point
-        si="$IFS"
-        IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-            COMP_LINE="$line" \
-            COMP_POINT="$point" \
-            npm completion -- "${words[@]}" \
-            2>/dev/null)) || return $?
-        IFS="$si"
-    }
-    compctl -K _npm_completion npm
-fi
+#     _npm_completion () {
+#         local cword line point words si
+#         read -Ac words
+#         read -cn cword
+#         let cword-=1
+#         read -l line
+#         read -ln point
+#         si="$IFS"
+#         IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+#             COMP_LINE="$line" \
+#             COMP_POINT="$point" \
+#             npm completion -- "${words[@]}" \
+#             2>/dev/null)) || return $?
+#         IFS="$si"
+#     }
+#     compctl -K _npm_completion npm
+# fi
 
 # Turnoff zsh profiler
 # zprof
