@@ -1276,9 +1276,9 @@ It is assumed that the author has only one or two names."
                                              ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")
 
                                              ;; Git
-                                             ("rush pre-commit" . "git commit")
-                                             ("rush commit all" . "git commit -a")
-                                             ("rush pre-push" . "git push")))
+                                             ("git pre-commit" . "git commit")
+                                             ("git commit all" . "git commit -a")
+                                             ("git pre-push" . "git push")))
 
                          ;; JSON
                          (json-mode . (
@@ -1304,9 +1304,9 @@ It is assumed that the author has only one or two names."
                                        ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")
 
                                        ;; Git
-                                       ("rush pre-commit" . "git commit")
-                                       ("rush commit all" . "git commit -a")
-                                       ("rush pre-push" . "git push")))
+                                       ("git pre-commit" . "git commit")
+                                       ("git commit all" . "git commit -a")
+                                       ("git pre-push" . "git push")))
 
                          ;; YAML
                          (yaml-mode . (
@@ -1331,9 +1331,9 @@ It is assumed that the author has only one or two names."
                                        ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")
 
                                        ;; Git
-                                       ("rush commit all" . "git commit -a")
-                                       ("rush pre-commit" . "git commit")
-                                       ("rush pre-push" . "git push")))
+                                       ("git commit all" . "git commit -a")
+                                       ("git pre-commit" . "git commit")
+                                       ("git pre-push" . "git push")))
 
                          ;; Golang
                          (go-mode . (("go build" . "go build")
