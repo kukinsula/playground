@@ -571,9 +571,9 @@
 
 ;; Rebind previous/next buffer
 (global-unset-key (kbd "C-x <left>"))
-(global-set-key (kbd "s-<left>") 'previous-buffer)
+(global-set-key (kbd "M-<left>") 'previous-buffer)
 (global-unset-key (kbd "C-x <right>"))
-(global-set-key (kbd "s-<right>") 'next-buffer)
+(global-set-key (kbd "M-<right>") 'next-buffer)
 
 ;; Create a new frame
 (global-unset-key (kbd "C-S-n"))
