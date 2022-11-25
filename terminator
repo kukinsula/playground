@@ -3,15 +3,11 @@
   tab_position = hidden
   enabled_plugins = CustomCommandsMenu, LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, EditorPlugin
   suppress_multiple_term_dialog = True
-  title_use_system_font = False
-  title_font = Source Code Pro 18
-  line_height = 1.1
+  cell_height = 1.1
 [keybindings]
 [profiles]
   [[default]]
     background_color = "#1c1c1c"
-    cursor_color = "#ffffff"
-    cursor_color_fg = False
     font = Source Code Pro 18
     foreground_color = "#d3d7cf"
     show_titlebar = False

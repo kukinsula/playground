@@ -51,6 +51,8 @@ export TERM=xterm-256color
 
 # Aliases
 
+preexec(){ [ $1 != $2 ] && print -r "> $2" }
+
 ## ls
 # alias ls='logo-ls -l --human-readable --git-status --time-style RFC822'
 # alias ll='ls -lh'
