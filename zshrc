@@ -16,6 +16,7 @@ zstyle ':vcs_info:git:*' formats '%b '
 PROMPT='%B%F{3}[%2d]%f %F{9}${vcs_info_msg_0_}%f%(?.%F{2}❯%f.%F{203}❯%f) '
 
 setopt NO_CASE_GLOB
+unsetopt share_history
 
 #
 
@@ -61,6 +62,7 @@ preexec(){ [ $1 != $2 ] && print -r "> $2" }
 alias ls='exa --color always --binary --icons --modified --git'
 alias ll='ls --long'
 alias la='ll --all'
+alias lll='ll'
 
 alias -s pdf='evince'
 alias e=$EDITOR

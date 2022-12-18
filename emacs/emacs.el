@@ -1273,7 +1273,7 @@ It is assumed that the author has only one or two names."
                                              ("rush check" . "rush check")
                                              ("rush scan" . "rush scan")
                                              ("rush clean" . "rush clean")
-                                             ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")
+                                             ("rush clean update build" . "rush clean && rush update && rush build")
 
                                              ;; Git
                                              ("git pre-commit" . "git commit")
@@ -1301,7 +1301,7 @@ It is assumed that the author has only one or two names."
                                        ("rush check" . "rush check")
                                        ("rush scan" . "rush scan")
                                        ("rush clean" . "rush clean")
-                                       ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")
+                                       ("rush clean update build" . "rush clean && rush update && rush build")
 
                                        ;; Git
                                        ("git pre-commit" . "git commit")
@@ -1328,7 +1328,7 @@ It is assumed that the author has only one or two names."
                                        ("rush check" . "rush check")
                                        ("rush scan" . "rush scan")
                                        ("rush clean" . "rush clean")
-                                       ("rush clean update rebuild" . "rush clean && rush update && rush rebuild")
+                                       ("rush clean update build" . "rush clean && rush update && rush build")
 
                                        ;; Git
                                        ("git commit all" . "git commit -a")

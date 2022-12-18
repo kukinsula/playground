@@ -127,6 +127,7 @@ sudo pacman -S \
   exa \
   duf \
   hblock \
+  gource
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
@@ -145,7 +146,7 @@ fwupdmgr refresh
 fwupdmgr get-updates
 fwupdmgr update
 
-## RSA keys
+## SSH keys
 ssh-keygen -t ed25519
 
 # YaY
