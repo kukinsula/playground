@@ -26,5 +26,8 @@
   search = grep --break --heading --line-number
   search-commit = log --pretty=\"format:%Cgreen%H %Cblue%s\" --name-status --grep
 
+# Stats
+  stats = shortlog --summary --numbered --email
+
 [commit]
   gpgsign = true
