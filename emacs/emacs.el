@@ -99,6 +99,20 @@
 ;;
 ;; * emacs open file at line
 
+;; ToDo
+;;
+;; tree-sitter
+;;
+;; eglot
+;;
+;; eldoc
+;;
+;; vertico
+;;
+;; elfeed
+;;
+;; scroll-pixel-precision
+
 (setq byte-compile-warnings '(not obsolete))
 
 ;; Memory
@@ -130,6 +144,19 @@
 
 (eval-when-compile
   (require 'use-package))
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 ;; Common Lisp
 (with-no-warnings
@@ -803,6 +830,47 @@
 ;;                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package tree-sitter
+  :ensure t
+  :config
+  (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+  :custom-face
+  (tree-sitter-hl-face ((t (:inherit bold :underline t))))
+  (tree-sitter-hl-face:string ((t (:inherit font-lock-string-face :foreground "SeaGreen3"))))
+  )
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
+(use-package ts-fold
+  :straight (ts-fold :type git
+                     :host github
+                     :repo "emacs-tree-sitter/ts-fold")
+  :config (global-ts-fold-mode t)
+  :bind (("C-c C-t f t" . ts-fold-toggle)
+         ("C-c C-t f o" . ts-fold-open-all)))
+
+;; (use-package eglot
+;;   :ensure t
+
+;;   :custom
+;;   (eglot-send-changes-idle-time 1)
+
+;;   :config
+;;   (add-hook 'typescript-mode-hook 'eglot-ensure)
+
+;;   :custom-face
+;;   (eglot-highlight-symbol-face ((t (:inherit bold :underline t))))
+;;   )
+
+(use-package apheleia
+  :ensure t
+  :config
+  (apheleia-global-mode +1))
+
 ;; VC auto refresh git branch
 (setq vc-handled-backends nil)
 (setq auto-revert-check-vc-info nil)
@@ -1440,6 +1508,14 @@ It is assumed that the author has only one or two names."
            web-mode-enable-current-element-highlight t))
 
 ;; Typescript
+(use-package typescript-mode
+  :ensure t
+  :after tree-sitter
+  :diminish
+
+  :custom
+  (typescript-indent-level 2))
+
 (use-package tide
   :ensure t
   :diminish
@@ -1483,7 +1559,8 @@ It is assumed that the author has only one or two names."
                          :insertSpaceBeforeTypeAnnotation nil
                          :insertSpaceAfterTypeAssertion nil))
   :hook ((typescript-mode . setup-tide)
-         (typescript-mode . prettier-mode))
+         ;; (typescript-mode . prettier-mode)
+         )
   :bind (("C-c C-t r s" . tide-rename-symbol)
          ("C-c C-t r f" . tide-rename-file)
          ("C-c C-t f r" . tide-references)
@@ -1492,9 +1569,6 @@ It is assumed that the author has only one or two names."
          ("C-c C-t p" . prettier-prettify))
   :custom-face
   (tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
-
-;; (use-package eglot
-;;   :ensure t)
 
 (use-package npm-mode
   :ensure t
@@ -1838,7 +1912,7 @@ It is assumed that the author has only one or two names."
  '(custom-safe-themes
    '("cbdf8c2e1b2b5c15b34ddb5063f1b21514c7169ff20e081d39cf57ffee89bc1e" "4f1d2476c290eaa5d9ab9d13b60f2c0f1c8fa7703596fa91b235db7f99a9441b" "d268b67e0935b9ebc427cad88ded41e875abfcc27abd409726a92e55459e0d01" default))
  '(package-selected-packages
-   '(helm-ag pacmacs ivy-posframe blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
+   '(apheleia eglot tree-sitter-langs tree-sitter helm-ag pacmacs ivy-posframe blamer compile-eslint goto-last-change prettify-symbols-mode pretty speed-type neotree pdf-tools multi-compile scss-mode yasnippet-snippets counsel-tramp all-the-icons-ivy pkgbuild-mode emmet-mode web-mode web markdown-mode cyphejor unicode-fonts vterm writeroom-mode which-key uuidgen use-package undo-fu tide systemd rainbow-mode rainbow-delimiters prettier-mode org-superstar npm-mode multiple-cursors move-text minions magit json-mode ivy-prescient helpful gcmh flx exec-path-from-shell esup doom-themes doom-modeline dockerfile-mode docker-compose-mode dired-subtree dimmer diminish dashboard csv-mode counsel-projectile company-statistics company-prescient company-box bug-hunter auto-package-update all-the-icons-dired aggressive-indent ag add-node-modules-path))
  '(writeroom-global-effects
    '(writeroom-set-fullscreen writeroom-set-alpha writeroom-set-menu-bar-lines writeroom-set-tool-bar-lines writeroom-set-vertical-scroll-bars writeroom-set-bottom-divider-width)))
 
@@ -1847,7 +1921,7 @@ It is assumed that the author has only one or two names."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))))
+ '(ag-match-face ((t (:background nil :foreground "hot pink" :weight bold))) t)
  '(blamer-face ((t :foreground "#7a88cf" :background nil :height 0.8 :italic t)))
  '(company-template-field ((t (:inherit company-box-scrollbar))))
  '(company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
@@ -1882,15 +1956,15 @@ It is assumed that the author has only one or two names."
  '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
  '(magit-reflog-other ((t (:foreground "#95FFA4"))))
  '(magit-reflog-remote ((t (:foreground "#95FFA4"))))
- '(org-document-title ((t :height 2.0)))
- '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)))
- '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)))
- '(org-level-3 ((t :inherit outline-3 :weight bold :height 1.1)))
- '(org-level-4 ((t :inherit outline-4 :weight bold :height 1.0)))
- '(org-level-5 ((t :inherit outline-5 :weight semi-bold :height 1.0)))
- '(org-level-6 ((t :inherit outline-6 :weight semi-bold :height 1.0)))
- '(org-level-7 ((t :inherit outline-7 :weight semi-bold)))
- '(org-level-8 ((t :inherit outline-8 :weight semi-bold)))
+ '(org-document-title ((t :height 2.0)) t)
+ '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)) t)
+ '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)) t)
+ '(org-level-3 ((t :inherit outline-3 :weight bold :height 1.1)) t)
+ '(org-level-4 ((t :inherit outline-4 :weight bold :height 1.0)) t)
+ '(org-level-5 ((t :inherit outline-5 :weight semi-bold :height 1.0)) t)
+ '(org-level-6 ((t :inherit outline-6 :weight semi-bold :height 1.0)) t)
+ '(org-level-7 ((t :inherit outline-7 :weight semi-bold)) t)
+ '(org-level-8 ((t :inherit outline-8 :weight semi-bold)) t)
  '(swiper-background-match-face-1 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(swiper-background-match-face-2 ((t (:foreground "hot pink" :weight bold :background nil))))
  '(swiper-background-match-face-3 ((t (:background "hot pink" :weight bold :background nil))))
@@ -1901,6 +1975,8 @@ It is assumed that the author has only one or two names."
  '(swiper-match-face-3 ((t (:background nil :foreground "hot pink" :weight bold))))
  '(swiper-match-face-4 ((t (:background nil :foreground "hot pink" :weight bold))))
  '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
+ '(tree-sitter-hl-face ((t (:background "nil"))) t)
+ '(tree-sitter-hl-face:string ((t (:inherit font-lock-string-face :foreground "SeaGreen3"))))
  '(yas-field-highlight-face ((t (:foreground "hot pink")))))
 
 (provide 'emacs)
