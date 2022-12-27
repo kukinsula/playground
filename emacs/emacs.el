@@ -255,7 +255,11 @@
   (uniquify-ignore-buffers-re "^\\*")
   (uniquify-after-kill-buffer-p t))
 
-(global-eldoc-mode t)
+(use-package eldoc
+  :custom
+  (eldoc-idle-delay 0)
+  :config
+  (global-eldoc-mode t))
 
 ;; Helpful
 (use-package helpful
