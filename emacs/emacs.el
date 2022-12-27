@@ -1852,6 +1852,31 @@ It is assumed that the author has only one or two names."
 
 (global-set-key (kbd "<f5>") 'revert-buffer)
 
+(use-package elfeed
+  :ensure t
+
+  :config
+  (add-hook 'elfeed-mode-hook
+            (lambda ()
+              (set-fill-column 120)))
+
+  (global-set-key (kbd "C-x w") 'elfeed)
+
+  :custom
+  (elfeed-feeds
+   '(("https://www.reddit.com/r/emacs.rss" emacs)
+     ("https://news.ycombinator.com/rss" hacker)
+     ("https://www.reddit.com/r/javascript.rss" javascript)
+     ("https://www.reddit.com/r/typescript.rss" typescript)
+     )
+   )
+  )
+
+(use-package elfeed-goodies
+  :ensure t
+  :config
+  (elfeed-goodies/setup))
+
 (defun reset-session ()
   "Kill all buffers except *Messages* and *dashboard**."
   (interactive)
