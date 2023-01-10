@@ -320,8 +320,7 @@
 
 (use-package eww
   :config
-  (toggle-truncate-lines nil)
-  )
+  (toggle-truncate-lines nil))
 
 ;; line:column in modeline
 (line-number-mode t)
@@ -404,6 +403,7 @@
   (doom-modeline-icon t)
   (doom-modeline-major-mode-color-icon t)
   (doom-modeline-buffer-modification-icon t)
+  (doom-modeline-buffer-file-name t)
   (doom-modeline-checker-simple-format t)
   (doom-modeline-bar-width 10)
   (doom-modeline-height 25)
@@ -416,6 +416,7 @@
   (doom-modeline-env-version nil)
   :custom-face
   (doom-modeline-bar ((t (:background "#906CFF"))))
+  (doom-modeline-buffer-modified ((t (:background nil :foreground "#FF8080"))))
   (doom-modeline-bar-inactive ((t (:background "#191729")))))
 
 (use-package minions
@@ -1010,7 +1011,7 @@ It is assumed that the author has only one or two names."
   :ensure t
   :diminish
   :custom
-  (company-idle-delay 0.2)
+  (company-idle-delay 0)
   (company-echo-delay 0)
   (company-tooltip-align-annotations t)
   (company-minimum-prefix-length 1)
@@ -1543,6 +1544,7 @@ It is assumed that the author has only one or two names."
   (typescript-indent-level 2)
   (tide-completion-ignore-case t)
   (tide-hl-identifier-idle-time 0.2)
+  (tide-save-buffer-after-code-edit nil)
   (tide-format-options '(
                          :insertSpaceAfterFunctionKeywordForAnonymousFunctions t
                          :placeOpenBraceOnNewLineForFunctions nil
@@ -1858,7 +1860,7 @@ It is assumed that the author has only one or two names."
   :config
   (add-hook 'elfeed-mode-hook
             (lambda ()
-              (set-fill-column 120)))
+              (setq-default truncate-lines nil)))
 
   (global-set-key (kbd "C-x w") 'elfeed)
 
