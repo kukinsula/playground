@@ -38,8 +38,6 @@
 ;;
 ;; * DAP https://github.com/emacs-lsp/dap-mode
 ;;
-;; * ElDoc
-;;
 ;; * Prisme.el
 ;;
 ;; * DAP
@@ -47,8 +45,6 @@
 ;; * Désactiver pleins de trucs si on est en mode text
 ;;
 ;; * Popper.el
-;;
-;; * pixel-scroll-mode
 ;;
 ;; * quelpa
 ;;
@@ -101,17 +97,15 @@
 
 ;; ToDo
 ;;
-;; tree-sitter
-;;
 ;; eglot
-;;
-;; eldoc
 ;;
 ;; vertico
 ;;
 ;; elfeed
 ;;
-;; scroll-pixel-precision
+;; pixel-scroll-precision-mode (emacs 29)
+;;
+;; flymake
 
 (setq byte-compile-warnings '(not obsolete))
 
@@ -177,6 +171,12 @@
       save-buffer-coding-system 'utf-8
       process-coding-system-alist (cons '("grep" utf-8 . utf-8) process-coding-system-alist))
 (prefer-coding-system 'utf-8)
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-language-environment 'utf-8)
 
 ;; Default browser
 (setq browse-url-browser-function 'browse-url-generic
@@ -394,7 +394,7 @@
     '(buffer-info)
     '(misc-info buffer-position process checker))
   :custom
-  (doom-modeline-set-modeline 'main 'default)
+  (doom-modeline-set-modeline 'main t)
   (size-indication-mode nil)
   (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-minor-modes t)
@@ -666,7 +666,7 @@
 ;; Dimm unfocused buffers.
 (use-package dimmer
   :ensure t
-  :disabled t
+  ;; :disabled t
   :custom (dimmer-fraction 0.1)
   :config (dimmer-mode))
 
@@ -850,13 +850,13 @@
   :ensure t
   :after tree-sitter)
 
-(use-package ts-fold
-  :straight (ts-fold :type git
-                     :host github
-                     :repo "emacs-tree-sitter/ts-fold")
-  :config (global-ts-fold-mode t)
-  :bind (("C-c C-t f t" . ts-fold-toggle)
-         ("C-c C-t f o" . ts-fold-open-all)))
+;; (use-package ts-fold
+;;   :straight (ts-fold :type git
+;;                      :host github
+;;                      :repo "emacs-tree-sitter/ts-fold")
+;;   :config (global-ts-fold-mode t)
+;;   :bind (("C-c C-t f t" . ts-fold-toggle)
+;;          ("C-c C-t f o" . ts-fold-open-all)))
 
 ;; (use-package eglot
 ;;   :ensure t
@@ -864,17 +864,17 @@
 ;;   :custom
 ;;   (eglot-send-changes-idle-time 1)
 
+;; :config
+;; (add-hook 'typescript-mode-hook 'eglot-ensure)
+
+;; :custom-face
+;; (eglot-highlight-symbol-face ((t (:inherit bold :underline t))))
+;; )
+
+;; (use-package apheleia
+;;   :ensure t
 ;;   :config
-;;   (add-hook 'typescript-mode-hook 'eglot-ensure)
-
-;;   :custom-face
-;;   (eglot-highlight-symbol-face ((t (:inherit bold :underline t))))
-;;   )
-
-(use-package apheleia
-  :ensure t
-  :config
-  (apheleia-global-mode +1))
+;;   (apheleia-global-mode +1))
 
 ;; VC auto refresh git branch
 (setq vc-handled-backends nil)
@@ -1174,8 +1174,9 @@ It is assumed that the author has only one or two names."
   :ensure t
   :diminish
   :custom
-  (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch))
+  (flycheck-check-syntax-automatically '(save idle-change new-line idle-buffer-switch))
   (flycheck-idle-buffer-switch-delay 0.5)
+  (flycheck-idle-change 0.5)
   (flycheck-checker-error-threshold 2000)
   :bind (("M-n" . flycheck-next-error)
          ("M-p" . flycheck-previous-error))
@@ -1512,6 +1513,15 @@ It is assumed that the author has only one or two names."
            web-mode-enable-auto-indentation t
            web-mode-enable-current-element-highlight t))
 
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-hook 'web-mode-hook
+          (lambda ()
+            (when (string-equal "tsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+;; enable typescript-tslint checker
+(flycheck-add-mode 'typescript-tslint 'web-mode)
+
 ;; Typescript
 (use-package typescript-mode
   :ensure t
@@ -1528,7 +1538,7 @@ It is assumed that the author has only one or two names."
   (defun setup-tide ()
     "Setup tide environment."
     (tide-setup)
-    (tide-hl-identifier-mode)
+    (tide-hl-identifier-mode t)
 
     ;; Use ESLint with tide-mode
     (flycheck-add-mode 'javascript-eslint 'tide-mode)
@@ -1543,7 +1553,7 @@ It is assumed that the author has only one or two names."
   (tide-server-max-response-length 1048576)
   (typescript-indent-level 2)
   (tide-completion-ignore-case t)
-  (tide-hl-identifier-idle-time 0.2)
+  (tide-hl-identifier-idle-time 0)
   (tide-save-buffer-after-code-edit nil)
   (tide-format-options '(
                          :insertSpaceAfterFunctionKeywordForAnonymousFunctions t
@@ -1565,8 +1575,8 @@ It is assumed that the author has only one or two names."
                          :insertSpaceBeforeTypeAnnotation nil
                          :insertSpaceAfterTypeAssertion nil))
   :hook ((typescript-mode . setup-tide)
-         ;; (typescript-mode . prettier-mode)
-         )
+         (typescript-mode . prettier-mode)
+         (before-save . prettier-prettify))
   :bind (("C-c C-t r s" . tide-rename-symbol)
          ("C-c C-t r f" . tide-rename-file)
          ("C-c C-t f r" . tide-references)
@@ -1574,7 +1584,7 @@ It is assumed that the author has only one or two names."
          ("C-c C-t e" . tide-project-errors)
          ("C-c C-t p" . prettier-prettify))
   :custom-face
-  (tide-hl-identifier-face ((t (:background nil :underline t :weight bold)))))
+  (tide-hl-identifier-face ((t (:inherit nil :background nil :underline t :weight bold)))))
 
 (use-package npm-mode
   :ensure t
@@ -1589,6 +1599,11 @@ It is assumed that the author has only one or two names."
 ;; ESLint errors regexp in compilation buffer
 (use-package compile-eslint
   :load-path "elpa/compile-eslint"
+
+  ;; :ensure t
+  ;; :straight (compile-eslint :type git
+  ;; :host github
+  ;; :repo "Fuco1/compile-eslint")
   :config
   (push 'eslint compilation-error-regexp-alist))
 
@@ -1621,11 +1636,12 @@ It is assumed that the author has only one or two names."
 (use-package org
   :ensure nil
   :diminish
-  :config
-  (define-key org-mode-map (kbd "<C-tab>") 'other-window)
+  ;; :config
+  ;; (define-key org-mode-map (kbd "<C-tab>") 'other-window)
   (org-support-shift-select t)
   :hook ((org-mode . org-indent-mode)
-         (org-mode . visual-line-mode))
+         (org-mode . visual-line-mode)
+         (org-mode . org-bullets-mode))
   :custom (org-hide-emphasis-markers t)
   :custom-face
   (org-document-title ((t :height 2.0)))
@@ -1638,14 +1654,8 @@ It is assumed that the author has only one or two names."
   (org-level-7 ((t :inherit outline-7 :weight semi-bold)))
   (org-level-8 ((t :inherit outline-8 :weight semi-bold))))
 
-(use-package org-superstar
-  :ensure t
-  :diminish
-  :after (org)
-  :hook (org-mode . org-superstar-mode)
-  :custom
-  (org-superstar-remove-leading-stars t)
-  (org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "◉" "🞛" "○" "▷")))
+(use-package org-bullets
+  :ensure t)
 
 (use-package dockerfile-mode
   :ensure t
@@ -1856,6 +1866,7 @@ It is assumed that the author has only one or two names."
 
 (use-package elfeed
   :ensure t
+  :disabled t
 
   :config
   (add-hook 'elfeed-mode-hook
@@ -1870,12 +1881,14 @@ It is assumed that the author has only one or two names."
      ("https://news.ycombinator.com/rss" hacker)
      ("https://www.reddit.com/r/javascript.rss" javascript)
      ("https://www.reddit.com/r/typescript.rss" typescript)
+     ("https://stackoverflow.blog/feed/" stackoverflow)
      )
    )
   )
 
 (use-package elfeed-goodies
   :ensure t
+  :disabled t
   :config
   (elfeed-goodies/setup))
 
@@ -1987,6 +2000,7 @@ It is assumed that the author has only one or two names."
  '(magit-header-line ((t (:background "#40346e" :foreground "white smoke" :box (:line-width 3 :color "#40346e") :weight bold))))
  '(magit-reflog-other ((t (:foreground "#95FFA4"))))
  '(magit-reflog-remote ((t (:foreground "#95FFA4"))))
+ '(markdown-code-face ((t (:extend t :background "nil"))))
  '(org-document-title ((t :height 2.0)) t)
  '(org-level-1 ((t :inherit outline-1 :weight extra-bold :height 1.5)) t)
  '(org-level-2 ((t :inherit outline-2 :weight bold :height 1.3)) t)
@@ -2005,7 +2019,7 @@ It is assumed that the author has only one or two names."
  '(swiper-match-face-2 ((t (:background nil :foreground "hot pink" :weight bold))))
  '(swiper-match-face-3 ((t (:background nil :foreground "hot pink" :weight bold))))
  '(swiper-match-face-4 ((t (:background nil :foreground "hot pink" :weight bold))))
- '(tide-hl-identifier-face ((t (:background nil :underline t :weight bold))))
+ '(tide-hl-identifier-face ((t (:inherit nil :background nil :underline t :weight bold))))
  '(tree-sitter-hl-face ((t (:background "nil"))) t)
  '(tree-sitter-hl-face:string ((t (:inherit font-lock-string-face :foreground "SeaGreen3"))))
  '(yas-field-highlight-face ((t (:foreground "hot pink")))))

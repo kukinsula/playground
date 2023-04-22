@@ -13,7 +13,8 @@ autoload -Uz vcs_info
 precmd() { vcs_info }
 zstyle ':vcs_info:git:*' formats '%b '
 
-PROMPT='%B%F{3}[%2d]%f %F{9}${vcs_info_msg_0_}%f%(?.%F{2}❯%f.%F{203}❯%f) '
+ZSH_THEME="robbyrussell"
+# PROMPT='%B%F{3}[%2d]%f %F{9}${vcs_info_msg_0_}%f%(?.%F{2}»%f.%F{203}❯%f) '
 
 setopt NO_CASE_GLOB
 unsetopt share_history
@@ -151,10 +152,10 @@ export BUN_INSTALL="/home/kuk/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # McFly
-eval "$(mcfly init zsh)"
-export MCFLY_FUZZY=2
-export MCFLY_RESULTS=50
-export MCFLY_RESULTS_SORT=LAST_RUN
+# eval "$(mcfly init zsh)"
+# export MCFLY_FUZZY=2
+# export MCFLY_RESULTS=50
+# export MCFLY_RESULTS_SORT=LAST_RUN
 
 # NPM autocompletion for ZSH
 # if type compdef &>/dev/null; then

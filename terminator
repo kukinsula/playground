@@ -4,7 +4,9 @@
   enabled_plugins = CustomCommandsMenu, LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, EditorPlugin
   suppress_multiple_term_dialog = True
   cell_height = 1.1
+  case_sensitive = False
 [keybindings]
+  switch_to_tab_1 = <Primary><Alt>1
 [profiles]
   [[default]]
     background_color = "#1c1c1c"
@@ -27,7 +29,6 @@
       maximised = True
       fullscreen = False
       size = 1920, 1143
-      title = kuk@x1-carbon:~/info/damapp/apps/api
       last_active_term = 61a128c5-dea6-4cdd-9190-1f23ce0f3841
       last_active_window = True
   [[Dametis dev]]
@@ -195,71 +196,103 @@
       type = Window
       parent = ""
       order = 0
-      position = 0:29
+      position = 0:28
       maximised = True
       fullscreen = False
-      size = 1920, 1143
-      last_active_term = 61a128c5-dea6-4cdd-9190-1f23ce0f3841
+      size = 1920, 1144
+      last_active_term = 5ec645cb-3c28-48e1-8e13-28c754794d5b
       last_active_window = True
     [[[child1]]]
       type = HPaned
       parent = child0
       order = 0
-      position = 1203
-      ratio = 0.6281984334203655
+      position = 1248
+      ratio = 0.6516971279373368
     [[[child2]]]
       type = VPaned
       parent = child1
       order = 0
-      position = 569
-      ratio = 0.5
+      position = 774
+      ratio = 0.6795434591747147
     [[[terminal3]]]
       type = Terminal
       parent = child2
       order = 0
       profile = default
-      uuid = 61a128c5-dea6-4cdd-9190-1f23ce0f3841
+      uuid = 5ec645cb-3c28-48e1-8e13-28c754794d5b
       command = cd ~/info/damapp/apps/api && zsh
     [[[terminal4]]]
       type = Terminal
       parent = child2
       order = 1
       profile = default
-      uuid = fc8ea045-4565-42bd-aa7b-1c8c99ac5e32
+      uuid = 380dc46b-1756-49fe-a762-5cf208d2d207
       command = cd ~/info/damapp/apps/api && zsh
     [[[child5]]]
       type = VPaned
       parent = child1
       order = 1
-      position = 184
-      ratio = 0.1616871704745167
+      position = 179
+      ratio = 0.15715539947322213
     [[[terminal6]]]
       type = Terminal
       parent = child5
       order = 0
       profile = default
-      uuid = 2582e48a-b3cb-4b94-a549-a3d54f88e072
+      uuid = 228ca385-fad8-464f-b9b4-452f1b5ff27d
       command = cd ~/info/damapp/apps/api && zsh
     [[[child7]]]
       type = VPaned
       parent = child5
       order = 1
-      position = 737
-      ratio = 0.7741596638655462
+      position = 710
+      ratio = 0.7426778242677824
     [[[terminal8]]]
       type = Terminal
       parent = child7
       order = 0
       profile = default
-      uuid = 3c82067f-1e27-47c3-b58c-c4be0437e72b
+      uuid = ac64b8ff-865f-4b56-b6b0-dbb76a3f581c
       command = cd ~/info/damapp/apps/bull-workers && zsh
     [[[terminal9]]]
       type = Terminal
       parent = child7
       order = 1
       profile = default
-      uuid = 5ec645cb-3c28-48e1-8e13-28c754794d5b
+      uuid = de561c46-1f1b-43e4-82e5-514413ac635c
       command = cd ~/info/damapp/apps/www && zsh
+  [[Dametis testing]]
+    [[[child0]]]
+      type = Window
+      parent = ""
+      order = 0
+      position = 0:34
+      maximised = True
+      fullscreen = False
+      size = 1920, 1018
+      title = Dametis testing
+      last_active_term = d8178671-7887-4a8f-b9ab-55963d02fb1e
+      last_active_window = True
+    [[[child1]]]
+      type = HPaned
+      parent = child0
+      order = 0
+      position = 958
+      ratio = 0.5002610966057441
+    [[[terminal2]]]
+      type = Terminal
+      parent = child1
+      order = 0
+      profile = default
+      uuid = d8178671-7887-4a8f-b9ab-55963d02fb1e
+      command = ssh testing.console && bash
+    [[[terminal3]]]
+      type = Terminal
+      parent = child1
+      order = 1
+      profile = default
+      uuid = d7310a64-7eec-417e-ae1c-0a96eb57d13a
+      command = ssh testing.console.clickhouse && bash
 [plugins]
   [[EditorPlugin]]
     command = '''emacsclient --eval '(progn (find-file "{filepath}") (goto-line {line}) (forward-char {column}) (recenter) (raise-frame))' --no-wait --alternate-editor="emacs --eval"'''

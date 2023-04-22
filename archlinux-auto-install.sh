@@ -127,7 +127,9 @@ sudo pacman -S \
   exa \
   duf \
   hblock \
-  gource
+  gource \
+  texlive-most \
+  mgba-qt
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
