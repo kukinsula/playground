@@ -234,7 +234,9 @@ npm install -g \
   ts-node-dev \
   tsun \
   # migrate-mongo \
-  eslint_d
+  eslint_d \
+  npm i -g turbo \
+  npm i -g pnpm
 
 # Docker
 sudo groupadd docker

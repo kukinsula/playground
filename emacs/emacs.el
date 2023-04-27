@@ -1336,18 +1336,22 @@ It is assumed that the author has only one or two names."
                                              ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                              ("npm run clean" . "npm run clean")
 
-                                             ;; Rush
-                                             ("rush build" . "rush build --verbose")
-                                             ("rush rebuild" . "rush rebuild --verbose")
-                                             ("rush install" . "rush install")
-                                             ("rush update" . "rush update")
-                                             ("rush purge" . "rush purge")
-                                             ("rush test" . "rush test --verbose")
-                                             ("rush lint" . "rush lint --verbose")
-                                             ("rush check" . "rush check")
-                                             ("rush scan" . "rush scan")
-                                             ("rush clean" . "rush clean")
-                                             ("rush clean update build" . "rush clean && rush update && rush build")
+                                             ;; ;; Rush
+                                             ;; ("rush build" . "rush build --verbose")
+                                             ;; ("rush rebuild" . "rush rebuild --verbose")
+                                             ;; ("rush install" . "rush install")
+                                             ;; ("rush update" . "rush update")
+                                             ;; ("rush purge" . "rush purge")
+                                             ;; ("rush test" . "rush test --verbose")
+                                             ;; ("rush lint" . "rush lint --verbose")
+                                             ;; ("rush check" . "rush check")
+                                             ;; ("rush scan" . "rush scan")
+                                             ;; ("rush clean" . "rush clean")
+                                             ;; ("rush clean update build" . "rush clean && rush update && rush build")
+
+                                             ;; Turbo
+                                             ("turbo build" . "turbo build --filter='*'")
+                                             ("turbo update" . "turbo update")
 
                                              ;; Git
                                              ("git pre-commit" . "git commit")
@@ -1364,18 +1368,22 @@ It is assumed that the author has only one or two names."
                                        ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                        ("npm run clean" . "npm run clean")
 
-                                       ;; Rush
-                                       ("rush build" . "rush build --verbose")
-                                       ("rush rebuild" . "rush rebuild --verbose")
-                                       ("rush install" . "rush install --verbose")
-                                       ("rush update" . "rush update")
-                                       ("rush-update --full" . "rush update --full")
-                                       ("rush test" . "rush test --verbose")
-                                       ("rush lint" . "rush lint --verbose")
-                                       ("rush check" . "rush check")
-                                       ("rush scan" . "rush scan")
-                                       ("rush clean" . "rush clean")
-                                       ("rush clean update build" . "rush clean && rush update && rush build")
+                                       ;; ;; Rush
+                                       ;; ("rush build" . "rush build --verbose")
+                                       ;; ("rush rebuild" . "rush rebuild --verbose")
+                                       ;; ("rush install" . "rush install --verbose")
+                                       ;; ("rush update" . "rush update")
+                                       ;; ("rush-update --full" . "rush update --full")
+                                       ;; ("rush test" . "rush test --verbose")
+                                       ;; ("rush lint" . "rush lint --verbose")
+                                       ;; ("rush check" . "rush check")
+                                       ;; ("rush scan" . "rush scan")
+                                       ;; ("rush clean" . "rush clean")
+                                       ;; ("rush clean update build" . "rush clean && rush update && rush build")
+
+                                       ;; Turbo
+                                       ("turbo build" . "turbo build --filter='*'")
+                                       ("turbo update" . "turbo update")
 
                                        ;; Git
                                        ("git pre-commit" . "git commit")
@@ -1392,17 +1400,21 @@ It is assumed that the author has only one or two names."
                                        ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                        ("npm run clean" . "npm run clean")
 
-                                       ;; Rush
-                                       ("rush build" . "rush build --verbose")
-                                       ("rush rebuild" . "rush rebuild --verbose")
-                                       ("rush install" . "rush install --verbose")
-                                       ("rush update" . "rush update")
-                                       ("rush test" . "rush test --verbose")
-                                       ("rush lint" . "rush lint --verbose")
-                                       ("rush check" . "rush check")
-                                       ("rush scan" . "rush scan")
-                                       ("rush clean" . "rush clean")
-                                       ("rush clean update build" . "rush clean && rush update && rush build")
+                                       ;; ;; Rush
+                                       ;; ("rush build" . "rush build --verbose")
+                                       ;; ("rush rebuild" . "rush rebuild --verbose")
+                                       ;; ("rush install" . "rush install --verbose")
+                                       ;; ("rush update" . "rush update")
+                                       ;; ("rush test" . "rush test --verbose")
+                                       ;; ("rush lint" . "rush lint --verbose")
+                                       ;; ("rush check" . "rush check")
+                                       ;; ("rush scan" . "rush scan")
+                                       ;; ("rush clean" . "rush clean")
+                                       ;; ("rush clean update build" . "rush clean && rush update && rush build")
+
+                                       ;; Turbo
+                                       ("turbo build" . "turbo build --filter='*'")
+                                       ("turbo update" . "turbo update")
 
                                        ;; Git
                                        ("git commit all" . "git commit -a")

@@ -203,3 +203,5 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Turnoff zsh profiler
 # zprof
+
+TURBO_TOKEN=a578a79b-359d-401e-bdb9-fa5bd3b97b4a
