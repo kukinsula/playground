@@ -139,11 +139,6 @@ BASE16_SHELL="$HOME/.config/base16-shell/"
 #     fi
 # }
 
-# Rush auto completion
-# autoload -U +X compinit && compinit
-# autoload -U +X bashcompinit && bashcompinit
-# source ~/.rush_auto_completion
-
 # bun completions
 # [ -s "/home/kuk/.bun/_bun" ] && source "/home/kuk/.bun/_bun"
 
@@ -201,7 +196,15 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 #     compctl -K _npm_completion npm
 # fi
 
+source <(gopass completion zsh | head -n -1 | tail -n +2)
+compdef _gopass gopass
+
 # Turnoff zsh profiler
 # zprof
 
 TURBO_TOKEN=a578a79b-359d-401e-bdb9-fa5bd3b97b4a
+
+export GPG_TTY=$(tty)
+
+# ChatGPT
+OPENAI_API_KEY=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

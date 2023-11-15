@@ -32,12 +32,13 @@ sudo pacman -S \
   chromium \
   emacs \
   terminator \
-  tlp \
-  tlp-rdw \
+  # tlp \
+  # tlp-rdw \
   zsh \
   tree \
   jq \
   gparted \
+  ntfsprogs \
   go \
   nodejs \
   ack \
@@ -49,14 +50,13 @@ sudo pacman -S \
   android-tools \
   evince \
   filezilla \
-  gparted \
   httpie \
   redshift \
   source-highlight \
   time \
   libreoffice-fresh \
   libreoffice-fresh-fr \
-  python-pip \
+  # python-pip \
   net-tools \
   dia \
   transmission-gtk \
@@ -129,7 +129,9 @@ sudo pacman -S \
   hblock \
   gource \
   texlive-most \
-  mgba-qt
+  mgba-qt \
+  gopass \
+  android-tools
 
 # Edit /etc/default/grub and set these
 # GRUB_DISABLE_SUBMENU=y
@@ -197,8 +199,8 @@ paru -S \
   gitleaks
 
 # TLP
-sudo systemctl enable tlp.service
-sudo tlp start
+# sudo systemctl enable tlp.service
+# sudo tlp start
 
 # Virtualbox
 sudo modprobe vboxdrv

@@ -21,6 +21,7 @@
 ;; * First run after installation
 ;;   - M-x pdf-tools-install
 ;;   - M-x all-the-icons-install-fonts
+;;   - M-x nerd-icons-install-fonts
 ;;
 ;;; TOTEST:
 ;;
@@ -550,6 +551,7 @@
 (use-package ivy-posframe
   :ensure t
   :diminish
+  :disabled t
   :custom
   (ivy-posframe-height 15)
   (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
@@ -835,6 +837,26 @@
 ;;                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; (use-package chatgpt
+;;   :ensure t
+;;   :defer t
+;;   :straight (:host github :repo "joshcho/ChatGPT.el" :files ("dist" "*.el"))
+;;   :bind ("C-c q" . chatgpt-query)
+
+;;   :custom
+;;   (chatgpt-code-query-map
+;;    '(
+;;      ;; ChatGPT.el defaults, string for each shortcut
+;;      ("bug" . "There is a bug in the following, please help me fix it.")
+;;      ("doc" . "Please write the documentation for the following.")
+;;      ("improve" . "Please improve the following.")
+;;      ("understand" . "What is the following?")
+;;      ("refactor" . "Please refactor the following.")
+;;      ("suggest" . "Please make suggestions for the following.")
+;;      ;; your shortcut
+;;      ("prompt-name" . "My custom prompt.")))
+;;   )
+
 (use-package tree-sitter
   :ensure t
   :config
@@ -1006,6 +1028,9 @@ It is assumed that the author has only one or two names."
                    :height 0.8
                    :italic t))))
 
+;; (use-package git-timemachine
+;;   :ensure t)
+
 ;; Company-mode
 (use-package company
   :ensure t
@@ -1025,17 +1050,18 @@ It is assumed that the author has only one or two names."
   (company-dabbrev-code-ignore-case t)
   (company-eclim-auto-save nil)
   :config
-  ;; Trigger auto completion on tab or indent based on context
+  ;; ;; Trigger auto completion on tab or indent based on context
   (define-key company-mode-map (kbd "TAB") 'company-indent-or-complete-common)
   (define-key company-mode-map (kbd "<tab>") 'company-indent-or-complete-common)
 
   ;; Cycle through completions on hitting tab. No need to use arrows
-  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+  ;; (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  ;; (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
 
   ;; Select previous completion on shift + tab
-  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
-  (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+  ;; (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+  ;; (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
+
   (global-company-mode t)
   :custom-face
   (company-tooltip ((t (:inherit tooltip :background nil :family "Source Code Pro"))))
@@ -1336,22 +1362,11 @@ It is assumed that the author has only one or two names."
                                              ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                              ("npm run clean" . "npm run clean")
 
-                                             ;; ;; Rush
-                                             ;; ("rush build" . "rush build --verbose")
-                                             ;; ("rush rebuild" . "rush rebuild --verbose")
-                                             ;; ("rush install" . "rush install")
-                                             ;; ("rush update" . "rush update")
-                                             ;; ("rush purge" . "rush purge")
-                                             ;; ("rush test" . "rush test --verbose")
-                                             ;; ("rush lint" . "rush lint --verbose")
-                                             ;; ("rush check" . "rush check")
-                                             ;; ("rush scan" . "rush scan")
-                                             ;; ("rush clean" . "rush clean")
-                                             ;; ("rush clean update build" . "rush clean && rush update && rush build")
-
                                              ;; Turbo
                                              ("turbo build" . "turbo build --filter='*'")
-                                             ("turbo update" . "turbo update")
+                                             ("turbo update" . "turbo update --filter='*'")
+                                             ("turbo purge clean update build" . "turbo purge --filter='*' && turbo clean --filter='*' && turbo update --filter='*' && turbo build --force --filter='*'")
+                                             ("turbo lint --force" . "turbo lint --force --filter='*'")
 
                                              ;; Git
                                              ("git pre-commit" . "git commit")
@@ -1368,22 +1383,11 @@ It is assumed that the author has only one or two names."
                                        ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                        ("npm run clean" . "npm run clean")
 
-                                       ;; ;; Rush
-                                       ;; ("rush build" . "rush build --verbose")
-                                       ;; ("rush rebuild" . "rush rebuild --verbose")
-                                       ;; ("rush install" . "rush install --verbose")
-                                       ;; ("rush update" . "rush update")
-                                       ;; ("rush-update --full" . "rush update --full")
-                                       ;; ("rush test" . "rush test --verbose")
-                                       ;; ("rush lint" . "rush lint --verbose")
-                                       ;; ("rush check" . "rush check")
-                                       ;; ("rush scan" . "rush scan")
-                                       ;; ("rush clean" . "rush clean")
-                                       ;; ("rush clean update build" . "rush clean && rush update && rush build")
-
                                        ;; Turbo
                                        ("turbo build" . "turbo build --filter='*'")
-                                       ("turbo update" . "turbo update")
+                                       ("turbo update" . "turbo update --filter='*'")
+                                       ("turbo purge clean update build" . "turbo purge --filter='*' && turbo clean --filter='*' && turbo update --filter='*' && turbo build --force --filter='*'")
+                                       ("turbo lint --force" . "turbo lint --force --filter='*'")
 
                                        ;; Git
                                        ("git pre-commit" . "git commit")
@@ -1400,21 +1404,11 @@ It is assumed that the author has only one or two names."
                                        ("npm run test:api" . "npm run test:cmd -- --config ./config/test.yml")
                                        ("npm run clean" . "npm run clean")
 
-                                       ;; ;; Rush
-                                       ;; ("rush build" . "rush build --verbose")
-                                       ;; ("rush rebuild" . "rush rebuild --verbose")
-                                       ;; ("rush install" . "rush install --verbose")
-                                       ;; ("rush update" . "rush update")
-                                       ;; ("rush test" . "rush test --verbose")
-                                       ;; ("rush lint" . "rush lint --verbose")
-                                       ;; ("rush check" . "rush check")
-                                       ;; ("rush scan" . "rush scan")
-                                       ;; ("rush clean" . "rush clean")
-                                       ;; ("rush clean update build" . "rush clean && rush update && rush build")
-
                                        ;; Turbo
                                        ("turbo build" . "turbo build --filter='*'")
-                                       ("turbo update" . "turbo update")
+                                       ("turbo update" . "turbo update --filter='*'")
+                                       ("turbo purge clean update build" . "turbo purge --filter='*' && turbo clean --filter='*' && turbo update --filter='*' && turbo build --force --filter='*'")
+                                       ("turbo lint --force" . "turbo lint --force --filter='*'")
 
                                        ;; Git
                                        ("git commit all" . "git commit -a")
@@ -1477,14 +1471,14 @@ It is assumed that the author has only one or two names."
                             (setq prettify-symbols-alist '(("lambda" . ?λ)
                                                            (">=" . ?≥)
                                                            ("<=" . ?≤)
-                                                           ("=>" . ?🡆)
+                                                           ("=>" . ?➔)
                                                            ("===" . ?≡)
                                                            ("!==" . ?≢)
                                                            ("&&" . ?∧)
                                                            ("&" . ?＆)
                                                            ("||" . ?∨)
-                                                           ("/" . ?÷)
-                                                           ("*" . ?⛌)
+                                                           ;; ("/" . ?÷)
+                                                           ;; ("*" . ?⛌)
                                                            ("+=" . ?⩲)
                                                            ("??" . ?⁇)
                                                            ("°C" ? ?℃)
@@ -1588,7 +1582,8 @@ It is assumed that the author has only one or two names."
                          :insertSpaceAfterTypeAssertion nil))
   :hook ((typescript-mode . setup-tide)
          (typescript-mode . prettier-mode)
-         (before-save . prettier-prettify))
+         (before-save . prettier-prettify)
+         )
   :bind (("C-c C-t r s" . tide-rename-symbol)
          ("C-c C-t r f" . tide-rename-file)
          ("C-c C-t f r" . tide-references)
@@ -1609,6 +1604,7 @@ It is assumed that the author has only one or two names."
   :diminish)
 
 ;; ESLint errors regexp in compilation buffer
+;; git clone git@github.com:Fuco1/compile-eslint.git ~/.emacs.d/elpa
 (use-package compile-eslint
   :load-path "elpa/compile-eslint"
 
@@ -2038,3 +2034,4 @@ It is assumed that the author has only one or two names."
 
 (provide 'emacs)
 ;;; emacs ends here
+(put 'scroll-left 'disabled nil)

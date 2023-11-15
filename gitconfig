@@ -3,7 +3,7 @@
 [user]
   name = TEXIER-ATGER Lucas
   email = lucas.texier-atger@dametis.com
-	signingkey = 28C12FAAEE89EA22
+	signingkey = 7F4BB29509A342862912C02028C12FAAEE89EA22
 
 [color]
   ui = auto
@@ -30,4 +30,6 @@
   stats = shortlog --summary --numbered --email
 
 [commit]
-  gpgsign = true
+	gpgsign = true
+[gpg]
+	program = gpg2

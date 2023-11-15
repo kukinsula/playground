@@ -1,5 +1,5 @@
 [global_config]
-  handle_size = 4
+  handle_size = 2
   tab_position = hidden
   enabled_plugins = CustomCommandsMenu, LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, EditorPlugin
   suppress_multiple_term_dialog = True
